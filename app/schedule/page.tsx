@@ -43,8 +43,7 @@ const Schedule = () => {
     <div className="flex min-h-screen">
       <Sidebar />
       <div className="p-6 bg-gray-100 flex-1">
-        {/* Header */}
-        <div className="flex justify-between items-center bg-gray-800 text-white p-4 rounded-md mb-6">
+        <div className="flex justify-between items-center bg-gray-800 text-white p-2 rounded-md mb-6">
           <button
             onClick={() => router.push("/dashboard")}
             className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-800 shadow-md hover:bg-gray-200"
@@ -56,7 +55,6 @@ const Schedule = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Schedule Section */}
           <Card className="md:col-span-2">
             <CardHeader>
               <CardTitle className="text-gray-900">My Schedule ({formattedHeaderDate})</CardTitle>
@@ -81,8 +79,6 @@ const Schedule = () => {
               )}
             </CardContent>
           </Card>
-
-          {/* Calendar Section */}
           <Card>
             <CardHeader>
               <CardTitle className="text-gray-900">Calendar</CardTitle>
@@ -112,8 +108,6 @@ const Schedule = () => {
                         <ChevronRight className="w-5 h-5" />
                       </Button>
                     </div>
-
-                    {/* Render Tanggal */}
                     <div className="grid grid-cols-7 gap-1 text-center text-gray-700">
                       {daysInMonth.map((date, i) => {
                         const isSelected = formatDate(selectedDate) === formatDate(date);

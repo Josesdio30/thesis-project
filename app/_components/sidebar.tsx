@@ -4,7 +4,7 @@ import { JSX, useState } from "react";
 import { useRouter } from "next/navigation";
 import { 
   FaTachometerAlt, FaCalendarAlt, FaBook, 
-  FaClipboardCheck, FaChartBar, FaComments 
+  FaClipboardCheck, FaChartBar, FaComments, FaUniversity
 } from "react-icons/fa";
 
 const Sidebar = () => {
@@ -35,6 +35,7 @@ const Sidebar = () => {
         <SidebarItem icon={<FaClipboardCheck />} text="Exam" isOpen={isOpen} path="/exam" router={router} />
         <SidebarItem icon={<FaChartBar />} text="Score" isOpen={isOpen} path="/score" router={router} />
         <SidebarItem icon={<FaComments />} text="Forum" isOpen={isOpen} path="/forum" router={router} />
+        <SidebarItem icon={<FaUniversity />} text="Course" isOpen={isOpen} path="/course" router={router} />
       </nav>
     </div>
   );

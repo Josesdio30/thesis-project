@@ -28,8 +28,7 @@ export default function Home() {
     <div className="flex min-h-screen bg-gray-100">
       <Sidebar />
       <div className="flex-1 p-6">
-        {/* Dashboard Header */}
-        <div className="bg-gray-800 text-white p-4 rounded-md mb-6">
+        <div className="bg-gray-800 text-white p-2 rounded-md mb-6">
           <h1 className="text-2xl font-bold">Dashboard</h1>
         </div>
 
@@ -48,7 +47,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Upcoming Class */}
           <div className="bg-white p-4 rounded-md shadow">
             <h2 className="text-xl font-semibold mb-4 text-gray-600">Upcoming Class</h2>
             <div className="p-4 border rounded-md shadow-sm">

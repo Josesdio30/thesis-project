@@ -1,6 +1,6 @@
-'use client'
+'use client';
 
-import router from "next/router";
+import Link from "next/link";
 import Sidebar from "../_components/sidebar";
 
 const Course = () => {
@@ -16,27 +16,28 @@ const Course = () => {
   return (
     <div className="flex h-screen">
       <Sidebar />
-      
       <div className="flex-1 bg-gray-100 p-8">
         <div className="flex justify-between items-center bg-gray-800 text-white p-2 rounded-md mb-6">
-          <button
-            onClick={() => router.push("/dashboard")}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-800 shadow-md hover:bg-gray-200"
-          >
+          <Link href="/dashboard" className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-800 shadow-md hover:bg-gray-200">
             ⬅
-          </button>
-          <h1 className="text-xl font-bold">Course </h1>
+          </Link>
+          <h1 className="text-xl font-bold">Course</h1>
           <div></div>
         </div>
-
-        
         <div className="p-6 grid grid-cols-3 gap-6">
           {courses.map((course, index) => (
-            <div key={index} className="bg-gray-200 p-4 rounded-lg shadow-md border">
+            <Link
+              key={index}
+              href={{
+                pathname: `/course/${course.code}`,
+                query: { code: course.code },
+              }}
+              className="bg-gray-200 p-4 rounded-lg shadow-md border hover:bg-gray-300 transition-colors text-left block"
+            >
               <h2 className="font-semibold">{course.name}</h2>
               <p className="text-sm text-gray-700">Kode: {course.code}</p>
               <p className="text-sm text-gray-700">Kelas: {course.class}</p>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

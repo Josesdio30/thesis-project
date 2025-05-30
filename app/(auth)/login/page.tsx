@@ -8,7 +8,7 @@ export default function LoginPage() {
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
         <div className="flex justify-center mb-6">
           <Image
-            src="/logo-sma-st-louis.png"
+            src="/st_louis-2.png"
             alt="SMA St. Louis Surabaya Logo"
             width={150}
             height={150}
@@ -32,7 +32,7 @@ export default function LoginPage() {
           </div>
           <Button
             type="submit"
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-white rounded-full"
+            className="w-full bg-orange-400 hover:bg-orange-600 text-white rounded-full"
           >
             Login
           </Button>

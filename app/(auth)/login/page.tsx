@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { Input } from "@headlessui/react";
+import { Input } from "@/components/ui/input"
 
 export default function LoginPage() {
   return (

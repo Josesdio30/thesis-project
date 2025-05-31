@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model admin_details {
+  id           Int       @id @default(autoincrement())
+  user_id      Int       @unique
+  kode_admin   String    @unique
+  nip          String?
+  created_date DateTime  @default(now())
+  created_by   Int?
+  updated_date DateTime?
+  updated_by   Int?
+  app_user     app_user  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model app_user {
+  id                  Int              @id @default(autoincrement())
+  email               String           @unique
+  password            String
+  user_name           String           @unique
+  nama_lengkap        String
+  last_login          DateTime?
+  profile_picture_url String?
+  is_active           Boolean          @default(true)
+  is_deleted          Boolean          @default(false)
+  deleted_at          DateTime?
+  deleted_by          Int?
+  created_date        DateTime         @default(now())
+  created_by          Int?
+  updated_date        DateTime?
+  updated_by          Int?
+  admin_details       admin_details?
+  app_user_role       app_user_role[]
+  student_details     student_details?
+  teacher_details     teacher_details?
+  user_profile        user_profile?
+}
+
+model app_user_role {
+  id           Int         @id @default(autoincrement())
+  role_id      Int
+  user_id      Int
+  is_active    Boolean     @default(true)
+  created_date DateTime    @default(now())
+  created_by   Int?
+  updated_date DateTime?
+  updated_by   Int?
+  enumeration  enumeration @relation(fields: [role_id], references: [id])
+  app_user     app_user    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model enumeration {
+  id            Int             @id @default(autoincrement())
+  name          String
+  alt_name      String?
+  is_active     Boolean         @default(true)
+  is_default    Boolean         @default(false)
+  category      String
+  created_by    Int?
+  app_user_role app_user_role[]
+
+  @@unique([name, category])
+}
+
+model student_details {
+  id             Int       @id @default(autoincrement())
+  user_id        Int       @unique
+  nis            String    @unique
+  nisn           String?
+  parent_contact String?
+  created_date   DateTime  @default(now())
+  created_by     Int?
+  updated_date   DateTime?
+  updated_by     Int?
+  app_user       app_user  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model teacher_details {
+  id           Int       @id @default(autoincrement())
+  user_id      Int       @unique
+  kode_guru    String    @unique
+  niy          String?
+  created_date DateTime  @default(now())
+  created_by   Int?
+  updated_date DateTime?
+  updated_by   Int?
+  app_user     app_user  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model user_profile {
+  id           Int       @id @default(autoincrement())
+  user_id      Int       @unique
+  tmp_lahir    String?
+  tgl_lahir    DateTime?
+  gender       String?
+  telepon      String?
+  alamat       String?
+  agama        String?
+  created_date DateTime  @default(now())
+  created_by   Int?
+  updated_date DateTime?
+  updated_by   Int?
+  app_user     app_user  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}

@@ -5,7 +5,7 @@ export interface DatabaseTransaction {
   query: (text: string, params?: any[]) => Promise<any>;
   commit: () => Promise<void>;
   rollback: () => Promise<void>;
-  release: () => void;
+  // release: () => void;
 }
 
 /**
@@ -36,7 +36,7 @@ export async function withTransaction<T>(
       query: (text: string, params?: any[]) => client.query(text, params),
       commit: async () => { await client.query('COMMIT'); },
       rollback: async () => { await client.query('ROLLBACK'); },
-      release: () => client.release()
+      // release: () => client.release()
     };
     
     const result = await callback(transaction);

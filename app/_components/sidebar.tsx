@@ -6,6 +6,17 @@ import {
   FaTachometerAlt, FaCalendarAlt, FaBook, 
   FaClipboardCheck, FaChartBar, FaComments, FaUniversity
 } from "react-icons/fa";
+import { NAVIGATION_ITEMS } from "@/lib/constants";
+
+const iconMap = {
+  FaTachometerAlt: FaTachometerAlt,
+  FaCalendarAlt: FaCalendarAlt,
+  FaBook: FaBook,
+  FaClipboardCheck: FaClipboardCheck,
+  FaChartBar: FaChartBar,
+  FaComments: FaComments,
+  FaUniversity: FaUniversity,
+};
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -26,16 +37,20 @@ const Sidebar = () => {
           }`}
         ></div>
         {isOpen && <h2 className="mt-2 text-sm font-semibold">Nama Siswa</h2>}
-      </div>
-
-      <nav className="w-full space-y-4">
-        <SidebarItem icon={<FaTachometerAlt />} text="Dashboard" isOpen={isOpen} path="/dashboard" router={router} />
-        <SidebarItem icon={<FaCalendarAlt />} text="Schedule" isOpen={isOpen} path="/schedule" router={router} />
-        <SidebarItem icon={<FaBook />} text="Assignment" isOpen={isOpen} path="/assignment" router={router} />
-        <SidebarItem icon={<FaClipboardCheck />} text="Exam" isOpen={isOpen} path="/exam" router={router} />
-        <SidebarItem icon={<FaChartBar />} text="Score" isOpen={isOpen} path="/score" router={router} />
-        <SidebarItem icon={<FaComments />} text="Forum" isOpen={isOpen} path="/forum" router={router} />
-        <SidebarItem icon={<FaUniversity />} text="Course" isOpen={isOpen} path="/course" router={router} />
+      </div>      <nav className="w-full space-y-4">
+        {NAVIGATION_ITEMS.map((item) => {
+          const IconComponent = iconMap[item.icon as keyof typeof iconMap];
+          return (
+            <SidebarItem 
+              key={item.path}
+              icon={<IconComponent />} 
+              text={item.text} 
+              isOpen={isOpen} 
+              path={item.path} 
+              router={router} 
+            />
+          );
+        })}
       </nav>
     </div>
   );

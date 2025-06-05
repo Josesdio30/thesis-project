@@ -11,9 +11,7 @@ export interface DatabaseTransaction {
 /**
  * Execute a database query with automatic connection management
  */
-export async function withDatabase<T>(
-  callback: (client: PoolClient) => Promise<T>
-): Promise<T> {
+export async function withDatabase<T>(callback: (client: PoolClient) => Promise<T>): Promise<T> {
   const client = await pool.connect();
   try {
     return await callback(client);
@@ -25,20 +23,22 @@ export async function withDatabase<T>(
 /**
  * Execute queries within a transaction
  */
-export async function withTransaction<T>(
-  callback: (transaction: DatabaseTransaction) => Promise<T>
-): Promise<T> {
+export async function withTransaction<T>(callback: (transaction: DatabaseTransaction) => Promise<T>): Promise<T> {
   const client = await pool.connect();
-  
+
   try {
     await client.query('BEGIN');
-      const transaction: DatabaseTransaction = {
+    const transaction: DatabaseTransaction = {
       query: (text: string, params?: any[]) => client.query(text, params),
-      commit: async () => { await client.query('COMMIT'); },
-      rollback: async () => { await client.query('ROLLBACK'); },
+      commit: async () => {
+        await client.query('COMMIT');
+      },
+      rollback: async () => {
+        await client.query('ROLLBACK');
+      },
       // release: () => client.release()
     };
-    
+
     const result = await callback(transaction);
     await transaction.commit();
     return result;
@@ -63,7 +63,7 @@ export async function checkDatabaseHealth(): Promise<{
       const res = await client.query('SELECT NOW() as current_time, version() as pg_version');
       return res.rows[0];
     });
-    
+
     return {
       connected: true,
       timestamp: result.current_time,

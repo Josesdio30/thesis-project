@@ -51,64 +51,76 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
               profile_picture_url: enrollment.app_user?.profile_picture_url
             })) || [],
           sessions:
-            cc.sessions?.map((session) => ({
-              id: session.id,
-              title: session.title,
-              description: session.description,
-              session_number: session.session_number,
-              start_time: session.start_time,
-              end_time: session.end_time,
-              is_completed: session.is_completed,
-              completed_at: session.completed_at,
-              materials:
-                session.materials?.map((material) => ({
-                  id: material.id,
-                  title: material.title,
-                  content: material.content,
-                  material_order: material.material_order,
-                  created_at: material.created_at
-                })) || [],
-              resources:
-                session.resources?.map((resource) => ({
-                  id: resource.id,
-                  file_name: resource.file_name,
-                  file_url: resource.file_url,
-                  file_size: resource.file_size,
-                  file_type: resource.file_type,
-                  content_type: resource.content_type,
-                  is_public: resource.is_public,
-                  download_count: resource.download_count,
-                  uploader: resource.app_user?.nama_lengkap
-                })) || [],
-              forum: session.forums
-                ? {
-                    id: session.forums.id,
-                    title: session.forums.title,
-                    description: session.forums.description,
-                    created_at: session.forums.created_at,
-                    creator: session.forums.app_user?.nama_lengkap,
-                    posts:
-                      session.forums.forum_posts?.map((post) => ({
-                        id: post.id,
-                        title: post.title,
-                        content: post.content,
-                        content_type: post.content_type,
-                        created_at: post.created_at,
-                        updated_at: post.updated_at,
-                        author: post.app_user?.nama_lengkap,
-                        reply_count: post.forum_replies?.length || 0,
-                        is_deleted: post.is_deleted
-                      })) || []
-                  }
-                : null,
-              attendance_summary: {
-                total_students: cc.enrollments?.length || 0,
-                present: session.attendance?.filter((a) => a.status === 'present').length || 0,
-                absent: session.attendance?.filter((a) => a.status === 'absent').length || 0,
-                late: session.attendance?.filter((a) => a.status === 'late').length || 0,
-                excused: session.attendance?.filter((a) => a.status === 'excused').length || 0
-              }
-            })) || [],
+            // Sort sessions by session_number, with start_time as tiebreaker
+            cc.sessions
+              ?.map((session) => ({
+                id: session.id,
+                title: session.title,
+                description: session.description,
+                session_number: session.session_number,
+                start_time: session.start_time,
+                end_time: session.end_time,
+                is_completed: session.is_completed,
+                completed_at: session.completed_at,
+                materials:
+                  session.materials?.map((material) => ({
+                    id: material.id,
+                    title: material.title,
+                    content: material.content,
+                    material_order: material.material_order,
+                    created_at: material.created_at
+                  })) || [],
+                resources:
+                  session.resources?.map((resource) => ({
+                    id: resource.id,
+                    file_name: resource.file_name,
+                    file_url: resource.file_url,
+                    file_size: resource.file_size,
+                    file_type: resource.file_type,
+                    content_type: resource.content_type,
+                    is_public: resource.is_public,
+                    download_count: resource.download_count,
+                    uploader: resource.app_user?.nama_lengkap
+                  })) || [],
+                forum: session.forums
+                  ? {
+                      id: session.forums.id,
+                      title: session.forums.title,
+                      description: session.forums.description,
+                      created_at: session.forums.created_at,
+                      creator: session.forums.app_user?.nama_lengkap,
+                      posts:
+                        session.forums.forum_posts?.map((post) => ({
+                          id: post.id,
+                          title: post.title,
+                          content: post.content,
+                          content_type: post.content_type,
+                          created_at: post.created_at,
+                          updated_at: post.updated_at,
+                          author: post.app_user?.nama_lengkap,
+                          reply_count: post.forum_replies?.length || 0,
+                          is_deleted: post.is_deleted
+                        })) || []
+                    }
+                  : null,
+                attendance_summary: {
+                  total_students: cc.enrollments?.length || 0,
+                  present: session.attendance?.filter((a) => a.status === 'present').length || 0,
+                  absent: session.attendance?.filter((a) => a.status === 'absent').length || 0,
+                  late: session.attendance?.filter((a) => a.status === 'late').length || 0,
+                  excused: session.attendance?.filter((a) => a.status === 'excused').length || 0
+                }
+              }))
+              // Sort sessions here
+              .sort((a, b) => {
+                // Sort by session_number first
+                const sessionNumberDiff = a.session_number - b.session_number;
+                if (sessionNumberDiff !== 0) {
+                  return sessionNumberDiff;
+                }
+                // If session_number is the same, sort by start_time
+                return new Date(a.start_time).getTime() - new Date(b.start_time).getTime();
+              }) || [],
           start_date: cc.start_date,
           end_date: cc.end_date,
           is_active: cc.is_active,

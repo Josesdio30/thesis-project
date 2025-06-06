@@ -2,16 +2,26 @@
 
 import Link from "next/link";
 import Sidebar from "../_components/sidebar";
+import { useEffect, useState } from "react";
 
 const Course = () => {
-  const courses = [
-    { name: "Bahasa Inggris Lanjut (A) (Peminatan)", code: "BI0092", class: "XI - 1" },
-    { name: "Matematika Wajib", code: "MT0011", class: "XI - 2" },
-    { name: "Fisika Lanjut", code: "FS0045", class: "XI - 3" },
-    { name: "Kimia Dasar", code: "KM0032", class: "XI - 4" },
-    { name: "Sejarah Indonesia", code: "SJ0021", class: "XI - 5" },
-    { name: "Ekonomi", code: "EK0050", class: "XI - 6" },
-  ];
+  const [courses, setCourses] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        const res = await fetch("/api/courses");
+        const data = await res.json();
+        setCourses(data.data || []);
+      } catch (err) {
+        setCourses([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchCourses();
+  }, []);
 
   return (
     <div className="flex h-screen">
@@ -25,20 +35,26 @@ const Course = () => {
           <div></div>
         </div>
         <div className="p-6 grid grid-cols-3 gap-6">
-          {courses.map((course, index) => (
-            <Link
-              key={index}
-              href={{
-                pathname: `/course/${course.code}`,
-                query: { code: course.code },
-              }}
-              className="bg-gray-200 p-4 rounded-lg shadow-md border hover:bg-gray-300 transition-colors text-left block"
-            >
-              <h2 className="font-semibold">{course.name}</h2>
-              <p className="text-sm text-gray-700">Kode: {course.code}</p>
-              <p className="text-sm text-gray-700">Kelas: {course.class}</p>
-            </Link>
-          ))}
+          {loading ? (
+            <p>Loading...</p>
+          ) : courses.length === 0 ? (
+            <p>Tidak ada course.</p>
+          ) : (
+            courses.map((course, index) => (
+              <Link
+                key={course.id || index}
+                href={{
+                  pathname: `/course/${course.course_code}`,
+                  query: { code: course.course_code },
+                }}
+                className="bg-gray-200 p-4 rounded-lg shadow-md border hover:bg-gray-300 transition-colors text-left block"
+              >
+                <h2 className="font-semibold">{course.course_name}</h2>
+                <p className="text-sm text-gray-700">Kode: {course.course_code}</p>
+                <p className="text-sm text-gray-700">{course.description}</p>
+              </Link>
+            ))
+          )}
         </div>
       </div>
     </div>

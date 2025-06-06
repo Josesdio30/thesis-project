@@ -1,10 +1,9 @@
-'use client'
+'use client';
 
-import { useEffect } from "react";
-import { JSX, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { 
-  FaTachometerAlt, FaCalendarAlt, FaBook, 
+import {
+  FaTachometerAlt, FaCalendarAlt, FaBook,
   FaClipboardCheck, FaChartBar, FaComments, FaUniversity,
   FaSignOutAlt
 } from "react-icons/fa";
@@ -20,77 +19,112 @@ const iconMap = {
   FaUniversity: FaUniversity,
 };
 
-const Sidebar = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface SidebarProps {
+  isMobileOpen: boolean;
+  setIsMobileOpen: (val: boolean) => void;
+}
+
+const Sidebar = ({ isMobileOpen, setIsMobileOpen }: SidebarProps) => {
   const [userName, setUserName] = useState<string | null>(null);
   const router = useRouter();
+
   useEffect(() => {
     const storedName = localStorage.getItem("userName");
-    if (storedName) {
-      setUserName(storedName);
-    }
+    if (storedName) setUserName(storedName);
   }, []);
+
   const handleLogout = () => {
-    localStorage.removeItem("userName"); // clear stored name on logout
+    localStorage.removeItem("userName");
     router.push("/login");
   };
 
-  return (
-    <div
-      className={`h-screen bg-gray-800 text-white p-4 flex flex-col items-center justify-between transition-all duration-300 ${
-        isOpen ? "w-64" : "w-16"
-      }`}
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
-    >
-      <div className="flex flex-col items-center w-full">
+  // Sidebar Item Renderer
+  const renderSidebarContent = () => (
+    <div className="h-full flex flex-col justify-between">
+      <div className="flex flex-col items-center">
         <div className="flex flex-col items-center mb-6">
-          <div
-            className={`rounded-full bg-gray-600 transition-all duration-300 ${
-              isOpen ? "w-16 h-16" : "w-10 h-10"
-            }`}
-          ></div>
-          {isOpen && <h2 className="mt-2 text-sm font-semibold">{userName || "Nama Siswa"}</h2>}
+          <div className="rounded-full bg-gray-600 w-16 h-16"></div>
+          <h2 className="mt-2 text-sm font-semibold">{userName || "Nama Siswa"}</h2>
         </div>
         <nav className="w-full space-y-4">
           {NAVIGATION_ITEMS.map((item) => {
             const IconComponent = iconMap[item.icon as keyof typeof iconMap];
             return (
-              <SidebarItem 
+              <SidebarItem
                 key={item.path}
-                icon={<IconComponent />} 
-                text={item.text} 
-                isOpen={isOpen} 
-                path={item.path} 
-                router={router} 
+                icon={<IconComponent />}
+                text={item.text}
+                path={item.path}
+                router={router}
+                onClick={() => setIsMobileOpen(false)}
               />
             );
           })}
         </nav>
       </div>
-
       <div className="w-full">
-        <SidebarItem 
-          icon={<FaSignOutAlt />} 
-          text="Logout" 
-          isOpen={isOpen} 
-          path="/login" 
-          router={router} 
-          onClick={handleLogout}
+        <SidebarItem
+          icon={<FaSignOutAlt />}
+          text="Logout"
+          path="/login"
+          router={router}
+          onClick={() => {
+            handleLogout();
+            setIsMobileOpen(false);
+          }}
         />
       </div>
     </div>
   );
+
+  return (
+    <>
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex h-screen bg-gray-800 text-white w-64 p-4">
+        {renderSidebarContent()}
+      </div>
+
+      {/* Mobile Sidebar Drawer */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black bg-opacity-50 md:hidden"
+          onClick={() => setIsMobileOpen(false)}
+        >
+          <div
+            className="bg-gray-800 text-white w-64 h-full p-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {renderSidebarContent()}
+          </div>
+        </div>
+      )}
+    </>
+  );
 };
 
-const SidebarItem = ({ icon, text, isOpen, path, router, onClick }: { icon: JSX.Element; text: string; isOpen: boolean; path: string; router: any; onClick?: () => void }) => {
+const SidebarItem = ({
+  icon,
+  text,
+  path,
+  router,
+  onClick,
+}: {
+  icon: JSX.Element;
+  text: string;
+  path: string;
+  router: any;
+  onClick?: () => void;
+}) => {
   return (
-    <div 
+    <div
       className="flex items-center gap-3 p-2 rounded-md hover:bg-gray-700 cursor-pointer w-full"
-      onClick={() => onClick ? onClick() : router.push(path)}
+      onClick={() => {
+        if (onClick) onClick();
+        router.push(path);
+      }}
     >
       <span className="text-xl">{icon}</span>
-      {isOpen && <span className="text-sm">{text}</span>}
+      <span className="text-sm">{text}</span>
     </div>
   );
 };

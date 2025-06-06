@@ -9,6 +9,7 @@ import { format, addMonths, subMonths, startOfMonth, endOfMonth, eachDayOfInterv
 import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import Sidebar from "../_components/sidebar";
 import { useRouter } from "next/navigation";
+import Topbar from "../_components/topbar";
 
 const dummySchedule: Record<string, { subject: string; teacher: string; time: string }[]> = {
   "2025-02-01": [
@@ -41,9 +42,14 @@ const Schedule = () => {
 
   return (
     <div className="flex min-h-screen">
-      <Sidebar />
+      <Sidebar isMobileOpen={false} setIsMobileOpen={function (val: boolean): void {
+        throw new Error("Function not implemented.");
+      } } />
       <div className="p-6 bg-gray-100 flex-1">
-        <div className="flex justify-between items-center bg-gray-800 text-white p-2 rounded-md mb-6">
+        <Topbar onMenuClick={function (): void {
+          throw new Error("Function not implemented.");
+        } }/>
+        {/* <div className="flex justify-between items-center bg-gray-800 text-white p-2 rounded-md mb-6">
           <button
             onClick={() => router.push("/dashboard")}
             className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-800 shadow-md hover:bg-gray-200"
@@ -52,9 +58,9 @@ const Schedule = () => {
           </button>
           <h1 className="text-2xl font-bold">Schedule</h1>
           <div></div>
-        </div>
+        </div> */}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8">
           <Card className="md:col-span-2">
             <CardHeader>
               <CardTitle className="text-gray-900">My Schedule ({formattedHeaderDate})</CardTitle>

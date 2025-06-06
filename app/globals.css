@@ -120,3 +120,221 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+
+/* TipTap Editor Selection Styles */
+.ProseMirror {
+  outline: none;
+}
+
+.ProseMirror ::selection {
+  background-color: #b3d4fc;
+}
+
+.ProseMirror-selectednode {
+  outline: 2px solid #68cef8;
+  background-color: rgba(104, 206, 248, 0.1);
+  border-radius: 4px;
+}
+
+.ProseMirror-focused .ProseMirror-gapcursor {
+  display: block;
+}
+
+/* Text selection styling */
+.ProseMirror *::selection {
+  background-color: #b3d4fc;
+}
+
+/* Node selection for blocks */
+.ProseMirror p.ProseMirror-selectednode,
+.ProseMirror h1.ProseMirror-selectednode,
+.ProseMirror h2.ProseMirror-selectednode,
+.ProseMirror h3.ProseMirror-selectednode,
+.ProseMirror h4.ProseMirror-selectednode,
+.ProseMirror h5.ProseMirror-selectednode,
+.ProseMirror h6.ProseMirror-selectednode,
+.ProseMirror ul.ProseMirror-selectednode,
+.ProseMirror ol.ProseMirror-selectednode,
+.ProseMirror blockquote.ProseMirror-selectednode {
+  outline: 2px solid #68cef8;
+  background-color: rgba(104, 206, 248, 0.1);
+  border-radius: 4px;
+}
+
+/* Empty paragraph placeholder */
+.ProseMirror p.is-empty::before {
+  color: #adb5bd;
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}
+
+/* Focus styles */
+.ProseMirror:focus {
+  outline: none;
+  border-color: #68cef8;
+  box-shadow: 0 0 0 2px rgba(104, 206, 248, 0.2);
+}
+
+/* TipTap Editor Typography Styles */
+.ProseMirror {
+  outline: none;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.ProseMirror h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 1.5rem 0 1rem 0;
+  color: #111827;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+.ProseMirror h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.75rem 0;
+  color: #1f2937;
+}
+
+.ProseMirror h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem 0;
+  color: #374151;
+}
+
+.ProseMirror p {
+  margin: 0.75rem 0;
+}
+
+.ProseMirror ul,
+.ProseMirror ol {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+}
+
+.ProseMirror ul {
+  list-style-type: disc;
+}
+
+.ProseMirror ol {
+  list-style-type: decimal;
+}
+
+.ProseMirror li {
+  margin: 0.25rem 0;
+  display: list-item;
+}
+
+.ProseMirror ul ul {
+  list-style-type: circle;
+  margin: 0.25rem 0;
+}
+
+.ProseMirror ul ul ul {
+  list-style-type: square;
+}
+
+.ProseMirror ol ol {
+  list-style-type: lower-alpha;
+  margin: 0.25rem 0;
+}
+
+.ProseMirror ol ol ol {
+  list-style-type: lower-roman;
+}
+
+.ProseMirror strong {
+  font-weight: 600;
+  color: #111827;
+}
+
+.ProseMirror em {
+  font-style: italic;
+}
+
+/* Preview Content Styles */
+.preview-content {
+  /* font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; */
+  line-height: 1.6;
+  color: #374151;
+}
+
+.preview-content h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 1.5rem 0 1rem 0;
+  color: #111827;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0.5rem;
+}
+
+.preview-content h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 1.25rem 0 0.75rem 0;
+  color: #1f2937;
+}
+
+.preview-content h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin: 1rem 0 0.5rem 0;
+  color: #374151;
+}
+
+.preview-content p {
+  margin: 0.75rem 0;
+}
+
+.preview-content ul,
+.preview-content ol {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+}
+
+.preview-content ul {
+  list-style-type: disc;
+}
+
+.preview-content ol {
+  list-style-type: decimal;
+}
+
+.preview-content li {
+  margin: 0.25rem 0;
+  display: list-item;
+}
+
+.preview-content ul ul {
+  list-style-type: circle;
+  margin: 0.25rem 0;
+}
+
+.preview-content ul ul ul {
+  list-style-type: square;
+}
+
+.preview-content ol ol {
+  list-style-type: lower-alpha;
+  margin: 0.25rem 0;
+}
+
+.preview-content ol ol ol {
+  list-style-type: lower-roman;
+}
+
+.preview-content strong {
+  font-weight: 600;
+  color: #111827;
+}
+
+.preview-content em {
+  font-style: italic;
+}

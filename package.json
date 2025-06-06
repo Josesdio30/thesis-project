@@ -1,7 +1,8 @@
 {
   "name": "thesis-project",
   "version": "0.1.0",
-  "private": true,  "scripts": {
+  "private": true,
+  "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -15,6 +16,9 @@
     "@headlessui/react": "^2.2.0",
     "@prisma/client": "^6.8.2",
     "@radix-ui/react-slot": "^1.1.2",
+    "@tiptap/pm": "^2.13.0",
+    "@tiptap/react": "^2.13.0",
+    "@tiptap/starter-kit": "^2.13.0",
     "@types/pg": "^8.15.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

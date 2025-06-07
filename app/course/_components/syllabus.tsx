@@ -156,7 +156,7 @@ import { useState } from 'react';
 import { EditorToolbar } from './syllabus-editor';
 
 export const SimpleEditor = () => {
-  const [isPreview, setIsPreview] = useState(false);
+  const [isPreview, setIsPreview] = useState(true);
 
   const editor = useEditor({
     extensions: [StarterKit],

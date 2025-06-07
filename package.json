@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -15,7 +15,7 @@
   "dependencies": {
     "@headlessui/react": "^2.2.0",
     "@prisma/client": "^6.8.2",
-    "@radix-ui/react-slot": "^1.1.2",
+    "@radix-ui/react-slot": "^1.2.3",
     "@tiptap/pm": "^2.13.0",
     "@tiptap/react": "^2.13.0",
     "@tiptap/starter-kit": "^2.13.0",

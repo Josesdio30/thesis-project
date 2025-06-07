@@ -10,14 +10,14 @@ export const userService = {
       include: {
         app_user_role: {
           include: {
-            enumeration: true
-          }
+            enumeration: true,
+          },
         },
         user_profile: true,
         admin_details: true,
         teacher_details: true,
-        student_details: true
-      }
+        student_details: true,
+      },
     });
   },
 
@@ -28,14 +28,14 @@ export const userService = {
       include: {
         app_user_role: {
           include: {
-            enumeration: true
-          }
+            enumeration: true,
+          },
         },
         user_profile: true,
         admin_details: true,
         teacher_details: true,
-        student_details: true
-      }
+        student_details: true,
+      },
     });
   },
 
@@ -46,14 +46,14 @@ export const userService = {
       include: {
         app_user_role: {
           include: {
-            enumeration: true
-          }
+            enumeration: true,
+          },
         },
         user_profile: true,
         admin_details: true,
         teacher_details: true,
-        student_details: true
-      }
+        student_details: true,
+      },
     });
   },
 
@@ -64,11 +64,11 @@ export const userService = {
       include: {
         app_user_role: {
           include: {
-            enumeration: true
-          }
+            enumeration: true,
+          },
         },
-        user_profile: true
-      }
+        user_profile: true,
+      },
     });
   },
 
@@ -80,11 +80,11 @@ export const userService = {
       include: {
         app_user_role: {
           include: {
-            enumeration: true
-          }
+            enumeration: true,
+          },
         },
-        user_profile: true
-      }
+        user_profile: true,
+      },
     });
   },
 
@@ -93,18 +93,18 @@ export const userService = {
     return await prisma.app_user.findMany({
       where: {
         is_active: true,
-        is_deleted: false
+        is_deleted: false,
       },
       include: {
         app_user_role: {
           include: {
-            enumeration: true
-          }
+            enumeration: true,
+          },
         },
-        user_profile: true
-      }
+        user_profile: true,
+      },
     });
-  }
+  },
 };
 
 // Role operations
@@ -114,8 +114,8 @@ export const roleService = {
     return await prisma.enumeration.findMany({
       where: {
         category: 'ROLE',
-        is_active: true
-      }
+        is_active: true,
+      },
     });
   },
 
@@ -125,12 +125,12 @@ export const roleService = {
       data: {
         user_id,
         role_id,
-        created_by
+        created_by,
       },
       include: {
         enumeration: true,
-        app_user: true
-      }
+        app_user: true,
+      },
     });
   },
 
@@ -139,8 +139,8 @@ export const roleService = {
     return await prisma.app_user_role.deleteMany({
       where: {
         user_id,
-        role_id
-      }
+        role_id,
+      },
     });
   },
 
@@ -149,13 +149,13 @@ export const roleService = {
     return await prisma.app_user_role.findMany({
       where: {
         user_id,
-        is_active: true
+        is_active: true,
       },
       include: {
-        enumeration: true
-      }
+        enumeration: true,
+      },
     });
-  }
+  },
 };
 
 // Student operations
@@ -170,12 +170,12 @@ export const studentService = {
             user_profile: true,
             app_user_role: {
               include: {
-                enumeration: true
-              }
-            }
-          }
-        }
-      }
+                enumeration: true,
+              },
+            },
+          },
+        },
+      },
     });
   },
 
@@ -189,12 +189,12 @@ export const studentService = {
             user_profile: true,
             app_user_role: {
               include: {
-                enumeration: true
-              }
-            }
-          }
-        }
-      }
+                enumeration: true,
+              },
+            },
+          },
+        },
+      },
     });
   },
 
@@ -207,14 +207,14 @@ export const studentService = {
             user_profile: true,
             app_user_role: {
               include: {
-                enumeration: true
-              }
-            }
-          }
-        }
-      }
+                enumeration: true,
+              },
+            },
+          },
+        },
+      },
     });
-  }
+  },
 };
 
 // Teacher operations
@@ -229,12 +229,12 @@ export const teacherService = {
             user_profile: true,
             app_user_role: {
               include: {
-                enumeration: true
-              }
-            }
-          }
-        }
-      }
+                enumeration: true,
+              },
+            },
+          },
+        },
+      },
     });
   },
 
@@ -248,12 +248,12 @@ export const teacherService = {
             user_profile: true,
             app_user_role: {
               include: {
-                enumeration: true
-              }
-            }
-          }
-        }
-      }
+                enumeration: true,
+              },
+            },
+          },
+        },
+      },
     });
   },
 
@@ -266,14 +266,14 @@ export const teacherService = {
             user_profile: true,
             app_user_role: {
               include: {
-                enumeration: true
-              }
-            }
-          }
-        }
-      }
+                enumeration: true,
+              },
+            },
+          },
+        },
+      },
     });
-  }
+  },
 };
 
 // Profile operations
@@ -286,9 +286,9 @@ export const profileService = {
       create: {
         ...profileData,
         app_user: {
-          connect: { id: user_id }
-        }
-      }
+          connect: { id: user_id },
+        },
+      },
     });
   },
 
@@ -297,10 +297,10 @@ export const profileService = {
     return await prisma.user_profile.findUnique({
       where: { user_id },
       include: {
-        app_user: true
-      }
+        app_user: true,
+      },
     });
-  }
+  },
 };
 
 // Course operations
@@ -317,26 +317,26 @@ export const courseService = {
                 app_user: {
                   include: {
                     user_profile: true,
-                    teacher_details: true
-                  }
-                }
-              }
+                    teacher_details: true,
+                  },
+                },
+              },
             },
             app_user: {
               include: {
                 user_profile: true,
-                teacher_details: true
-              }
+                teacher_details: true,
+              },
             },
             enrollments: {
               include: {
                 app_user: {
                   include: {
                     user_profile: true,
-                    student_details: true
-                  }
-                }
-              }
+                    student_details: true,
+                  },
+                },
+              },
             },
             sessions: {
               include: {
@@ -348,22 +348,22 @@ export const courseService = {
                       include: {
                         app_user: {
                           include: {
-                            user_profile: true
-                          }
+                            user_profile: true,
+                          },
                         },
-                        forum_replies: true
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+                        forum_replies: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
       orderBy: {
-        course_name: 'asc'
-      }
+        course_name: 'asc',
+      },
     });
   },
 
@@ -380,26 +380,26 @@ export const courseService = {
                 app_user: {
                   include: {
                     user_profile: true,
-                    teacher_details: true
-                  }
-                }
-              }
+                    teacher_details: true,
+                  },
+                },
+              },
             },
             app_user: {
               include: {
                 user_profile: true,
-                teacher_details: true
-              }
+                teacher_details: true,
+              },
             },
             enrollments: {
               include: {
                 app_user: {
                   include: {
                     user_profile: true,
-                    student_details: true
-                  }
-                }
-              }
+                    student_details: true,
+                  },
+                },
+              },
             },
             sessions: {
               include: {
@@ -411,29 +411,29 @@ export const courseService = {
                       include: {
                         app_user: {
                           include: {
-                            user_profile: true
-                          }
+                            user_profile: true,
+                          },
                         },
-                        forum_replies: true
-                      }
-                    }
-                  }
+                        forum_replies: true,
+                      },
+                    },
+                  },
                 },
                 attendance: {
                   include: {
                     app_user_attendance_student_idToapp_user: {
                       include: {
                         user_profile: true,
-                        student_details: true
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                        student_details: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
   },
 
@@ -450,26 +450,26 @@ export const courseService = {
                 app_user: {
                   include: {
                     user_profile: true,
-                    teacher_details: true
-                  }
-                }
-              }
+                    teacher_details: true,
+                  },
+                },
+              },
             },
             app_user: {
               include: {
                 user_profile: true,
-                teacher_details: true
-              }
+                teacher_details: true,
+              },
             },
             enrollments: {
               include: {
                 app_user: {
                   include: {
                     user_profile: true,
-                    student_details: true
-                  }
-                }
-              }
+                    student_details: true,
+                  },
+                },
+              },
             },
             sessions: {
               include: {
@@ -481,19 +481,19 @@ export const courseService = {
                       include: {
                         app_user: {
                           include: {
-                            user_profile: true
-                          }
+                            user_profile: true,
+                          },
                         },
-                        forum_replies: true
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+                        forum_replies: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     });
   },
 
@@ -505,26 +505,32 @@ export const courseService = {
         courses: true,
         classes: {
           include: {
-            academic_years: true
-          }
+            academic_years: true,
+          },
+        },
+        app_user: {
+          include: {
+            user_profile: true,
+            teacher_details: true,
+          },
         },
         enrollments: {
           include: {
             app_user: {
               include: {
                 user_profile: true,
-                student_details: true
-              }
-            }
-          }
+                student_details: true,
+              },
+            },
+          },
         },
         sessions: {
           include: {
             materials: true,
-            resources: true
-          }
-        }
-      }
+            resources: true,
+          },
+        },
+      },
     });
   },
 
@@ -538,24 +544,24 @@ export const courseService = {
             courses: true,
             classes: {
               include: {
-                academic_years: true
-              }
+                academic_years: true,
+              },
             },
             app_user: {
               include: {
                 user_profile: true,
-                teacher_details: true
-              }
+                teacher_details: true,
+              },
             },
             sessions: {
               include: {
                 materials: true,
-                resources: true
-              }
-            }
-          }
-        }
-      }
+                resources: true,
+              },
+            },
+          },
+        },
+      },
     });
   },
 
@@ -570,12 +576,12 @@ export const courseService = {
             app_user: {
               include: {
                 user_profile: true,
-                teacher_details: true
-              }
-            }
-          }
-        }
-      }
+                teacher_details: true,
+              },
+            },
+          },
+        },
+      },
     });
   },
 
@@ -591,21 +597,21 @@ export const courseService = {
             app_user: {
               include: {
                 user_profile: true,
-                teacher_details: true
-              }
-            }
-          }
-        }
-      }
+                teacher_details: true,
+              },
+            },
+          },
+        },
+      },
     });
   },
 
   // Delete course
   delete: async (id: number) => {
     return await prisma.courses.delete({
-      where: { id }
+      where: { id },
     });
-  }
+  },
 };
 
 // Class Course operations
@@ -618,16 +624,16 @@ export const classCourseService = {
         courses: true,
         classes: {
           include: {
-            academic_years: true
-          }
+            academic_years: true,
+          },
         },
         app_user: {
           include: {
             user_profile: true,
-            teacher_details: true
-          }
-        }
-      }
+            teacher_details: true,
+          },
+        },
+      },
     });
   },
 
@@ -637,33 +643,33 @@ export const classCourseService = {
       where: {
         class_id_course_id: {
           class_id,
-          course_id
-        }
+          course_id,
+        },
       },
       include: {
         courses: true,
         classes: {
           include: {
-            academic_years: true
-          }
+            academic_years: true,
+          },
         },
         app_user: {
           include: {
             user_profile: true,
-            teacher_details: true
-          }
+            teacher_details: true,
+          },
         },
         enrollments: {
           include: {
             app_user: {
               include: {
                 user_profile: true,
-                student_details: true
-              }
-            }
-          }
-        }
-      }
+                student_details: true,
+              },
+            },
+          },
+        },
+      },
     });
-  }
+  },
 };

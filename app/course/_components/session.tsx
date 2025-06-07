@@ -1,167 +1,10 @@
-// 'use client';
-
-// import { useState } from 'react';
-
-// const Session = ({
-//   sessions,
-//   activeSession,
-//   setActiveSession,
-// }: {
-//   sessions: any[];
-//   activeSession: number;
-//   setActiveSession: (id: number) => void;
-// }) => {
-//   const [isFabOpen, setIsFabOpen] = useState(false);
-//   const currentSession = sessions.find(s => s.id === activeSession);
-//   const handleAddFile = () => {
-//     setIsFabOpen(false);
-//   };
-//   const handleAddVideo = () => {
-//     setIsFabOpen(false);
-//   };
-
-//   const handleAddLink = () => {
-//     setIsFabOpen(false);
-//   };
-
-//   return (
-//     <div className="flex-1">
-//       <div className="flex space-x-3 mb-6 overflow-x-auto whitespace-nowrap">
-//         {sessions.map(session => (
-//           <button
-//             key={session.id}
-//             onClick={() => setActiveSession(session.id)}
-//             className={`px-4 py-2 rounded-md border border-gray-300 ${
-//               activeSession === session.id
-//                 ? 'bg-blue-500 text-white border-blue-500'
-//                 : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-//             }`}
-//           >
-//             Session {session.session_number}
-//           </button>
-//         ))}
-//       </div>
-
-//       {currentSession ? (
-//         <div className="border border-gray-300 rounded-lg p-6 shadow-sm flex">
-//           <div className="flex-1">
-//             <h3 className="text-xl font-bold text-gray-800 mb-3">Nama Materi</h3>
-//             <h4 className="text-lg font-semibold text-gray-800 mb-2">{currentSession.title}</h4>
-//             <ul className="list-disc list-inside mb-6 text-gray-700">
-//               {currentSession.materials?.length > 0 ? (
-//                 currentSession.materials.map((material: any, index: number) => (
-//                   <li key={index} className="text-base">
-//                     {material.title}
-//                   </li>
-//                 ))
-//               ) : (
-//                 <li className="text-base">No materials available.</li>
-//               )}
-//             </ul>
-
-//             {/* Ganti 'books' dengan informasi lain atau hapus jika tidak diperlukan */}
-//             <h4 className="text-lg font-semibold text-gray-800 mb-2">Resources</h4>
-//             <ul className="list-disc list-inside mb-6 text-gray-700">
-//               {currentSession.resources?.length > 0 ? (
-//                 currentSession.resources.map((resource: any, index: number) => (
-//                   <li key={index} className="text-base">
-//                     {resource.file_name}
-//                   </li>
-//                 ))
-//               ) : (
-//                 <li className="text-base">No resources available.</li>
-//               )}
-//             </ul>
-
-//             <div className="mt-6">
-//               <p className="text-gray-700 font-semibold">Start</p>
-//               <p className="text-gray-700">{currentSession.start_time}</p>
-//               <p className="text-gray-700 font-semibold mt-2">End</p>
-//               <p className="text-gray-700">{currentSession.end_time}</p>
-//             </div>
-//           </div>
-//           <div className="w-1/4 ml-6 p-4 bg-gray-100 rounded-lg shadow-md border border-gray-300 h-fit relative">
-//             <h3 className="text-lg font-semibold text-gray-800 mb-3">Things to do in this Session</h3>
-//             <ul className="space-y-3">
-//               {currentSession.resources?.length > 0 ? (
-//                 currentSession.resources.map((resource: any, index: number) => (
-//                   <li key={index} className="flex items-center justify-between">
-//                     <a
-//                       href={resource.file_url}
-//                       target="_blank"
-//                       rel="noopener noreferrer"
-//                       className="flex items-center text-gray-700 hover:text-blue-500"
-//                     >
-//                       <span className="mr-2">{resource.file_type === 'pdf' ? '📖' : '🔗'}</span>
-//                       <span className="text-base">{resource.file_name}</span>
-//                     </a>
-//                     <span className="text-gray-500">↔</span>
-//                   </li>
-//                 ))
-//               ) : (
-//                 <li className="text-base text-gray-700">No resources to do.</li>
-//               )}
-//             </ul>
-
-//             <div className="relative mt-4">
-//               <button
-//                 onClick={() => setIsFabOpen(!isFabOpen)}
-//                 className={`w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-600 transition-transform duration-300 ${
-//                   isFabOpen ? 'rotate-45' : 'rotate-0'
-//                 }`}
-//               >
-//                 <span className="text-2xl">+</span>
-//               </button>
-
-//               <div className="absolute top-12 left-1/2 transform -translate-x-1/2 flex items-center justify-center">
-//                 <button
-//                   onClick={handleAddFile}
-//                   className={`absolute flex items-center space-x-2 px-4 py-2 bg-white text-gray-800 rounded-full shadow-md hover:bg-gray-100 transform transition-all duration-300 ease-in-out ${
-//                     isFabOpen ? 'translate-y-10 -translate-x-16 opacity-100' : 'translate-y-0 translate-x-0 opacity-0'
-//                   }`}
-//                 >
-//                   <span>📄</span>
-//                   <span>File</span>
-//                 </button>
-//                 <button
-//                   onClick={handleAddVideo}
-//                   className={`absolute flex items-center space-x-2 px-4 py-2 bg-white text-gray-800 rounded-full shadow-md hover:bg-gray-100 transform transition-all duration-300 ease-in-out ${
-//                     isFabOpen ? 'translate-y-16 opacity-100' : 'translate-y-0 opacity-0'
-//                   }`}
-//                   style={{ transitionDelay: '50ms' }}
-//                 >
-//                   <span>🎥</span>
-//                   <span>Video</span>
-//                 </button>
-//                 <button
-//                   onClick={handleAddLink}
-//                   className={`absolute flex items-center space-x-2 px-4 py-2 bg-white text-gray-800 rounded-full shadow-md hover:bg-gray-100 transform transition-all duration-300 ease-in-out ${
-//                     isFabOpen ? 'translate-y-10 translate-x-16 opacity-100' : 'translate-y-0 translate-x-0 opacity-0'
-//                   }`}
-//                   style={{ transitionDelay: '100ms' }}
-//                 >
-//                   <span>🔗</span>
-//                   <span>Link</span>
-//                 </button>
-//               </div>
-//             </div>
-//           </div>
-//         </div>
-//       ) : (
-//         <p className="text-gray-700">Session not found.</p>
-//       )}
-//     </div>
-//   );
-// };
-
-// export default Session;
-
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaFile, FaVideo, FaLink, FaPlus, FaClock, FaBookOpen, FaDownload, FaExternalLinkAlt } from 'react-icons/fa';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import UploadModal from './upload-modal';
 
 interface Material {
   title: string;
@@ -189,8 +32,11 @@ interface SessionProps {
   sessions: SessionData[];
   activeSession: number;
   setActiveSession: (id: number) => void;
+  courseCode?: string;
+  userRole?: string;
 }
 
+// Keep all your existing helper functions (getResourceIcon, formatTime, formatDate, SessionSelector, SessionContent)
 const getResourceIcon = (fileType: string) => {
   switch (fileType) {
     case 'pdf':
@@ -235,10 +81,7 @@ const formatTime = (timeString: string) => {
   if (!timeString) return 'Not set';
 
   try {
-    // Handle different time formats
     let date: Date;
-
-    // If it's already a time format like "10:00" or "10:00:00"
     if (timeString.match(/^\d{1,2}:\d{2}(:\d{2})?$/)) {
       const today = new Date();
       const [hours, minutes, seconds = '00'] = timeString.split(':');
@@ -250,20 +93,16 @@ const formatTime = (timeString: string) => {
         parseInt(minutes),
         parseInt(seconds)
       );
-    }
-    // If it's a full datetime string
-    else {
+    } else {
       date = new Date(timeString);
     }
 
-    // Format to readable time
     return date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true,
     });
   } catch (error) {
-    // If parsing fails, return the original string
     return timeString;
   }
 };
@@ -284,7 +123,7 @@ const formatDate = (dateString: string) => {
   }
 };
 
-const SessionContent = ({ session }: { session: SessionData }) => (
+const SessionContent = ({ session, loadingResources }: { session: SessionData; loadingResources?: boolean }) => (
   <Card className="mb-6">
     <CardHeader>
       <CardTitle className="flex items-center gap-2 text-xl">
@@ -319,7 +158,7 @@ const SessionContent = ({ session }: { session: SessionData }) => (
         </div>
       </div>
 
-      {/* Session Time - UPDATED */}
+      {/* Session Time */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="bg-green-50 rounded-lg p-4">
           <div className="flex items-center gap-2 text-green-700 font-semibold mb-2">
@@ -339,7 +178,7 @@ const SessionContent = ({ session }: { session: SessionData }) => (
         </div>
       </div>
 
-      {/* Session Duration - NEW ADDITION */}
+      {/* Session Duration */}
       {session.start_time && session.end_time && (
         <div className="bg-blue-50 rounded-lg p-4 mb-6">
           <div className="flex items-center gap-2 text-blue-700 font-semibold mb-2">
@@ -401,37 +240,69 @@ const SessionContent = ({ session }: { session: SessionData }) => (
           )}
         </div>
       </div>
+      {/* Resources Section with Loading State */}
+      <div>
+        <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+          <FaDownload className="text-sm text-blue-600" />
+          Available Resources
+        </h4>
+        <div className="bg-gray-50 rounded-lg p-4">
+          {loadingResources ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+              <span className="ml-2 text-gray-600">Loading resources...</span>
+            </div>
+          ) : session.resources?.length ? (
+            <div className="grid gap-3">
+              {session.resources.map((resource, index) => (
+                <a
+                  key={resource.id || index}
+                  href={resource.file_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 group"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-xl">{getResourceIcon(resource.file_type)}</span>
+                    <div>
+                      <span className="text-gray-800 font-medium group-hover:text-blue-700">
+                        {resource.title || resource.file_name}
+                      </span>
+                      <p className="text-xs text-gray-500 capitalize">{resource.file_type} file</p>
+                      {resource.description && <p className="text-xs text-gray-600 mt-1">{resource.description}</p>}
+                    </div>
+                  </div>
+                  <FaExternalLinkAlt className="text-gray-400 group-hover:text-blue-600 text-sm" />
+                </a>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 italic">No resources available for this session.</p>
+          )}
+        </div>
+      </div>
     </CardContent>
   </Card>
 );
+
+// ✅ FIXED: ActionsSidebar now receives all required props
+interface ActionsSidebarProps {
+  session: SessionData;
+  isFabOpen: boolean;
+  setIsFabOpen: (open: boolean) => void;
+  onAddFile: () => void;
+  onAddVideo: () => void;
+  onAddLink: () => void;
+}
 
 const ActionsSidebar = ({
   session,
   isFabOpen,
   setIsFabOpen,
-}: {
-  session: SessionData;
-  isFabOpen: boolean;
-  setIsFabOpen: (open: boolean) => void;
-}) => {
-  const handleAddFile = () => {
-    setIsFabOpen(false);
-    // TODO: Implement file upload
-    console.log('Add file');
-  };
-
-  const handleAddVideo = () => {
-    setIsFabOpen(false);
-    // TODO: Implement video upload
-    console.log('Add video');
-  };
-
-  const handleAddLink = () => {
-    setIsFabOpen(false);
-    // TODO: Implement link addition
-    console.log('Add link');
-  };
-
+  onAddFile,
+  onAddVideo,
+  onAddLink,
+}: ActionsSidebarProps) => {
   return (
     <Card className="lg:w-80 h-fit">
       <CardHeader>
@@ -480,7 +351,7 @@ const ActionsSidebar = ({
             {/* Action Buttons */}
             <div className="absolute top-16 flex flex-col items-center space-y-3">
               <button
-                onClick={handleAddFile}
+                onClick={onAddFile}
                 className={cn(
                   'flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-full shadow-md hover:bg-gray-100 transition-all duration-300',
                   isFabOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
@@ -492,7 +363,7 @@ const ActionsSidebar = ({
               </button>
 
               <button
-                onClick={handleAddVideo}
+                onClick={onAddVideo}
                 className={cn(
                   'flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-full shadow-md hover:bg-gray-100 transition-all duration-300',
                   isFabOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
@@ -504,7 +375,7 @@ const ActionsSidebar = ({
               </button>
 
               <button
-                onClick={handleAddLink}
+                onClick={onAddLink}
                 className={cn(
                   'flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-full shadow-md hover:bg-gray-100 transition-all duration-300',
                   isFabOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
@@ -522,9 +393,62 @@ const ActionsSidebar = ({
   );
 };
 
-const Session = ({ sessions, activeSession, setActiveSession }: SessionProps) => {
+// ✅ FIXED: Session component with proper props and state management
+const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRole }: SessionProps) => {
   const [isFabOpen, setIsFabOpen] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [uploadType, setUploadType] = useState<'file' | 'video' | 'link'>('file');
+
+  const [sessionResources, setSessionResources] = useState<Resource[]>([]);
+  const [loadingResources, setLoadingResources] = useState(false);
+
   const currentSession = sessions.find(s => s.id === activeSession);
+
+  const fetchResources = async () => {
+    if (!courseCode || !activeSession) return;
+
+    setLoadingResources(true);
+    try {
+      const response = await fetch(`/api/courses/${courseCode}/sessions/${activeSession}/resources`);
+      const result = await response.json();
+
+      if (result.success) {
+        setSessionResources(result.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch resources:', error);
+    } finally {
+      setLoadingResources(false);
+    }
+  };
+
+  // ✅ FIXED: Handler functions defined in correct scope
+  const handleAddFile = () => {
+    setUploadType('file');
+    setIsUploadModalOpen(true);
+    setIsFabOpen(false);
+  };
+
+  const handleAddVideo = () => {
+    setUploadType('video');
+    setIsUploadModalOpen(true);
+    setIsFabOpen(false);
+  };
+
+  const handleAddLink = () => {
+    setUploadType('link');
+    setIsUploadModalOpen(true);
+    setIsFabOpen(false);
+  };
+
+  const handleUploadSuccess = () => {
+    setIsUploadModalOpen(false);
+    fetchResources(); // Refresh resources instead of page reload
+  };
+
+  useEffect(() => {
+    fetchResources();
+  }, [activeSession, courseCode]);
 
   if (!currentSession) {
     return (
@@ -546,13 +470,38 @@ const Session = ({ sessions, activeSession, setActiveSession }: SessionProps) =>
 
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1">
-          <SessionContent session={currentSession} />
+          <SessionContent
+            session={{
+              ...currentSession,
+              resources: sessionResources, // Pass fetched resources
+            }}
+            loadingResources={loadingResources}
+          />
         </div>
 
         <div className="lg:w-80">
-          <ActionsSidebar session={currentSession} isFabOpen={isFabOpen} setIsFabOpen={setIsFabOpen} />
+          <ActionsSidebar
+            session={currentSession}
+            isFabOpen={isFabOpen}
+            setIsFabOpen={setIsFabOpen}
+            onAddFile={handleAddFile}
+            onAddVideo={handleAddVideo}
+            onAddLink={handleAddLink}
+          />
         </div>
       </div>
+
+      {/* Upload Modal */}
+      {isUploadModalOpen && (
+        <UploadModal
+          type={uploadType}
+          courseCode={courseCode}
+          sessionId={activeSession}
+          isOpen={isUploadModalOpen}
+          onClose={() => setIsUploadModalOpen(false)}
+          onSuccess={handleUploadSuccess} // Use new handler
+        />
+      )}
     </div>
   );
 };

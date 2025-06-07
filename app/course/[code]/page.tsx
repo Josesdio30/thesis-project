@@ -459,7 +459,13 @@ const CourseDetail = () => {
 
             {/* Tab Content */}
             {activeTab === 'Session' && (
-              <Session sessions={sessions} activeSession={activeSession} setActiveSession={setActiveSession} />
+              <Session
+                sessions={sessions}
+                activeSession={activeSession}
+                setActiveSession={setActiveSession}
+                courseCode={code as string} // ADD THIS
+                userRole="teacher" // ADD THIS (get from auth)
+              />
             )}
 
             {activeTab === 'Syllabus' && (

@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1749328012080,
+    "session_id": 1,
+    "file_name": "dummy.pdf",
+    "file_url": "/uploads/courses/MAT001/sessions/1/1749328011557_dummy.pdf",
+    "file_type": "file",
+    "title": "asdasd",
+    "description": "",
+    "created_at": "2025-06-07T20:26:52.080Z"
+  },
+  {
+    "id": 1749329224744,
+    "session_id": 1,
+    "file_name": "asasdasd",
+    "file_url": "https://ui.shadcn.com/docs/components/label",
+    "file_type": "link",
+    "title": "asasdasd",
+    "description": "",
+    "created_at": "2025-06-07T20:47:04.744Z"
+  },
+  {
+    "id": 1749329308669,
+    "session_id": 3,
+    "file_name": "dummy.pdf",
+    "file_url": "/uploads/courses/MAT001/sessions/3/1749329308432_dummy.pdf",
+    "file_type": "file",
+    "title": "test",
+    "description": "",
+    "created_at": "2025-06-07T20:48:28.669Z"
+  }
+]

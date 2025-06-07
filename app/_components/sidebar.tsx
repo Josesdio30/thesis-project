@@ -129,9 +129,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }: SidebarProps) => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem('userName');
-    setIsMobileOpen(false);
-    router.push('/login');
+    await signOut({ callbackUrl: '/login' });
   };
 
   const handleMobileItemClick = () => {

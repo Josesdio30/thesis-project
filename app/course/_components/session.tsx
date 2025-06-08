@@ -208,7 +208,7 @@ const SessionContent = ({ session, loadingResources }: { session: SessionData; l
       )}
 
       {/* Resources Section */}
-      {/* <div>
+      <div>
         <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
           <FaDownload className="text-sm text-blue-600" />
           Available Resources
@@ -239,7 +239,7 @@ const SessionContent = ({ session, loadingResources }: { session: SessionData; l
             <p className="text-gray-500 italic">No resources available for this session.</p>
           )}
         </div>
-      </div> */}
+      </div>
       {/* Resources Section with Loading State */}
       <div>
         <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
@@ -466,8 +466,7 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRo
 
   return (
     <div className="space-y-6">
-      <SessionSelector sessions={sessions} activeSession={activeSession} setActiveSession={setActiveSession} />
-
+      <SessionSelector sessions={sessions} activeSession={activeSession} setActiveSession={setActiveSession} />{' '}
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1">
           <SessionContent
@@ -481,7 +480,10 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRo
 
         <div className="lg:w-80">
           <ActionsSidebar
-            session={currentSession}
+            session={{
+              ...currentSession,
+              resources: sessionResources, // Pass fetched resources here too
+            }}
             isFabOpen={isFabOpen}
             setIsFabOpen={setIsFabOpen}
             onAddFile={handleAddFile}
@@ -490,7 +492,6 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRo
           />
         </div>
       </div>
-
       {/* Upload Modal */}
       {isUploadModalOpen && (
         <UploadModal

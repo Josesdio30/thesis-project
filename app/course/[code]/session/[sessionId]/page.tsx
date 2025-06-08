@@ -2,7 +2,17 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { FaArrowLeft, FaBookOpen, FaClock, FaDownload, FaExternalLinkAlt, FaFile, FaVideo, FaLink, FaPlus } from 'react-icons/fa';
+import {
+  FaArrowLeft,
+  FaBookOpen,
+  FaClock,
+  FaDownload,
+  FaExternalLinkAlt,
+  FaFile,
+  FaVideo,
+  FaLink,
+  FaPlus,
+} from 'react-icons/fa';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -268,7 +278,7 @@ const SessionPage = () => {
       <Sidebar isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
       <div className="flex-1 bg-gray-50 min-w-0">
         <Topbar onMenuClick={() => setIsMobileOpen(!isMobileOpen)} />
-        
+
         <main className="p-6 space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
@@ -288,7 +298,7 @@ const SessionPage = () => {
 
           {/* Session Navigation */}
           <div className="flex space-x-3 overflow-x-auto pb-2">
-            {allSessions.map((s) => (
+            {allSessions.map(s => (
               <button
                 key={s.id}
                 onClick={() => navigateToSession(s.id)}
@@ -314,9 +324,7 @@ const SessionPage = () => {
                     <FaBookOpen className="text-blue-600" />
                     {session.title}
                   </CardTitle>
-                  {session.description && (
-                    <p className="text-gray-600 mt-2">{session.description}</p>
-                  )}
+                  {session.description && <p className="text-gray-600 mt-2">{session.description}</p>}
                 </CardHeader>
                 <CardContent>
                   {/* Materials Section */}
@@ -333,9 +341,7 @@ const SessionPage = () => {
                               <span className="text-blue-600 mt-1">•</span>
                               <div>
                                 <span className="text-gray-800 font-medium">{material.title}</span>
-                                {material.content && (
-                                  <p className="text-gray-600 text-sm mt-1">{material.content}</p>
-                                )}
+                                {material.content && <p className="text-gray-600 text-sm mt-1">{material.content}</p>}
                               </div>
                             </li>
                           ))}
@@ -514,11 +520,10 @@ const SessionPage = () => {
             onSuccess={handleUploadSuccess}
           />
         )}
-
         <Footer />
       </div>
     </div>
   );
-}
+};
 
 export default SessionPage;

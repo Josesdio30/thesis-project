@@ -2,14 +2,11 @@
 
 import Sidebar from '../_components/sidebar';
 import Link from 'next/link';
-import { useState } from 'react';
-
+s;
 export default function ExamPage() {
-  const [isMobileOpen, setIsMobileOpen] = useState(false);
-
   return (
     <div className="flex min-h-screen bg-gray-100">
-      <Sidebar isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
+      <Sidebar />
       <div className="flex-1 p-6">
         <div className="flex justify-between items-center bg-gray-800 text-white p-2 rounded-md mb-6">
           <Link

@@ -436,6 +436,7 @@ export const courseService = {
       },
     });
   },
+
   // Get course by code
   findByCode: async (course_code: string) => {
     return await prisma.courses.findUnique({
@@ -473,22 +474,9 @@ export const courseService = {
             sessions: {
               include: {
                 materials: true,
-                resources: {
-                  include: {
-                    app_user: {
-                      select: {
-                        nama_lengkap: true,
-                      },
-                    },
-                  },
-                },
+                resources: true,
                 forums: {
                   include: {
-                    app_user: {
-                      select: {
-                        nama_lengkap: true,
-                      },
-                    },
                     forum_posts: {
                       include: {
                         app_user: {
@@ -497,16 +485,6 @@ export const courseService = {
                           },
                         },
                         forum_replies: true,
-                      },
-                    },
-                  },
-                },
-                attendance: {
-                  include: {
-                    app_user_attendance_student_idToapp_user: {
-                      include: {
-                        user_profile: true,
-                        student_details: true,
                       },
                     },
                   },

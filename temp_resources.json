@@ -48,5 +48,25 @@
     "title": "Lokasi",
     "description": "",
     "created_at": "2025-06-08T10:37:08.367Z"
+  },
+  {
+    "id": 1749383406152,
+    "session_id": 3,
+    "file_name": "Link yt Math",
+    "file_url": "https://sma.dikdasmen.go.id/data/files/silabus/1.%20Silabus%20Matematika.pdf",
+    "file_type": "link",
+    "title": "Link yt Math",
+    "description": "",
+    "created_at": "2025-06-08T11:50:06.152Z"
+  },
+  {
+    "id": 1749383455163,
+    "session_id": 1,
+    "file_name": "dummy.pdf",
+    "file_url": "/uploads/courses/MAT001/sessions/1/1749383454880_dummy.pdf",
+    "file_type": "file",
+    "title": "materi ujian",
+    "description": "",
+    "created_at": "2025-06-08T11:50:55.163Z"
   }
 ]

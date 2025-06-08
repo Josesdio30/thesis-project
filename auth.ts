@@ -14,8 +14,11 @@ export const authOptions: NextAuthOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.username || !credentials?.password) {
+          console.log('Missing credentials');
           return null;
         }
+
+        console.log('Attempting login for username:', credentials.username);
 
         try {
           const users = await sql`
@@ -28,15 +31,20 @@ export const authOptions: NextAuthOptions = {
                 AND ap.is_deleted = FALSE
             `;
 
+          console.log('Database query result:', users.length, 'users found');
+
           if (users.length === 0) {
+            console.log('No user found with username:', credentials.username);
             return null;
           }
-
           const user = users[0];
+          console.log('Found user:', { id: user.id, username: user.user_name, role: user.role });
 
           const isValidPassword = await verifyPassword(credentials.password as string, user.password);
+          console.log('Password validation result:', isValidPassword);
 
           if (isValidPassword) {
+            console.log('Login successful for user:', user.user_name);
             await sql`
                 UPDATE app_user 
                 SET last_login = CURRENT_TIMESTAMP, updated_date = CURRENT_TIMESTAMP 
@@ -50,6 +58,8 @@ export const authOptions: NextAuthOptions = {
               username: user.user_name,
               role: user.role,
             };
+          } else {
+            console.log('Invalid password for user:', user.user_name);
           }
 
           return null;

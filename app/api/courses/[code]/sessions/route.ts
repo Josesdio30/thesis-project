@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest, { params }: { params: { code: string; sessionId: string } }) {
   try {
-    const { code, sessionId } = await params;
+    const { code, sessionId } = params;
     const sessionIdNum = parseInt(sessionId);
 
     if (isNaN(sessionIdNum)) {
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
         },
       },
       orderBy: {
-        id: 'desc',
+        upload_date: 'desc',
       },
     });
 
@@ -76,6 +76,7 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
         version: resource.version,
         is_public: resource.is_public,
         download_count: resource.download_count,
+        upload_date: resource.upload_date,
         uploader: resource.app_user?.nama_lengkap,
       })),
     });
@@ -94,7 +95,7 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
 
 export async function POST(request: NextRequest, { params }: { params: { code: string; sessionId: string } }) {
   try {
-    const { code, sessionId } = await params;
+    const { code, sessionId } = params;
     const sessionIdNum = parseInt(sessionId);
     const body = await request.json();
 
@@ -148,6 +149,7 @@ export async function POST(request: NextRequest, { params }: { params: { code: s
         version: 1,
         is_public: true,
         download_count: 0,
+        upload_date: new Date(),
       },
       include: {
         app_user: {
@@ -166,6 +168,7 @@ export async function POST(request: NextRequest, { params }: { params: { code: s
         file_url: newResource.file_url,
         file_type: newResource.file_type,
         file_size: newResource.file_size,
+        upload_date: newResource.upload_date,
         uploader: newResource.app_user?.nama_lengkap,
       },
       message: 'Resource uploaded successfully',

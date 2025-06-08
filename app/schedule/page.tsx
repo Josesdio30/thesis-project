@@ -227,10 +227,10 @@ const Schedule = () => {
   const datesWithSchedule = Object.keys(dummySchedule).map(dateStr => new Date(dateStr));
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex max-h-screen">
       <Sidebar isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
 
-      <div className="p-3 sm:p-4 md:p-6 bg-gray-100 flex-1 min-w-0">
+      <div className="p-3 sm:p-4 md:p-6 bg-gray-100 flex-1 min-w-0 overflow-y-auto">
         <Topbar onMenuClick={handleMenuClick} />
 
         <div className="grid grid-cols-1 gap-6 pt-8">

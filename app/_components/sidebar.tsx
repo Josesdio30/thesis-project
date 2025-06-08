@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { signOut } from 'next-auth/react';
 import {
   FaTachometerAlt,
   FaCalendarAlt,
@@ -123,12 +122,13 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }: SidebarProps) => {
   const [userName, setUserName] = useState<string | null>(null);
   const router = useRouter();
   const pathname = usePathname();
+
   useEffect(() => {
     const storedName = localStorage.getItem('userName');
     if (storedName) setUserName(storedName);
   }, []);
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     await signOut({ callbackUrl: '/login' });
   };
 

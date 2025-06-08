@@ -4,7 +4,7 @@ import { ApiResponse } from '@/types';
 
 export async function GET(request: NextRequest, { params }: { params: { code: string } }) {
   try {
-    const { code } = await params;
+    const { code } = params;
 
     const course = await courseService.findByCode(code);
 

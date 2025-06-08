@@ -15,6 +15,7 @@ import {
 } from 'react-icons/fa';
 import { NAVIGATION_ITEMS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
+import { signOut } from 'next-auth/react';
 
 const iconMap = {
   FaTachometerAlt: FaTachometerAlt,
@@ -128,7 +129,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }: SidebarProps) => {
     if (storedName) setUserName(storedName);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     await signOut({ callbackUrl: '/login' });
   };
 

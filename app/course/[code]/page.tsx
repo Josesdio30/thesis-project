@@ -83,7 +83,8 @@ const CourseDetail = () => {
   const sessions = classCourse?.sessions || [];
 
   return (
-    <div className="flex min-h-screen w-full overflow-hidden">
+    // <div className="flex min-h-screen w-full overflow-hidden">
+    <div className="flex max-h-screen">
       <Sidebar isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
 
       <div className="flex-1 bg-gray-50 flex flex-col min-w-0">

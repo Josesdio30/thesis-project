@@ -1,10 +1,23 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FaFile, FaVideo, FaLink, FaPlus, FaClock, FaBookOpen, FaDownload, FaExternalLinkAlt } from 'react-icons/fa';
+import {
+  FaFile,
+  FaVideo,
+  FaLink,
+  FaPlus,
+  FaClock,
+  FaBookOpen,
+  FaDownload,
+  FaExternalLinkAlt,
+  FaTrash,
+  FaEllipsisV,
+} from 'react-icons/fa';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import UploadModal from './upload-modal';
+import DeleteConfirmModal from './delete-confirm-modal';
+import { useToast } from './toast';
 
 interface Material {
   title: string;
@@ -12,9 +25,19 @@ interface Material {
 }
 
 interface Resource {
+  id?: number;
   file_name: string;
   file_url: string;
   file_type: 'pdf' | 'video' | 'link' | string;
+  file_size?: number;
+  content_type?: string;
+  version?: number;
+  is_public?: boolean;
+  download_count?: number;
+  uploader?: string;
+  title?: string;
+  description?: string;
+  file_tittle?: string; // New field from database
 }
 
 interface SessionData {
@@ -36,7 +59,6 @@ interface SessionProps {
   userRole?: string;
 }
 
-// Keep all your existing helper functions (getResourceIcon, formatTime, formatDate, SessionSelector, SessionContent)
 const getResourceIcon = (fileType: string) => {
   switch (fileType) {
     case 'pdf':
@@ -78,13 +100,19 @@ const SessionSelector = ({
 );
 
 const formatTime = (timeString: string) => {
-  if (!timeString) return 'Not set';
+  if (!timeString) {
+    return 'Not set';
+  }
 
   try {
     let date: Date;
-    if (timeString.match(/^\d{1,2}:\d{2}(:\d{2})?$/)) {
+    const timeRegex = /^\d{1,2}:\d{2}(:\d{2})?$/;
+    const isTimeFormat = timeRegex.test(timeString);
+
+    if (isTimeFormat) {
       const today = new Date();
       const [hours, minutes, seconds = '00'] = timeString.split(':');
+
       date = new Date(
         today.getFullYear(),
         today.getMonth(),
@@ -95,14 +123,24 @@ const formatTime = (timeString: string) => {
       );
     } else {
       date = new Date(timeString);
-    }
 
-    return date.toLocaleTimeString('en-US', {
+      if (timeString.includes('Z') || timeString.includes('+00:00')) {
+        const utcHours = date.getUTCHours();
+        const utcMinutes = date.getUTCMinutes();
+
+        date = new Date();
+        date.setHours(utcHours, utcMinutes, 0, 0);
+      }
+    }
+    const formatted = date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
-      hour12: true,
+      hour12: false,
     });
+
+    return formatted;
   } catch (error) {
+    console.error('Invalid time format:', timeString, error);
     return timeString;
   }
 };
@@ -156,15 +194,14 @@ const SessionContent = ({ session, loadingResources }: { session: SessionData; l
             <p className="text-gray-500 italic">No materials available for this session.</p>
           )}
         </div>
-      </div>
-
+      </div>{' '}
       {/* Session Time */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="bg-green-50 rounded-lg p-4">
           <div className="flex items-center gap-2 text-green-700 font-semibold mb-2">
             <FaClock className="text-sm" />
             Start Time
-          </div>
+          </div>{' '}
           <p className="text-green-800 text-lg font-bold">{formatTime(session.start_time)}</p>
           <p className="text-green-600 text-sm mt-1">{formatDate(session.start_time)}</p>
         </div>
@@ -177,7 +214,6 @@ const SessionContent = ({ session, loadingResources }: { session: SessionData; l
           <p className="text-red-600 text-sm mt-1">{formatDate(session.end_time)}</p>
         </div>
       </div>
-
       {/* Session Duration */}
       {session.start_time && session.end_time && (
         <div className="bg-blue-50 rounded-lg p-4 mb-6">
@@ -206,129 +242,149 @@ const SessionContent = ({ session, loadingResources }: { session: SessionData; l
           </p>
         </div>
       )}
-
-      {/* Resources Section */}
-      <div>
-        <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-          <FaDownload className="text-sm text-blue-600" />
-          Available Resources
-        </h4>
-        <div className="bg-gray-50 rounded-lg p-4">
-          {session.resources?.length ? (
-            <div className="grid gap-3">
-              {session.resources.map((resource, index) => (
-                <a
-                  key={index}
-                  href={resource.file_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 group"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">{getResourceIcon(resource.file_type)}</span>
-                    <div>
-                      <span className="text-gray-800 font-medium group-hover:text-blue-700">{resource.file_name}</span>
-                      <p className="text-xs text-gray-500 capitalize">{resource.file_type} file</p>
-                    </div>
-                  </div>
-                  <FaExternalLinkAlt className="text-gray-400 group-hover:text-blue-600 text-sm" />
-                </a>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 italic">No resources available for this session.</p>
-          )}
-        </div>
-      </div>
-      {/* Resources Section with Loading State */}
-      <div>
-        <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-          <FaDownload className="text-sm text-blue-600" />
-          Available Resources
-        </h4>
-        <div className="bg-gray-50 rounded-lg p-4">
-          {loadingResources ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-              <span className="ml-2 text-gray-600">Loading resources...</span>
-            </div>
-          ) : session.resources?.length ? (
-            <div className="grid gap-3">
-              {session.resources.map((resource, index) => (
-                <a
-                  key={resource.id || index}
-                  href={resource.file_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 group"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">{getResourceIcon(resource.file_type)}</span>
-                    <div>
-                      <span className="text-gray-800 font-medium group-hover:text-blue-700">
-                        {resource.title || resource.file_name}
-                      </span>
-                      <p className="text-xs text-gray-500 capitalize">{resource.file_type} file</p>
-                      {resource.description && <p className="text-xs text-gray-600 mt-1">{resource.description}</p>}
-                    </div>
-                  </div>
-                  <FaExternalLinkAlt className="text-gray-400 group-hover:text-blue-600 text-sm" />
-                </a>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 italic">No resources available for this session.</p>
-          )}
-        </div>
-      </div>
     </CardContent>
   </Card>
 );
 
-// ✅ FIXED: ActionsSidebar now receives all required props
 interface ActionsSidebarProps {
   session: SessionData;
+  sessionResources: Resource[];
+  loadingResources: boolean;
   isFabOpen: boolean;
   setIsFabOpen: (open: boolean) => void;
   onAddFile: () => void;
   onAddVideo: () => void;
   onAddLink: () => void;
+  onDeleteResource: (resource: Resource) => void;
+  courseCode?: string;
+  userRole?: string;
 }
 
 const ActionsSidebar = ({
   session,
+  sessionResources,
+  loadingResources,
   isFabOpen,
   setIsFabOpen,
   onAddFile,
   onAddVideo,
   onAddLink,
+  onDeleteResource,
+  courseCode,
+  userRole,
 }: ActionsSidebarProps) => {
+  const [resourceMenuOpen, setResourceMenuOpen] = useState<number | null>(null);
+  const handleDeleteClick = async (resource: Resource) => {
+    onDeleteResource(resource);
+    setResourceMenuOpen(null);
+  };
+
+  const canManageResources = userRole === 'teacher' || userRole === 'admin';
+
+  // Close resource menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setResourceMenuOpen(null);
+    };
+
+    if (resourceMenuOpen !== null) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [resourceMenuOpen]);
   return (
     <Card className="lg:w-80 h-fit">
       <CardHeader>
-        <CardTitle className="text-lg">Session Actions</CardTitle>
+        <CardTitle className="text-lg">Resources</CardTitle>
       </CardHeader>
       <CardContent>
-        {/* Quick Actions */}
         <div className="mb-6">
-          <h4 className="font-semibold text-gray-800 mb-3">Quick Access</h4>
-          <div className="space-y-2">
-            {session.resources?.length ? (
-              session.resources.slice(0, 3).map((resource, index) => (
-                <a
-                  key={index}
-                  href={resource.file_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          {/* <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+            <FaDownload className="text-sm text-blue-600" />
+            Available Resources
+          </h4> */}
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {loadingResources ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                <span className="ml-2 text-gray-600 text-sm">Loading...</span>
+              </div>
+            ) : sessionResources?.length ? (
+              sessionResources.map((resource, index) => (
+                <div
+                  key={resource.id || index}
+                  className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors group"
                 >
                   <span className="text-lg">{getResourceIcon(resource.file_type)}</span>
-                  <span className="text-sm text-gray-700 truncate flex-1">{resource.file_name}</span>
-                  <FaExternalLinkAlt className="text-xs text-gray-400" />
-                </a>
+                  <div className="flex-1 min-w-0">
+                    {' '}
+                    <a
+                      href={resource.file_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-sm text-gray-700 truncate block font-medium hover:text-blue-600 transition-colors"
+                    >
+                      {resource.file_tittle || resource.file_name}
+                    </a>
+                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                      <span className="capitalize">{resource.file_type} file</span>
+                      {resource.file_size && (
+                        <>
+                          <span>•</span>
+                          <span>{(resource.file_size / 1024 / 1024).toFixed(2)} MB</span>
+                        </>
+                      )}
+                      {/* {resource.download_count !== undefined && (
+                        <>
+                          <span>•</span>
+                          <span>{resource.download_count} downloads</span>
+                        </>
+                      )} */}
+                    </div>
+                  </div>
+
+                  {/* Resource Actions */}
+                  <div className="flex items-center gap-1">
+                    <a
+                      href={resource.file_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                      title="Open resource"
+                    >
+                      <FaExternalLinkAlt className="text-xs" />
+                    </a>
+
+                    {canManageResources && resource.id && (
+                      <div className="relative">
+                        {' '}
+                        <button
+                          onClick={() =>
+                            setResourceMenuOpen(resourceMenuOpen === resource.id ? null : resource.id || null)
+                          }
+                          className="p-1 text-gray-400 hover:text-gray-600 transition-colors opacity-0 group-hover:opacity-100"
+                          title="Resource actions"
+                        >
+                          <FaEllipsisV className="text-xs" />
+                        </button>
+                        {resourceMenuOpen === resource.id && (
+                          <div className="absolute right-0 top-6 z-10 bg-white border border-gray-200 rounded-md shadow-lg py-1 min-w-[120px]">
+                            <button
+                              onClick={() => handleDeleteClick(resource)}
+                              className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left transition-colors"
+                            >
+                              <FaTrash className="text-xs" />
+                              Delete
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
               ))
             ) : (
-              <p className="text-sm text-gray-500 italic">No quick actions available</p>
+              <p className="text-sm text-gray-500 italic">No resources available</p>
             )}
           </div>
         </div>
@@ -393,17 +449,20 @@ const ActionsSidebar = ({
   );
 };
 
-// ✅ FIXED: Session component with proper props and state management
 const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRole }: SessionProps) => {
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [uploadType, setUploadType] = useState<'file' | 'video' | 'link'>('file');
-
+  // Resource management states
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedResource, setSelectedResource] = useState<Resource | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [sessionResources, setSessionResources] = useState<Resource[]>([]);
   const [loadingResources, setLoadingResources] = useState(false);
 
-  const currentSession = sessions.find(s => s.id === activeSession);
+  const { success, error, info, ToastContainer } = useToast();
 
+  const currentSession = sessions.find(s => s.id === activeSession);
   const fetchResources = async () => {
     if (!courseCode || !activeSession) return;
 
@@ -414,9 +473,12 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRo
 
       if (result.success) {
         setSessionResources(result.data);
+      } else {
+        error('Failed to fetch resources', result.error || 'Unknown error occurred');
       }
-    } catch (error) {
-      console.error('Failed to fetch resources:', error);
+    } catch (err) {
+      error('Failed to fetch resources', 'Network error occurred');
+      console.error('Failed to fetch resources:', err);
     } finally {
       setLoadingResources(false);
     }
@@ -440,10 +502,56 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRo
     setIsUploadModalOpen(true);
     setIsFabOpen(false);
   };
-
   const handleUploadSuccess = () => {
+    success('Resource uploaded', 'New resource has been successfully uploaded');
     setIsUploadModalOpen(false);
     fetchResources(); // Refresh resources instead of page reload
+  };
+  // Resource management handlers
+  const handleDeleteResource = async (resource: Resource) => {
+    setSelectedResource(resource);
+    setIsDeleteModalOpen(true);
+  };
+  const confirmDeleteResource = async () => {
+    if (!courseCode || !selectedResource?.id) return;
+
+    setIsDeleting(true);
+    try {
+      console.log('=== RESOURCE DELETE STARTED ===');
+      console.log('Course Code:', courseCode);
+      console.log('Session ID:', activeSession);
+      console.log('Resource ID:', selectedResource.id);
+
+      const response = await fetch(
+        `/api/courses/${courseCode}/sessions/${activeSession}/resources/${selectedResource.id}`,
+        {
+          method: 'DELETE',
+        }
+      );
+
+      const result = await response.json();
+      console.log('Delete response:', result);
+
+      if (response.ok && result.success) {
+        console.log('✅ Resource deleted successfully');
+        success(
+          'Resource deleted',
+          `${selectedResource.file_tittle || selectedResource.file_name} has been successfully deleted`
+        );
+        setIsDeleteModalOpen(false);
+        setSelectedResource(null);
+        fetchResources(); // Refresh the resources list
+      } else {
+        console.error('❌ Failed to delete resource:', result);
+        error('Delete failed', result.error || result.message || 'Unknown error occurred');
+      }
+    } catch (err) {
+      console.error('=== DELETE ERROR ===');
+      console.error('Error:', err);
+      error('Delete failed', err instanceof Error ? err.message : 'Network error occurred');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   useEffect(() => {
@@ -476,22 +584,27 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRo
             }}
             loadingResources={loadingResources}
           />
-        </div>
-
+        </div>{' '}
         <div className="lg:w-80">
+          {' '}
           <ActionsSidebar
             session={{
               ...currentSession,
               resources: sessionResources, // Pass fetched resources here too
             }}
+            sessionResources={sessionResources}
+            loadingResources={loadingResources}
             isFabOpen={isFabOpen}
             setIsFabOpen={setIsFabOpen}
             onAddFile={handleAddFile}
             onAddVideo={handleAddVideo}
             onAddLink={handleAddLink}
+            onDeleteResource={handleDeleteResource}
+            courseCode={courseCode}
+            userRole={userRole}
           />
         </div>
-      </div>
+      </div>{' '}
       {/* Upload Modal */}
       {isUploadModalOpen && (
         <UploadModal
@@ -503,6 +616,21 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRo
           onSuccess={handleUploadSuccess} // Use new handler
         />
       )}
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && selectedResource && (
+        <DeleteConfirmModal
+          resource={selectedResource}
+          isOpen={isDeleteModalOpen}
+          onClose={() => {
+            setIsDeleteModalOpen(false);
+            setSelectedResource(null);
+          }}
+          onConfirm={confirmDeleteResource}
+          isDeleting={isDeleting}
+        />
+      )}
+      {/* Toast Notifications */}
+      <ToastContainer />
     </div>
   );
 };

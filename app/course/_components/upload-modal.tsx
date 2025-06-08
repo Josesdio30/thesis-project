@@ -129,6 +129,7 @@ const UploadModal = ({ type, courseCode, sessionId, isOpen, onClose, onSuccess }
             file_url: url,
             file_type: 'link',
             file_name: title,
+            file_tittle: title, // Add file_tittle field for links
           }),
         });
 
@@ -184,6 +185,7 @@ const UploadModal = ({ type, courseCode, sessionId, isOpen, onClose, onSuccess }
               file_url: uploadResult.data.url,
               file_type: type,
               file_name: uploadResult.data.filename,
+              file_tittle: title || file.name, // Add file_tittle field for files
             }),
           });
 

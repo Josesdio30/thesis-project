@@ -68,5 +68,25 @@
     "title": "materi ujian",
     "description": "",
     "created_at": "2025-06-08T11:50:55.163Z"
+  },
+  {
+    "id": 1749416335259,
+    "session_id": 1,
+    "file_name": "maps",
+    "file_url": "https://www.deepl.com/en/translator#en/id/although",
+    "file_type": "link",
+    "title": "maps",
+    "description": "berikut adalah map yang bisa kalian lihat",
+    "created_at": "2025-06-08T20:58:55.259Z"
+  },
+  {
+    "id": 1749418262825,
+    "session_id": 1,
+    "file_name": "cuplikan.mp4",
+    "file_url": "/uploads/courses/MAT001/sessions/1/1749418262508_cuplikan.mp4",
+    "file_type": "video",
+    "title": "asdasd",
+    "description": "asd",
+    "created_at": "2025-06-08T21:31:02.825Z"
   }
 ]

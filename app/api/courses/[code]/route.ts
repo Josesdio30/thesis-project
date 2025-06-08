@@ -4,7 +4,7 @@ import { ApiResponse } from '@/types';
 
 export async function GET(request: NextRequest, { params }: { params: { code: string } }) {
   try {
-    const { code } = params;
+    const { code } = await params;
 
     const course = await courseService.findByCode(code);
 
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
       const response: ApiResponse<null> = {
         success: false,
         error: 'Not found',
-        message: 'Course not found'
+        message: 'Course not found',
       };
       return NextResponse.json(response, { status: 404 });
     }
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
       created_at: course.created_at,
       updated_at: course.updated_at,
       class_courses:
-        course.class_courses?.map((cc) => ({
+        course.class_courses?.map(cc => ({
           id: cc.id,
           class_id: cc.class_id,
           class_name: cc.classes?.class_name,
@@ -38,22 +38,22 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
             nama_lengkap: cc.app_user?.nama_lengkap,
             email: cc.app_user?.email,
             kode_guru: cc.app_user?.teacher_details?.kode_guru,
-            profile_picture_url: cc.app_user?.profile_picture_url
+            profile_picture_url: cc.app_user?.profile_picture_url,
           },
           students:
-            cc.enrollments?.map((enrollment) => ({
+            cc.enrollments?.map(enrollment => ({
               id: enrollment.app_user?.id,
               nama_lengkap: enrollment.app_user?.nama_lengkap,
               email: enrollment.app_user?.email,
               nis: enrollment.app_user?.student_details?.nis,
               roll_number: enrollment.roll_number,
               enrollment_date: enrollment.enrollment_date,
-              profile_picture_url: enrollment.app_user?.profile_picture_url
+              profile_picture_url: enrollment.app_user?.profile_picture_url,
             })) || [],
           sessions:
             // Sort sessions by session_number, with start_time as tiebreaker
             cc.sessions
-              ?.map((session) => ({
+              ?.map(session => ({
                 id: session.id,
                 title: session.title,
                 description: session.description,
@@ -63,15 +63,15 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
                 is_completed: session.is_completed,
                 completed_at: session.completed_at,
                 materials:
-                  session.materials?.map((material) => ({
+                  session.materials?.map(material => ({
                     id: material.id,
                     title: material.title,
                     content: material.content,
                     material_order: material.material_order,
-                    created_at: material.created_at
+                    created_at: material.created_at,
                   })) || [],
                 resources:
-                  session.resources?.map((resource) => ({
+                  session.resources?.map(resource => ({
                     id: resource.id,
                     file_name: resource.file_name,
                     file_url: resource.file_url,
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
                     content_type: resource.content_type,
                     is_public: resource.is_public,
                     download_count: resource.download_count,
-                    uploader: resource.app_user?.nama_lengkap
+                    uploader: resource.app_user?.nama_lengkap,
                   })) || [],
                 forum: session.forums
                   ? {
@@ -90,7 +90,7 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
                       created_at: session.forums.created_at,
                       creator: session.forums.app_user?.nama_lengkap,
                       posts:
-                        session.forums.forum_posts?.map((post) => ({
+                        session.forums.forum_posts?.map(post => ({
                           id: post.id,
                           title: post.title,
                           content: post.content,
@@ -99,17 +99,17 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
                           updated_at: post.updated_at,
                           author: post.app_user?.nama_lengkap,
                           reply_count: post.forum_replies?.length || 0,
-                          is_deleted: post.is_deleted
-                        })) || []
+                          is_deleted: post.is_deleted,
+                        })) || [],
                     }
                   : null,
                 attendance_summary: {
                   total_students: cc.enrollments?.length || 0,
-                  present: session.attendance?.filter((a) => a.status === 'present').length || 0,
-                  absent: session.attendance?.filter((a) => a.status === 'absent').length || 0,
-                  late: session.attendance?.filter((a) => a.status === 'late').length || 0,
-                  excused: session.attendance?.filter((a) => a.status === 'excused').length || 0
-                }
+                  present: session.attendance?.filter(a => a.status === 'present').length || 0,
+                  absent: session.attendance?.filter(a => a.status === 'absent').length || 0,
+                  late: session.attendance?.filter(a => a.status === 'late').length || 0,
+                  excused: session.attendance?.filter(a => a.status === 'excused').length || 0,
+                },
               }))
               // Sort sessions here
               .sort((a, b) => {
@@ -124,13 +124,13 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
           start_date: cc.start_date,
           end_date: cc.end_date,
           is_active: cc.is_active,
-          syllabus: cc.syllabus
-        })) || []
+          syllabus: cc.syllabus,
+        })) || [],
     };
 
     const response: ApiResponse<typeof transformedCourse> = {
       success: true,
-      data: transformedCourse
+      data: transformedCourse,
     };
 
     return NextResponse.json(response);
@@ -140,7 +140,7 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
     const response: ApiResponse<null> = {
       success: false,
       error: 'Internal server error',
-      message: 'Failed to fetch course details'
+      message: 'Failed to fetch course details',
     };
 
     return NextResponse.json(response, { status: 500 });
@@ -158,7 +158,7 @@ export async function PUT(request: NextRequest, { params }: { params: { code: st
       const response: ApiResponse<null> = {
         success: false,
         error: 'Not found',
-        message: 'Course not found'
+        message: 'Course not found',
       };
       return NextResponse.json(response, { status: 404 });
     }
@@ -167,13 +167,13 @@ export async function PUT(request: NextRequest, { params }: { params: { code: st
     const updatedCourse = await courseService.update(existingCourse.id, {
       course_name: body.course_name,
       description: body.description,
-      updated_by: body.updated_by
+      updated_by: body.updated_by,
     });
 
     const response: ApiResponse<typeof updatedCourse> = {
       success: true,
       data: updatedCourse,
-      message: 'Course updated successfully'
+      message: 'Course updated successfully',
     };
 
     return NextResponse.json(response);
@@ -183,7 +183,7 @@ export async function PUT(request: NextRequest, { params }: { params: { code: st
     const response: ApiResponse<null> = {
       success: false,
       error: 'Internal server error',
-      message: 'Failed to update course'
+      message: 'Failed to update course',
     };
 
     return NextResponse.json(response, { status: 500 });
@@ -200,7 +200,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { code:
       const response: ApiResponse<null> = {
         success: false,
         error: 'Not found',
-        message: 'Course not found'
+        message: 'Course not found',
       };
       return NextResponse.json(response, { status: 404 });
     }
@@ -210,7 +210,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { code:
 
     const response: ApiResponse<null> = {
       success: true,
-      message: 'Course deleted successfully'
+      message: 'Course deleted successfully',
     };
 
     return NextResponse.json(response);
@@ -225,7 +225,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { code:
     const response: ApiResponse<null> = {
       success: false,
       error: 'Database error',
-      message: errorMessage
+      message: errorMessage,
     };
 
     return NextResponse.json(response, { status: 400 });

@@ -5,7 +5,8 @@ import path from 'path';
 export async function GET(request: NextRequest, { params }: { params: { path: string[] } }) {
   try {
     // Join the path segments
-    const filePath = params.path.join('/');
+    const { path: pathSegments } = await params;
+    const filePath = pathSegments.join('/');
     const fullPath = path.join(process.cwd(), 'public', 'uploads', filePath);
 
     console.log('=== FILE READ REQUEST ===');

@@ -28,5 +28,25 @@
     "title": "test",
     "description": "",
     "created_at": "2025-06-07T20:48:28.669Z"
+  },
+  {
+    "id": 1749378394538,
+    "session_id": 1,
+    "file_name": "dummy.pdf",
+    "file_url": "/uploads/courses/MAT001/sessions/1/1749378394196_dummy.pdf",
+    "file_type": "file",
+    "title": "materi proposal",
+    "description": "",
+    "created_at": "2025-06-08T10:26:34.538Z"
+  },
+  {
+    "id": 1749379028366,
+    "session_id": 1,
+    "file_name": "Lokasi",
+    "file_url": "https://www.google.com/maps/place/Kabupaten+Raja+Ampat/@-1.0320468,130.5052176,3a,75y,90t/data=!3m8!1e2!3m6!1sCIHM0ogKEICAgIDE6ZLYHg!2e10!3e12!6shttps:%2F%2Flh3.googleusercontent.com%2Fgps-cs-s%2FAC9h4npI_6lf5x6Bgu0mv4Y3N0Tee0WqTsu1rSCbZHRNdgFDvDzYbl-lUHzO3h1uvX8lsqTeNPisNzZoFZc0WKTDXV9eS3hnppibpkpaKKzatlPeWB7Qgi7pn0yt0UQVow03IJGQFuHo%3Dw203-h147-k-no!7i1024!8i745!4m15!1m7!3m6!1s0x2d5c3eaaccb47097:0x7851bd844c4cdf44!2sKabupaten+Raja+Ampat!8m2!3d-1.0320468!4d130.5052176!16s%2Fm%2F02pgv9k!3m6!1s0x2d5c3eaaccb47097:0x7851bd844c4cdf44!8m2!3d-1.0320468!4d130.5052176!10e5!16s%2Fm%2F02pgv9k?entry=ttu&g_ep=EgoyMDI1MDYwNC4wIKXMDSoASAFQAw%3D%3D",
+    "file_type": "link",
+    "title": "Lokasi",
+    "description": "",
+    "created_at": "2025-06-08T10:37:08.367Z"
   }
 ]

@@ -4,18 +4,9 @@ import { useState, useEffect } from 'react';
 import { FaFile, FaVideo, FaLink, FaPlus, FaClock, FaBookOpen, FaDownload, FaExternalLinkAlt } from 'react-icons/fa';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { Resource } from '@/types';
+import { Material } from '@/types';
 import UploadModal from './upload-modal';
-
-interface Material {
-  title: string;
-  description?: string;
-}
-
-interface Resource {
-  file_name: string;
-  file_url: string;
-  file_type: 'pdf' | 'video' | 'link' | string;
-}
 
 interface SessionData {
   id: number;
@@ -36,7 +27,6 @@ interface SessionProps {
   userRole?: string;
 }
 
-// Keep all your existing helper functions (getResourceIcon, formatTime, formatDate, SessionSelector, SessionContent)
 const getResourceIcon = (fileType: string) => {
   switch (fileType) {
     case 'pdf':
@@ -144,10 +134,10 @@ const SessionContent = ({ session, loadingResources }: { session: SessionData; l
             <ul className="space-y-2">
               {session.materials.map((material, index) => (
                 <li key={index} className="flex items-start gap-2">
-                  <span className="text-blue-600 mt-1">•</span>
+                  <span className="text-blue-600 mt-1">•</span>{' '}
                   <div>
                     <span className="text-gray-800 font-medium">{material.title}</span>
-                    {material.description && <p className="text-gray-600 text-sm mt-1">{material.description}</p>}
+                    {material.content && <p className="text-gray-600 text-sm mt-1">{material.content}</p>}
                   </div>
                 </li>
               ))}
@@ -157,7 +147,6 @@ const SessionContent = ({ session, loadingResources }: { session: SessionData; l
           )}
         </div>
       </div>
-
       {/* Session Time */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="bg-green-50 rounded-lg p-4">
@@ -177,7 +166,6 @@ const SessionContent = ({ session, loadingResources }: { session: SessionData; l
           <p className="text-red-600 text-sm mt-1">{formatDate(session.end_time)}</p>
         </div>
       </div>
-
       {/* Session Duration */}
       {session.start_time && session.end_time && (
         <div className="bg-blue-50 rounded-lg p-4 mb-6">
@@ -206,9 +194,8 @@ const SessionContent = ({ session, loadingResources }: { session: SessionData; l
           </p>
         </div>
       )}
-
       {/* Resources Section */}
-      <div>
+      {/* <div>
         <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
           <FaDownload className="text-sm text-blue-600" />
           Available Resources
@@ -239,48 +226,8 @@ const SessionContent = ({ session, loadingResources }: { session: SessionData; l
             <p className="text-gray-500 italic">No resources available for this session.</p>
           )}
         </div>
-      </div>
-      {/* Resources Section with Loading State */}
-      <div>
-        <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-          <FaDownload className="text-sm text-blue-600" />
-          Available Resources
-        </h4>
-        <div className="bg-gray-50 rounded-lg p-4">
-          {loadingResources ? (
-            <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
-              <span className="ml-2 text-gray-600">Loading resources...</span>
-            </div>
-          ) : session.resources?.length ? (
-            <div className="grid gap-3">
-              {session.resources.map((resource, index) => (
-                <a
-                  key={resource.id || index}
-                  href={resource.file_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 group"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">{getResourceIcon(resource.file_type)}</span>
-                    <div>
-                      <span className="text-gray-800 font-medium group-hover:text-blue-700">
-                        {resource.title || resource.file_name}
-                      </span>
-                      <p className="text-xs text-gray-500 capitalize">{resource.file_type} file</p>
-                      {resource.description && <p className="text-xs text-gray-600 mt-1">{resource.description}</p>}
-                    </div>
-                  </div>
-                  <FaExternalLinkAlt className="text-gray-400 group-hover:text-blue-600 text-sm" />
-                </a>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500 italic">No resources available for this session.</p>
-          )}
-        </div>
-      </div>
+      </div> */}{' '}
+      {/* Resources section moved to sidebar */}
     </CardContent>
   </Card>
 );
@@ -288,6 +235,8 @@ const SessionContent = ({ session, loadingResources }: { session: SessionData; l
 // ✅ FIXED: ActionsSidebar now receives all required props
 interface ActionsSidebarProps {
   session: SessionData;
+  sessionResources: Resource[];
+  loadingResources: boolean;
   isFabOpen: boolean;
   setIsFabOpen: (open: boolean) => void;
   onAddFile: () => void;
@@ -297,6 +246,8 @@ interface ActionsSidebarProps {
 
 const ActionsSidebar = ({
   session,
+  sessionResources,
+  loadingResources,
   isFabOpen,
   setIsFabOpen,
   onAddFile,
@@ -309,26 +260,37 @@ const ActionsSidebar = ({
         <CardTitle className="text-lg">Session Actions</CardTitle>
       </CardHeader>
       <CardContent>
-        {/* Quick Actions */}
+        {/* Resources Section - Now with all resources */}
         <div className="mb-6">
-          <h4 className="font-semibold text-gray-800 mb-3">Quick Access</h4>
-          <div className="space-y-2">
-            {session.resources?.length ? (
-              session.resources.slice(0, 3).map((resource, index) => (
+          <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+            <FaDownload className="text-sm text-blue-600" />
+            Available Resources
+          </h4>
+          <div className="space-y-2 max-h-96 overflow-y-auto">
+            {loadingResources ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                <span className="ml-2 text-gray-600 text-sm">Loading...</span>
+              </div>
+            ) : sessionResources?.length ? (
+              sessionResources.map((resource, index) => (
                 <a
-                  key={index}
+                  key={resource.id || index}
                   href={resource.file_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200 hover:border-blue-300"
                 >
                   <span className="text-lg">{getResourceIcon(resource.file_type)}</span>
-                  <span className="text-sm text-gray-700 truncate flex-1">{resource.file_name}</span>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-sm text-gray-700 truncate block font-medium">{resource.file_name}</span>
+                    <p className="text-xs text-gray-500 capitalize">{resource.file_type} file</p>
+                  </div>
                   <FaExternalLinkAlt className="text-xs text-gray-400" />
                 </a>
               ))
             ) : (
-              <p className="text-sm text-gray-500 italic">No quick actions available</p>
+              <p className="text-sm text-gray-500 italic">No resources available</p>
             )}
           </div>
         </div>
@@ -469,19 +431,15 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRo
       <SessionSelector sessions={sessions} activeSession={activeSession} setActiveSession={setActiveSession} />
 
       <div className="flex flex-col lg:flex-row gap-6">
+        {' '}
         <div className="flex-1">
-          <SessionContent
-            session={{
-              ...currentSession,
-              resources: sessionResources, // Pass fetched resources
-            }}
-            loadingResources={loadingResources}
-          />
+          <SessionContent session={currentSession} loadingResources={loadingResources} />
         </div>
-
         <div className="lg:w-80">
           <ActionsSidebar
             session={currentSession}
+            sessionResources={sessionResources}
+            loadingResources={loadingResources}
             isFabOpen={isFabOpen}
             setIsFabOpen={setIsFabOpen}
             onAddFile={handleAddFile}

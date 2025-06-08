@@ -21,7 +21,7 @@ export interface UserProfile {
   user_id: number;
   tmp_lahir?: string;
   tgl_lahir?: Date;
-  gender?: 'L' | 'P';
+  gender?: string;
   telepon?: string;
   alamat?: string;
   agama?: string;
@@ -91,23 +91,23 @@ export interface AcademicYear {
   year_name: string;
   start_date: Date;
   end_date: Date;
-  is_active: boolean;
+  is_active?: boolean;
   created_by?: number;
   updated_by?: number;
-  created_at: Date;
-  updated_at: Date;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 export interface Class {
   id: number;
   class_name: string;
-  grade_level: 'X' | 'XI' | 'XII';
-  year_id: number;
+  grade_level: string;
+  year_id?: number;
   wali_kelas?: number;
   created_by?: number;
   updated_by?: number;
-  created_at: Date;
-  updated_at: Date;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 export interface Course {
@@ -117,96 +117,97 @@ export interface Course {
   description?: string;
   created_by?: number;
   updated_by?: number;
-  created_at: Date;
-  updated_at: Date;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 export interface ClassCourse {
   id: number;
-  class_id: number;
-  course_id: number;
+  class_id?: number;
+  course_id?: number;
   teacher_id?: number;
   start_date: Date;
   end_date: Date;
-  is_active: boolean;
+  is_active?: boolean;
+  syllabus?: string;
 }
 
 export interface Enrollment {
   id: number;
-  class_course_id: number;
-  student_id: number;
+  class_course_id?: number;
+  student_id?: number;
   roll_number?: number;
-  enrollment_date: Date;
+  enrollment_date?: Date;
 }
 
 export interface Session {
   id: number;
-  class_course_id: number;
+  class_course_id?: number;
   title: string;
   description?: string;
   session_number: number;
   start_time: Date;
   end_time: Date;
-  is_completed: boolean;
+  is_completed?: boolean;
   completed_at?: Date;
 }
 
 export interface Material {
   id: number;
-  session_id: number;
+  session_id?: number;
   title: string;
   content?: string;
   material_order: number;
-  created_at: Date;
+  created_at?: Date;
 }
 
 export interface Resource {
   id: number;
-  session_id: number;
+  session_id?: number;
   uploader_id?: number;
   file_url: string;
   file_name: string;
   file_size: number;
   file_type: string;
   content_type?: string;
-  version: number;
-  is_public: boolean;
-  download_count: number;
+  version?: number;
+  is_public?: boolean;
+  download_count?: number;
   last_downloaded?: Date;
   checksum?: string;
 }
 
 export interface Forum {
   id: number;
-  session_id: number;
-  creator_id: number;
+  session_id?: number;
+  creator_id?: number;
   title: string;
   description?: string;
-  created_at: Date;
+  created_at?: Date;
 }
 
 export interface ForumPost {
   id: number;
-  forum_id: number;
+  forum_id?: number;
   user_id?: number;
   title: string;
   content: string;
-  content_type: 'plaintext' | 'markdown';
-  is_deleted: boolean;
-  created_at: Date;
-  updated_at: Date;
+  content_type?: string;
+  is_deleted?: boolean;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 export interface ForumReply {
   id: number;
-  post_id: number;
+  post_id?: number;
   user_id?: number;
   parent_reply_id?: number;
   content: string;
-  content_type: 'plaintext' | 'markdown';
-  is_deleted: boolean;
-  created_at: Date;
-  updated_at: Date;
+  content_type?: string;
+  is_deleted?: boolean;
+  created_at?: Date;
+  updated_at?: Date;
 }
 
 export interface ForumAttachment {
@@ -217,18 +218,17 @@ export interface ForumAttachment {
   file_url: string;
   file_name: string;
   file_size: number;
-  file_type: string;
-  uploaded_at: Date;
+  uploaded_at?: Date;
 }
 
 export interface Attendance {
   id: number;
-  session_id: number;
-  student_id: number;
-  status: 'present' | 'absent' | 'late' | 'excused';
+  session_id?: number;
+  student_id?: number;
+  status: string;
   recorded_by?: number;
   notes?: string;
-  recorded_at: Date;
+  recorded_at?: Date;
 }
 
 export interface Announcement {
@@ -236,23 +236,23 @@ export interface Announcement {
   author_id?: number;
   title: string;
   content: string;
-  target_type: 'global' | 'class' | 'course' | 'user';
+  target_type: string;
   target_id?: number;
   start_date: Date;
   end_date?: Date;
-  created_at: Date;
+  created_at?: Date;
 }
 
 export interface Notification {
   id: number;
-  user_id: number;
+  user_id?: number;
   title: string;
   message: string;
-  is_read: boolean;
+  is_read?: boolean;
   notification_type: string;
   related_entity_type?: string;
   related_entity_id?: number;
-  created_at: Date;
+  created_at?: Date;
   read_at?: Date;
 }
 

@@ -75,7 +75,7 @@ export async function POST(request: NextRequest, { params }: { params: { code: s
 
 export async function GET(request: NextRequest, { params }: { params: { code: string; sessionId: string } }) {
   try {
-    const { sessionId } = params;
+    const { sessionId } = await params;
 
     console.log('=== RESOURCE FETCH REQUEST ===');
     console.log('Session ID:', sessionId);
@@ -99,10 +99,8 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
       allResources = JSON.parse(fileContent);
     } catch (error) {
       allResources = [];
-    }
-
-    // Filter resources for this session
-    const sessionResources = allResources.filter(resource => resource.session_id === parseInt(sessionId));
+    } // Filter resources for this session
+    const sessionResources = allResources.filter((resource: any) => resource.session_id === parseInt(sessionId));
 
     return NextResponse.json({
       success: true,

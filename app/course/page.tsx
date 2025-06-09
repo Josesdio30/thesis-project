@@ -8,6 +8,7 @@ import Topbar from '../_components/topbar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FaBook, FaClipboard, FaCode, FaSpinner } from 'react-icons/fa';
 import { cn } from '@/lib/utils';
+import { useSession } from 'next-auth/react';
 
 interface Course {
   id?: string;
@@ -70,17 +71,30 @@ const CourseCard = ({ course }: { course: Course }) => (
   </Link>
 );
 
-const EmptyState = () => (
-  <div className="col-span-full flex flex-col items-center justify-center py-12">
-    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-      <FaBook className="text-gray-400 text-3xl" />
+const EmptyState = ({ userRole }: { userRole?: string }) => {
+  const getMessage = () => {
+    switch (userRole) {
+      case 'STUDENT':
+        return 'You are not enrolled in any courses yet. Please contact your administrator for course enrollment.';
+      case 'TEACHER':
+        return 'You are not assigned to teach any courses yet. Please contact your administrator.';
+      case 'ADMIN':
+        return 'No courses have been created yet. You can create courses through the admin panel.';
+      default:
+        return 'There are currently no courses to display. Please check back later or contact your administrator.';
+    }
+  };
+
+  return (
+    <div className="col-span-full flex flex-col items-center justify-center py-12">
+      <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+        <FaBook className="text-gray-400 text-3xl" />
+      </div>
+      <h3 className="text-lg font-medium text-gray-900 mb-2">No Courses Available</h3>
+      <p className="text-gray-600 text-center max-w-md">{getMessage()}</p>
     </div>
-    <h3 className="text-lg font-medium text-gray-900 mb-2">No Courses Available</h3>
-    <p className="text-gray-600 text-center max-w-md">
-      There are currently no courses to display. Please check back later or contact your administrator.
-    </p>
-  </div>
-);
+  );
+};
 
 const LoadingState = () => (
   <div className="col-span-full flex flex-col items-center justify-center py-12">
@@ -89,7 +103,34 @@ const LoadingState = () => (
   </div>
 );
 
+const getPageTitle = (role?: string) => {
+  switch (role) {
+    case 'STUDENT':
+      return 'My Courses';
+    case 'TEACHER':
+      return 'Teaching Courses';
+    case 'ADMIN':
+      return 'All Courses';
+    default:
+      return 'Courses';
+  }
+};
+
+const getPageDescription = (role?: string) => {
+  switch (role) {
+    case 'STUDENT':
+      return 'View and access your enrolled courses';
+    case 'TEACHER':
+      return 'Manage your teaching courses';
+    case 'ADMIN':
+      return 'Manage all courses in the system';
+    default:
+      return 'Browse and access your available courses';
+  }
+};
+
 const Course = () => {
+  const { data: session, status } = useSession();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -97,9 +138,42 @@ const Course = () => {
 
   useEffect(() => {
     const fetchCourses = async () => {
+      // Wait for session to load
+      if (status === 'loading') {
+        return;
+      }
+
+      if (status === 'unauthenticated' || !session?.user) {
+        setError('Authentication required');
+        setLoading(false);
+        return;
+      }
+
       try {
         setError(null);
-        const res = await fetch('/api/courses');
+        setLoading(true);
+
+        // Build API URL with user-specific filters
+        let apiUrl = '/api/courses';
+        const params = new URLSearchParams(); // Filter courses based on user role
+        if (session.user.role === 'STUDENT' && session.user.id) {
+          params.append('studentId', session.user.id);
+        } else if (session.user.role === 'TEACHER' && session.user.id) {
+          params.append('teacherId', session.user.id);
+        }
+        // For ADMIN role, no filtering - show all courses
+
+        if (params.toString()) {
+          apiUrl += `?${params.toString()}`;
+        }
+
+        console.log('Fetching courses for user:', {
+          role: session.user.role,
+          userId: session.user.id,
+          apiUrl,
+        });
+
+        const res = await fetch(apiUrl);
 
         if (!res.ok) {
           throw new Error('Failed to fetch courses');
@@ -116,37 +190,40 @@ const Course = () => {
     };
 
     fetchCourses();
-  }, []);
+  }, [session, status]);
 
   return (
     <div className="flex max-h-screen">
       <Sidebar isMobileOpen={sidebarOpen} setIsMobileOpen={setSidebarOpen} />
 
       <div className="flex flex-col flex-1 bg-gray-50">
-        <Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
-
+        <Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />{' '}
         <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto">
           {/* Page Header */}
           <div className="mb-8">
-            {/* <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-blue-100 rounded-lg">
                 <FaBook className="text-blue-600 text-xl" />
-              </div>
+              </div>{' '}
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Courses</h1>
-                <p className="text-gray-600 mt-1">Browse and access your available courses</p>
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{getPageTitle(session?.user?.role)}</h1>
+                <p className="text-gray-600 mt-1">{getPageDescription(session?.user?.role)}</p>
               </div>
-            </div> */}
+            </div>
 
             {!loading && !error && (
               <div className="flex items-center gap-2 text-sm text-gray-600 mt-4">
                 <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
                   {courses.length} {courses.length === 1 ? 'Course' : 'Courses'}
                 </span>
+                {session?.user?.role && (
+                  <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full font-medium capitalize">
+                    {session.user.role}
+                  </span>
+                )}
               </div>
             )}
           </div>
-
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
               <div className="flex items-center gap-2 text-red-800">
@@ -154,8 +231,7 @@ const Course = () => {
                 <span>{error}</span>
               </div>
             </div>
-          )}
-
+          )}{' '}
           <div className={cn('grid gap-4 md:gap-6', 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3')}>
             {loading ? (
               <LoadingState />
@@ -169,13 +245,12 @@ const Course = () => {
                 </button>
               </div>
             ) : courses.length === 0 ? (
-              <EmptyState />
+              <EmptyState userRole={session?.user?.role} />
             ) : (
               courses.map((course, index) => <CourseCard key={course.id || index} course={course} />)
             )}
           </div>
         </main>
-
         <Footer />
       </div>
     </div>

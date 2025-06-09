@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { ApiResponse } from '@/types';
 
-export async function GET(request: NextRequest, { params }: { params: { code: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   try {
-    const { code } = params;
+    const { code } = await params;
 
     // Find the class_course by course code to get the syllabus
     const classCourse = await prisma.class_courses.findFirst({
@@ -61,9 +61,9 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { code: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   try {
-    const { code } = params;
+    const { code } = await params;
     const body = await request.json();
     const { syllabus, updated_by } = body;
 

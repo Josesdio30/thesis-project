@@ -100,9 +100,67 @@ export async function POST(request: NextRequest, { params }: { params: { code: s
   }
 }
 
-export async function GET(request: NextRequest, { params }: { params: { code: string; sessionId: string } }) {
+// export async function GET(request: NextRequest, { params }: { params: { code: string; sessionId: string } }) {
+//   try {
+//     const { sessionId } = await params;
+//     const sessionIdNum = parseInt(sessionId);
+
+//     console.log('=== RESOURCE FETCH REQUEST ===');
+//     console.log('Session ID:', sessionId);
+//     console.log('===============================');
+
+//     // Fetch resources from database using Prisma
+//     const resources = await prisma.resources.findMany({
+//       where: {
+//         session_id: sessionIdNum,
+//       },
+//       include: {
+//         app_user: {
+//           select: {
+//             nama_lengkap: true,
+//           },
+//         },
+//       },
+//       orderBy: {
+//         id: 'desc', // Use id instead of upload_date since upload_date doesn't exist
+//       },
+//     });
+
+//     return NextResponse.json({
+//       success: true,
+//       data: resources.map(resource => ({
+//         id: resource.id,
+//         file_name: resource.file_name,
+//         file_tittle: resource.file_tittle, // Include file_tittle field
+//         file_url: resource.file_url,
+//         file_type: resource.file_type,
+//         file_size: resource.file_size,
+//         content_type: resource.content_type,
+//         version: resource.version,
+//         is_public: resource.is_public,
+//         download_count: resource.download_count,
+//         uploader: resource.app_user?.nama_lengkap,
+//       })),
+//     });
+//   } catch (error) {
+//     console.error('=== FETCH ERROR ===');
+//     console.error('Error details:', error);
+
+//     return NextResponse.json(
+//       {
+//         success: false,
+//         error: 'Database error',
+//         details: error instanceof Error ? error.message : 'Failed to fetch resources',
+//       },
+//       { status: 500 }
+//     );
+//   }
+// }
+
+export async function GET(request: NextRequest, { params }: { params: Promise<{ code: string; sessionId: string }> }) {
   try {
-    const { sessionId } = params;
+    // Await params before using its properties
+    const { sessionId } = await params;
     const sessionIdNum = parseInt(sessionId);
 
     console.log('=== RESOURCE FETCH REQUEST ===');

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   FaFile,
   FaVideo,
@@ -12,12 +12,14 @@ import {
   FaExternalLinkAlt,
   FaTrash,
   FaEllipsisV,
+  FaChevronDown,
 } from 'react-icons/fa';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import UploadModal from './upload-modal';
 import DeleteConfirmModal from './delete-confirm-modal';
 import { useToast } from './toast';
+import { useSession } from 'next-auth/react';
 
 interface Material {
   title: string;
@@ -56,7 +58,6 @@ interface SessionProps {
   activeSession: number;
   setActiveSession: (id: number) => void;
   courseCode?: string;
-  userRole?: string;
 }
 
 const getResourceIcon = (fileType: string) => {
@@ -80,24 +81,169 @@ const SessionSelector = ({
   sessions: SessionData[];
   activeSession: number;
   setActiveSession: (id: number) => void;
-}) => (
-  <div className="flex space-x-3 mb-6 overflow-x-auto pb-2">
-    {sessions.map(session => (
-      <button
-        key={session.id}
-        onClick={() => setActiveSession(session.id)}
-        className={cn(
-          'px-4 py-2 rounded-lg border transition-all duration-200 whitespace-nowrap flex-shrink-0',
-          activeSession === session.id
-            ? 'bg-blue-500 text-white border-blue-500 shadow-md'
-            : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-300'
+}) => {
+  const [visibleSessions, setVisibleSessions] = useState<SessionData[]>([]);
+  const [hiddenSessions, setHiddenSessions] = useState<SessionData[]>([]);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownPosition, setDropdownPosition] = useState<'left' | 'right'>('right');
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const calculateVisibleSessions = () => {
+      if (!containerRef.current) return;
+
+      const containerWidth = containerRef.current.offsetWidth;
+      const buttonWidth = 110;
+      const dropdownButtonWidth = 60;
+      const maxVisibleButtons = Math.floor((containerWidth - dropdownButtonWidth) / buttonWidth);
+      if (maxVisibleButtons >= sessions.length) {
+        setVisibleSessions(sessions);
+        setHiddenSessions([]);
+      } else {
+        const activeSessionData = sessions.find(s => s.id === activeSession);
+        let visible: SessionData[] = [];
+        let hidden: SessionData[] = [];
+        if (activeSessionData) {
+          const activeIndex = sessions.findIndex(s => s.id === activeSession);
+
+          const currentVisible = visibleSessions.length > 0 ? visibleSessions : sessions.slice(0, maxVisibleButtons);
+          const isActiveCurrentlyVisible = currentVisible.some(s => s.id === activeSession);
+
+          if (isActiveCurrentlyVisible) {
+            visible = currentVisible.slice(0, maxVisibleButtons);
+            hidden = sessions.filter(s => !visible.includes(s));
+          } else {
+            const remainingSlots = maxVisibleButtons - 1;
+
+            let startIndex = Math.max(0, activeIndex - Math.floor(remainingSlots / 2));
+            let endIndex = Math.min(sessions.length, startIndex + maxVisibleButtons);
+
+            if (endIndex - startIndex < maxVisibleButtons) {
+              startIndex = Math.max(0, endIndex - maxVisibleButtons);
+            }
+
+            visible = sessions.slice(startIndex, endIndex);
+            hidden = sessions.filter(s => !visible.includes(s));
+          }
+        } else {
+          visible = sessions.slice(0, maxVisibleButtons);
+          hidden = sessions.slice(maxVisibleButtons);
+        }
+
+        setVisibleSessions(visible);
+        setHiddenSessions(hidden);
+      }
+    };
+
+    calculateVisibleSessions();
+
+    const handleResize = () => calculateVisibleSessions();
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, [sessions, activeSession]);
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    const calculateDropdownPosition = () => {
+      if (dropdownButtonRef.current && dropdownOpen) {
+        const buttonRect = dropdownButtonRef.current.getBoundingClientRect();
+        const dropdownWidth = 180;
+        const rightSpace = window.innerWidth - buttonRect.right;
+
+        if (rightSpace < dropdownWidth && buttonRect.left > dropdownWidth) {
+          setDropdownPosition('left');
+        } else {
+          setDropdownPosition('right');
+        }
+      }
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      calculateDropdownPosition();
+      return () => document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, [dropdownOpen]);
+
+  return (
+    <div className="mb-6" ref={containerRef}>
+      <div className="flex items-center gap-3">
+        {/* Visible session buttons */}
+        {visibleSessions.map(session => (
+          <button
+            key={session.id}
+            onClick={() => setActiveSession(session.id)}
+            className={cn(
+              'px-4 py-2 rounded-lg border transition-all duration-200 whitespace-nowrap flex-shrink-0',
+              activeSession === session.id
+                ? 'bg-blue-500 text-white border-blue-500 shadow-md'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-300'
+            )}
+          >
+            Session {session.session_number}
+          </button>
+        ))}
+
+        {/* Dropdown for hidden sessions */}
+        {hiddenSessions.length > 0 && (
+          <div className="relative" ref={dropdownRef}>
+            {' '}
+            <button
+              ref={dropdownButtonRef}
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className={cn(
+                'px-3 py-2 rounded-lg border transition-all duration-200 flex items-center gap-2',
+                dropdownOpen
+                  ? 'bg-blue-50 border-blue-300 text-blue-700'
+                  : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+              )}
+            >
+              <span className="text-sm">+{hiddenSessions.length}</span>
+              <FaChevronDown
+                className={cn('text-xs transition-transform duration-200', dropdownOpen && 'rotate-180')}
+              />
+            </button>{' '}
+            {dropdownOpen && (
+              <div
+                className={cn(
+                  'absolute top-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-[180px] max-h-[300px] overflow-y-auto',
+                  dropdownPosition === 'left' ? 'right-0' : 'left-0'
+                )}
+              >
+                {hiddenSessions.map(session => (
+                  <button
+                    key={session.id}
+                    onClick={() => {
+                      setActiveSession(session.id);
+                      setDropdownOpen(false);
+                    }}
+                    className={cn(
+                      'w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0',
+                      activeSession === session.id && 'bg-blue-50 text-blue-700'
+                    )}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">Session {session.session_number}</span>
+                      {/* <span className="text-gray-400">•</span> */}
+                      {/* <span className="text-gray-600 truncate flex-1">{session.title}</span> */}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         )}
-      >
-        Session {session.session_number}
-      </button>
-    ))}
-  </div>
-);
+      </div>
+    </div>
+  );
+};
 
 const formatTime = (timeString: string) => {
   if (!timeString) {
@@ -257,7 +403,6 @@ interface ActionsSidebarProps {
   onAddLink: () => void;
   onDeleteResource: (resource: Resource) => void;
   courseCode?: string;
-  userRole?: string;
 }
 
 const ActionsSidebar = ({
@@ -271,17 +416,18 @@ const ActionsSidebar = ({
   onAddLink,
   onDeleteResource,
   courseCode,
-  userRole,
 }: ActionsSidebarProps) => {
+  const { data: sessionData, status } = useSession();
   const [resourceMenuOpen, setResourceMenuOpen] = useState<number | null>(null);
+
   const handleDeleteClick = async (resource: Resource) => {
     onDeleteResource(resource);
     setResourceMenuOpen(null);
   };
 
-  const canManageResources = userRole === 'teacher' || userRole === 'admin';
+  // Check if user can manage resources (teachers and admins only)
+  const canManageResources = sessionData?.user?.role === 'TEACHER' || sessionData?.user?.role === 'ADMIN';
 
-  // Close resource menu when clicking outside
   useEffect(() => {
     const handleClickOutside = () => {
       setResourceMenuOpen(null);
@@ -303,7 +449,7 @@ const ActionsSidebar = ({
             <FaDownload className="text-sm text-blue-600" />
             Available Resources
           </h4> */}
-          <div className="space-y-2 max-h-96 overflow-y-auto">
+          <div className="space-y-2 max-h-96">
             {loadingResources ? (
               <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
@@ -387,70 +533,85 @@ const ActionsSidebar = ({
             ) : (
               <p className="text-sm text-gray-500 italic">No resources available</p>
             )}
-          </div>
+          </div>{' '}
         </div>
 
-        {/* Floating Action Button */}
-        <div className="relative">
-          <h4 className="font-semibold text-gray-800 mb-3">Add Content</h4>
+        {/* Upload Section - Only for Teachers and Admins */}
+        {canManageResources && (
+          <div className="relative">
+            <h4 className="font-semibold text-gray-800 mb-3">Add Content</h4>
 
-          <div className="relative flex justify-center">
-            <button
-              onClick={() => setIsFabOpen(!isFabOpen)}
-              className={cn(
-                'w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-600 transition-all duration-300',
-                isFabOpen && 'rotate-45'
-              )}
-            >
-              <FaPlus className="text-lg" />
-            </button>
-
-            {/* Action Buttons */}
-            <div className="absolute top-16 flex flex-col items-center space-y-3">
+            <div className="relative flex justify-center">
               <button
-                onClick={onAddFile}
+                onClick={() => setIsFabOpen(!isFabOpen)}
                 className={cn(
-                  'flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-full shadow-md hover:bg-gray-100 transition-all duration-300',
-                  isFabOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
+                  'w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-600 transition-all duration-300',
+                  isFabOpen && 'rotate-45'
                 )}
-                style={{ transitionDelay: '0ms' }}
               >
-                <FaFile className="text-blue-600" />
-                <span className="text-sm">File</span>
+                <FaPlus className="text-lg" />
               </button>
 
-              <button
-                onClick={onAddVideo}
-                className={cn(
-                  'flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-full shadow-md hover:bg-gray-100 transition-all duration-300',
-                  isFabOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
-                )}
-                style={{ transitionDelay: '50ms' }}
-              >
-                <FaVideo className="text-red-600" />
-                <span className="text-sm">Video</span>
-              </button>
+              {/* Action Buttons */}
+              <div className="absolute top-16 flex flex-col items-center space-y-3">
+                <button
+                  onClick={onAddFile}
+                  className={cn(
+                    'flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-full shadow-md hover:bg-gray-100 transition-all duration-300',
+                    isFabOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
+                  )}
+                  style={{ transitionDelay: '0ms' }}
+                >
+                  <FaFile className="text-blue-600" />
+                  <span className="text-sm">File</span>
+                </button>
 
-              <button
-                onClick={onAddLink}
-                className={cn(
-                  'flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-full shadow-md hover:bg-gray-100 transition-all duration-300',
-                  isFabOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
-                )}
-                style={{ transitionDelay: '100ms' }}
-              >
-                <FaLink className="text-green-600" />
-                <span className="text-sm">Link</span>
-              </button>
+                <button
+                  onClick={onAddVideo}
+                  className={cn(
+                    'flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-full shadow-md hover:bg-gray-100 transition-all duration-300',
+                    isFabOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
+                  )}
+                  style={{ transitionDelay: '50ms' }}
+                >
+                  <FaVideo className="text-red-600" />
+                  <span className="text-sm">Video</span>
+                </button>
+
+                <button
+                  onClick={onAddLink}
+                  className={cn(
+                    'flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-full shadow-md hover:bg-gray-100 transition-all duration-300',
+                    isFabOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
+                  )}
+                  style={{ transitionDelay: '100ms' }}
+                >
+                  <FaLink className="text-green-600" />
+                  <span className="text-sm">Link</span>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Read-only message for students */}
+        {/* {!canManageResources && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 text-blue-700">
+              <FaBookOpen className="text-sm" />
+              <span className="text-sm font-medium">Resources are read-only</span>
+            </div>
+            <p className="text-blue-600 text-sm mt-1">
+              Only teachers and administrators can upload new resources to this session.
+            </p>
+          </div>
+        )} */}
       </CardContent>
     </Card>
   );
 };
 
-const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRole }: SessionProps) => {
+const Session = ({ sessions, activeSession, setActiveSession, courseCode }: SessionProps) => {
   const [isFabOpen, setIsFabOpen] = useState(false);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [uploadType, setUploadType] = useState<'file' | 'video' | 'link'>('file');
@@ -462,6 +623,7 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRo
   const [loadingResources, setLoadingResources] = useState(false);
 
   const { success, error, info, ToastContainer } = useToast();
+  const { data: sessionData } = useSession();
 
   const currentSession = sessions.find(s => s.id === activeSession);
   const fetchResources = async () => {
@@ -485,7 +647,6 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRo
     }
   };
 
-  // ✅ FIXED: Handler functions defined in correct scope
   const handleAddFile = () => {
     setUploadType('file');
     setIsUploadModalOpen(true);
@@ -506,7 +667,7 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRo
   const handleUploadSuccess = () => {
     success('Resource uploaded', 'New resource has been successfully uploaded');
     setIsUploadModalOpen(false);
-    fetchResources(); // Refresh resources instead of page reload
+    fetchResources();
   };
   // Resource management handlers
   const handleDeleteResource = async (resource: Resource) => {
@@ -581,7 +742,7 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRo
           <SessionContent
             session={{
               ...currentSession,
-              resources: sessionResources, // Pass fetched resources
+              resources: sessionResources,
             }}
             loadingResources={loadingResources}
           />
@@ -591,7 +752,7 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRo
           <ActionsSidebar
             session={{
               ...currentSession,
-              resources: sessionResources, // Pass fetched resources here too
+              resources: sessionResources,
             }}
             sessionResources={sessionResources}
             loadingResources={loadingResources}
@@ -602,7 +763,6 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRo
             onAddLink={handleAddLink}
             onDeleteResource={handleDeleteResource}
             courseCode={courseCode}
-            userRole={userRole}
           />
         </div>
       </div>{' '}

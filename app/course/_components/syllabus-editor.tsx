@@ -7,6 +7,7 @@ interface EditorToolbarProps {
   editor: Editor;
   isPreview: boolean;
   onTogglePreview: () => void;
+  disabled?: boolean;
 }
 
 interface ToolbarButtonProps {
@@ -14,14 +15,16 @@ interface ToolbarButtonProps {
   isActive?: boolean;
   children: React.ReactNode;
   title?: string;
+  disabled?: boolean;
 }
 
-const ToolbarButton = ({ onClick, isActive, children, title }: ToolbarButtonProps) => (
+const ToolbarButton = ({ onClick, isActive, children, title, disabled }: ToolbarButtonProps) => (
   <button
     onClick={onClick}
+    disabled={disabled}
     className={`p-2 rounded hover:bg-gray-100 transition-colors ${
       isActive ? 'bg-blue-100 text-blue-600' : 'text-gray-600'
-    }`}
+    } ${disabled ? 'opacity-50 cursor-not-allowed hover:bg-transparent' : ''}`}
     title={title}
     type="button"
   >
@@ -31,11 +34,11 @@ const ToolbarButton = ({ onClick, isActive, children, title }: ToolbarButtonProp
 
 const Divider = () => <div className="w-px h-6 bg-gray-300 mx-2" />;
 
-export const EditorToolbar = ({ editor, isPreview, onTogglePreview }: EditorToolbarProps) => {
+export const EditorToolbar = ({ editor, isPreview, onTogglePreview, disabled = false }: EditorToolbarProps) => {
   return (
     <div className="flex items-center justify-between gap-1 p-2 border-b bg-gray-50 flex-shrink-0">
       <div className="flex items-center gap-1">
-        {!isPreview && (
+        {!isPreview && !disabled && (
           <>
             {/* History */}
             <ToolbarButton onClick={() => editor.chain().focus().undo().run()} title="Undo">
@@ -107,10 +110,14 @@ export const EditorToolbar = ({ editor, isPreview, onTogglePreview }: EditorTool
             </ToolbarButton>
           </>
         )}
-      </div>
-
+      </div>{' '}
       {/* Preview Toggle */}
-      <ToolbarButton onClick={onTogglePreview} isActive={isPreview} title={isPreview ? 'Edit Mode' : 'Preview Mode'}>
+      <ToolbarButton
+        onClick={onTogglePreview}
+        isActive={isPreview}
+        title={isPreview ? 'Edit Mode' : 'Preview Mode'}
+        disabled={disabled}
+      >
         {isPreview ? <Edit3 size={16} /> : <Eye size={16} />}
       </ToolbarButton>
     </div>

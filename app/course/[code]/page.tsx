@@ -133,14 +133,13 @@ const CourseDetail = () => {
                 </button>
               ))}
             </div>
-            {/* Tab Content */}
+            {/* Tab Content */}{' '}
             {activeTab === 'Session' && (
               <Session
                 sessions={sessions}
                 activeSession={activeSession}
                 setActiveSession={setActiveSession}
-                courseCode={code as string} // ADD THIS
-                userRole="teacher" // ADD THIS (get from auth)
+                courseCode={code as string}
               />
             )}{' '}
             {activeTab === 'Syllabus' && (

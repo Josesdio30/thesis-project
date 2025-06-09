@@ -4,9 +4,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 
 // GET - Get forum for a course (session-based)
-export async function GET(request: NextRequest, { params }: { params: { code: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   try {
-    const { code } = params;
+    const { code } = await params;
     const { searchParams } = new URL(request.url);
     const sessionId = searchParams.get('sessionId');
 

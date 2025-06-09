@@ -2,6 +2,72 @@ import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 
+// Content type mapping for common file extensions
+const CONTENT_TYPE_MAP: Record<string, string> = {
+  // Documents
+  pdf: 'application/pdf',
+  doc: 'application/msword',
+  docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  xls: 'application/vnd.ms-excel',
+  xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  ppt: 'application/vnd.ms-powerpoint',
+  pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  txt: 'text/plain',
+  rtf: 'application/rtf',
+
+  // Images
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  gif: 'image/gif',
+  bmp: 'image/bmp',
+  webp: 'image/webp',
+  svg: 'image/svg+xml',
+
+  // Videos
+  mp4: 'video/mp4',
+  avi: 'video/x-msvideo',
+  mov: 'video/quicktime',
+  wmv: 'video/x-ms-wmv',
+  flv: 'video/x-flv',
+  webm: 'video/webm',
+  mkv: 'video/x-matroska',
+
+  // Audio
+  mp3: 'audio/mpeg',
+  wav: 'audio/wav',
+  ogg: 'audio/ogg',
+  aac: 'audio/aac',
+
+  // Archives
+  zip: 'application/zip',
+  rar: 'application/vnd.rar',
+  '7z': 'application/x-7z-compressed',
+  tar: 'application/x-tar',
+  gz: 'application/gzip',
+
+  // Code files
+  js: 'text/javascript',
+  css: 'text/css',
+  html: 'text/html',
+  json: 'application/json',
+  xml: 'application/xml',
+
+  // Default fallback
+  default: 'application/octet-stream',
+};
+
+function getFileExtension(filename: string): string {
+  const lastDot = filename.lastIndexOf('.');
+  if (lastDot === -1) return '';
+  return filename.substring(lastDot + 1).toLowerCase();
+}
+
+function getContentType(filename: string): string {
+  const extension = getFileExtension(filename);
+  return CONTENT_TYPE_MAP[extension] || CONTENT_TYPE_MAP['default'];
+}
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -39,13 +105,19 @@ export async function POST(request: NextRequest) {
     } catch (mkdirError) {
       console.error('Error creating directory:', mkdirError);
       return NextResponse.json({ error: 'Failed to create upload directory' }, { status: 500 });
-    }
-
-    // Generate unique filename
+    } // Generate unique filename
     const timestamp = Date.now();
     const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
     const filename = `${timestamp}_${sanitizedName}`;
     const filepath = path.join(uploadDir, filename);
+
+    // Get file extension and content type
+    const fileExtension = getFileExtension(file.name);
+    const detectedContentType = getContentType(file.name);
+
+    console.log('File extension:', fileExtension);
+    console.log('Detected content type:', detectedContentType);
+    console.log('Browser reported type:', file.type);
 
     // Save file
     const bytes = await file.arrayBuffer();
@@ -63,7 +135,10 @@ export async function POST(request: NextRequest) {
         filename: sanitizedName,
         url: fileUrl,
         size: file.size,
-        type: file.type,
+        type: file.type, // Browser-detected MIME type
+        file_extension: fileExtension, // Actual file extension
+        content_type: detectedContentType, // Proper MIME type based on extension
+        original_name: file.name,
       },
     });
   } catch (error) {

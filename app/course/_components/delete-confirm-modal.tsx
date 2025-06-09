@@ -49,10 +49,9 @@ const DeleteConfirmModal = ({ resource, isOpen, onClose, onConfirm, isDeleting =
                 {!['pdf', 'video', 'link'].includes(resource.file_type) && '📄'}
               </span>{' '}
               <div>
-                <p className="font-medium text-gray-800">{resource.file_tittle || resource.file_name}</p>
-                <div className="flex items-center gap-2 text-sm text-gray-500">
+                <p className="font-medium text-gray-800">{resource.file_tittle || resource.file_name}</p>                <div className="flex items-center gap-2 text-sm text-gray-500">
                   <span className="capitalize">{resource.file_type} file</span>
-                  {resource.file_size && (
+                  {resource.file_size && resource.file_size > 0 && resource.file_type !== 'link' && (
                     <>
                       <span>•</span>
                       <span>{(resource.file_size / 1024 / 1024).toFixed(2)} MB</span>

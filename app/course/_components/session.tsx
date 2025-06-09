@@ -324,16 +324,17 @@ const ActionsSidebar = ({
                       rel="noopener noreferrer"
                       className="text-sm text-gray-700 truncate block font-medium hover:text-blue-600 transition-colors"
                     >
-                      {resource.file_tittle || resource.file_name}
+                      {resource.file_tittle}
                     </a>
                     <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <span className="capitalize">{resource.file_type} file</span>
-                      {resource.file_size && (
+                      <span className="uppercase">{resource.file_type}</span>
+                      {/* {resource.file_size && (
                         <>
                           <span>•</span>
                           <span>{(resource.file_size / 1024 / 1024).toFixed(2)} MB</span>
                         </>
-                      )}
+                      )} */}
+                      {/* {resource.file_type} */}
                       {/* {resource.download_count !== undefined && (
                         <>
                           <span>•</span>

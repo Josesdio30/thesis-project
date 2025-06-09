@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { usePathname } from "next/navigation";
-import { Bell, Menu } from "lucide-react";
-import { useState } from "react";
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
+import { Bell, Menu } from 'lucide-react';
+import { useState } from 'react';
 
 export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   const pathname = usePathname();
@@ -11,20 +11,21 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
 
   // Dummy notifications
   const notifications = [
-    { id: 1, message: "You have a new message." },
-    { id: 2, message: "Assignment deadline approaching." },
-    { id: 3, message: "Your course has been updated." },
+    { id: 1, message: 'You have a new message.' },
+    { id: 2, message: 'Assignment deadline approaching.' },
+    { id: 3, message: 'Your course has been updated.' },
   ];
 
   const pathTitleMap: Record<string, string> = {
-    "/dashboard": "MY DASHBOARD",
-    "/course": "MY COURSE",
-    "/forum": "MY FORUM",
-    "/session": "MY SESSION",
-    "/schedule": "MY SCHEDULE",
+    '/dashboard': 'MY DASHBOARD',
+    '/course': 'MY COURSE',
+    '/forum': 'MY FORUM',
+    '/session': 'MY SESSION',
+    '/schedule': 'MY SCHEDULE',
+    '/course/[code]': 'MY COURSE DETAIL',
   };
 
-  const pageTitle = pathTitleMap[pathname] || "MY PAGE";
+  const pageTitle = pathTitleMap[pathname] || 'MY PAGE';
 
   return (
     <div className="w-full h-14 bg-white flex items-center justify-between px-4 border-b shadow-sm">
@@ -43,10 +44,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
       {/* Right side - Notification */}
       <div className="flex items-center space-x-6 relative">
         <div className="relative">
-          <Bell
-            className="w-6 h-6 text-gray-600 cursor-pointer"
-            onClick={() => setShowNotif(!showNotif)}
-          />
+          <Bell className="w-6 h-6 text-gray-600 cursor-pointer" onClick={() => setShowNotif(!showNotif)} />
           {notifications.length > 0 && (
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               {notifications.length}
@@ -59,11 +57,8 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
               <div className="p-3 text-sm font-semibold border-b">Notifications</div>
               {notifications.length > 0 ? (
                 <ul className="max-h-60 overflow-y-auto">
-                  {notifications.map((notif) => (
-                    <li
-                      key={notif.id}
-                      className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer"
-                    >
+                  {notifications.map(notif => (
+                    <li key={notif.id} className="px-4 py-2 text-sm hover:bg-gray-100 cursor-pointer">
                       {notif.message}
                     </li>
                   ))}

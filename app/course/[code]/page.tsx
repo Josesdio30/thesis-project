@@ -119,7 +119,6 @@ const CourseDetail = () => {
                 </div>
               </div>
             </div>
-
             {/* Tab Navigation - BACK TO ORIGINAL */}
             <div className="flex border-b border-gray-300 mb-6 overflow-x-auto">
               {['Session', 'Syllabus', 'Assignment', 'Forum', 'Scoring', 'People'].map(tab => (
@@ -134,7 +133,6 @@ const CourseDetail = () => {
                 </button>
               ))}
             </div>
-
             {/* Tab Content */}
             {activeTab === 'Session' && (
               <Session
@@ -144,22 +142,18 @@ const CourseDetail = () => {
                 courseCode={code as string} // ADD THIS
                 userRole="teacher" // ADD THIS (get from auth)
               />
-            )}
-
+            )}{' '}
             {activeTab === 'Syllabus' && (
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <SimpleEditor />
+                <SimpleEditor courseCode={code as string} />
               </div>
-            )}
-
+            )}{' '}
             {activeTab === 'Forum' && (
               <div>
-                <Forum />
+                <Forum courseCode={code as string} sessionId={activeSession} />
               </div>
             )}
-
-            {activeTab === 'People' && <People teacher={teacher} students={students} />}
-
+            {activeTab === 'People' && <People courseCode={code as string} />}
             {activeTab !== 'Session' && activeTab !== 'Syllabus' && activeTab !== 'Forum' && activeTab !== 'People' && (
               <div>
                 <p className="text-gray-700">Content for {activeTab} will be added here.</p>

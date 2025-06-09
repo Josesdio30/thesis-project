@@ -11,6 +11,7 @@ export const NAVIGATION_ITEMS = [
   { icon: 'FaBook', text: 'Assignment', path: '/assignment' },
   { icon: 'FaClipboardCheck', text: 'Exam', path: '/exam' },
   { icon: 'FaChartBar', text: 'Score', path: '/score' },
+  { icon: 'FaBullhorn', text: 'Announcement', path: '/announcement' },
 ] as const;
 
 // User roles

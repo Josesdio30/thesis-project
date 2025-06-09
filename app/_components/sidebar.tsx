@@ -10,6 +10,7 @@ import {
   FaChartBar,
   FaComments,
   FaUniversity,
+  FaBullhorn,
   FaSignOutAlt,
   FaTimes,
 } from 'react-icons/fa';
@@ -25,6 +26,7 @@ const iconMap = {
   FaChartBar: FaChartBar,
   FaComments: FaComments,
   FaUniversity: FaUniversity,
+  FaBullhorn: FaBullhorn,
 } as const;
 
 interface SidebarProps {

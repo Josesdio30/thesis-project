@@ -74,10 +74,12 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File;
     const courseCode = formData.get('courseCode') as string;
     const sessionId = formData.get('sessionId') as string;
+    const context = formData.get('context') as string; // New parameter for context (e.g., "forum", "materials", etc.)
 
     console.log('=== FILE UPLOAD REQUEST ===');
     console.log('Course Code:', courseCode);
     console.log('Session ID:', sessionId);
+    console.log('Context:', context);
     console.log('File Name:', file?.name);
     console.log('==========================');
     if (!file) {
@@ -94,10 +96,10 @@ export async function POST(request: NextRequest) {
         },
         { status: 413 } // 413 Payload Too Large
       );
-    }
-
-    // Create upload directory
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'courses', courseCode, 'sessions', sessionId);
+    } // Create upload directory with context support
+    const uploadDir = context
+      ? path.join(process.cwd(), 'public', 'uploads', 'courses', courseCode, 'sessions', sessionId, context)
+      : path.join(process.cwd(), 'public', 'uploads', 'courses', courseCode, 'sessions', sessionId);
 
     try {
       await mkdir(uploadDir, { recursive: true });
@@ -124,10 +126,10 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes);
     await writeFile(filepath, buffer);
 
-    console.log('File saved to:', filepath);
-
-    // Return file URL (public path)
-    const fileUrl = `/uploads/courses/${courseCode}/sessions/${sessionId}/${filename}`;
+    console.log('File saved to:', filepath); // Return file URL (public path) with context support
+    const fileUrl = context
+      ? `/uploads/courses/${courseCode}/sessions/${sessionId}/${context}/${filename}`
+      : `/uploads/courses/${courseCode}/sessions/${sessionId}/${filename}`;
 
     return NextResponse.json({
       success: true,

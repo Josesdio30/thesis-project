@@ -614,7 +614,7 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode, userRo
           sessionId={activeSession}
           isOpen={isUploadModalOpen}
           onClose={() => setIsUploadModalOpen(false)}
-          onSuccess={handleUploadSuccess} // Use new handler
+          onSuccess={handleUploadSuccess}
         />
       )}
       {/* Delete Confirmation Modal */}

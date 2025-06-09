@@ -18,12 +18,17 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import UploadModal from './upload-modal';
 import DeleteConfirmModal from './delete-confirm-modal';
+import Materials from './materials';
 import { useToast } from './toast';
 import { useSession } from 'next-auth/react';
 
 interface Material {
+  id: number;
+  session_id: number;
   title: string;
-  description?: string;
+  content?: string;
+  material_order: number;
+  created_at?: string;
 }
 
 interface Resource {
@@ -307,7 +312,15 @@ const formatDate = (dateString: string) => {
   }
 };
 
-const SessionContent = ({ session, loadingResources }: { session: SessionData; loadingResources?: boolean }) => (
+const SessionContent = ({
+  session,
+  loadingResources,
+  courseCode,
+}: {
+  session: SessionData;
+  loadingResources?: boolean;
+  courseCode?: string;
+}) => (
   <Card className="mb-6">
     <CardHeader>
       <CardTitle className="flex items-center gap-2 text-xl">
@@ -317,30 +330,9 @@ const SessionContent = ({ session, loadingResources }: { session: SessionData; l
       {session.description && <p className="text-gray-600 mt-2">{session.description}</p>}
     </CardHeader>
     <CardContent>
-      {/* Materials Section */}
-      <div className="mb-6">
-        <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-          <FaBookOpen className="text-sm text-blue-600" />
-          Course Materials
-        </h4>
-        <div className="bg-gray-50 rounded-lg p-4">
-          {session.materials?.length ? (
-            <ul className="space-y-2">
-              {session.materials.map((material, index) => (
-                <li key={index} className="flex items-start gap-2">
-                  <span className="text-blue-600 mt-1">•</span>
-                  <div>
-                    <span className="text-gray-800 font-medium">{material.title}</span>
-                    {material.description && <p className="text-gray-600 text-sm mt-1">{material.description}</p>}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-gray-500 italic">No materials available for this session.</p>
-          )}
-        </div>
-      </div>{' '}
+      {/* Materials Section - Now using dedicated Materials component */}
+      <Materials sessionId={session.id} courseCode={courseCode} className="mb-6" />
+
       {/* Session Time */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="bg-green-50 rounded-lg p-4">
@@ -738,6 +730,7 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode }: Sess
     <div className="space-y-6">
       <SessionSelector sessions={sessions} activeSession={activeSession} setActiveSession={setActiveSession} />{' '}
       <div className="flex flex-col lg:flex-row gap-6">
+        {' '}
         <div className="flex-1">
           <SessionContent
             session={{
@@ -745,6 +738,7 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode }: Sess
               resources: sessionResources,
             }}
             loadingResources={loadingResources}
+            courseCode={courseCode}
           />
         </div>{' '}
         <div className="lg:w-80">

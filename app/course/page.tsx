@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import Footer from '@/components/common/footer';
 import Topbar from '../_components/topbar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FaBook, FaClipboard, FaCode, FaSpinner } from 'react-icons/fa';
+import { FaBook, FaClipboard, FaCode, FaSpinner, FaUserFriends } from 'react-icons/fa';
 import { cn } from '@/lib/utils';
 import { useSession } from 'next-auth/react';
 
@@ -15,6 +15,7 @@ interface Course {
   course_name: string;
   course_code: string;
   description: string;
+  class_name: string;
 }
 
 const LoadingCard = () => (
@@ -54,12 +55,17 @@ const CourseCard = ({ course }: { course: Course }) => (
         </div>
         <div className="flex items-center gap-1 text-sm text-gray-600 mt-2">
           {/* <FaCode className="text-xs" /> */}
-          <span className="font-mono bg-gray-100 px-2 py-1 rounded text-xs">{course.course_code}</span>
+          {/* <span className="font-mono bg-gray-100 px-2 py-1 rounded text-xs">{course.course_code}</span> */}
         </div>
         <div className="flex items-center gap-1 text-sm text-gray-600 mt-2">
           {/* <FaClipboard className="text-xs" /> */}
           <FaClipboard className="text-xs" />
           <span className=" ">{course.course_code}</span>
+        </div>
+        <div className="flex items-center gap-1 text-sm text-gray-600 mt-2">
+          {/* <FaClipboard className="text-xs" /> */}
+          <FaUserFriends className="text-xs" />
+          <span className=" ">{course.class_name}</span>
         </div>
       </CardHeader>
       <CardContent>
@@ -201,7 +207,7 @@ const Course = () => {
         <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-y-auto">
           {/* Page Header */}
           <div className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
+            {/* <div className="flex items-center gap-3 mb-2">
               <div className="p-2 bg-blue-100 rounded-lg">
                 <FaBook className="text-blue-600 text-xl" />
               </div>{' '}
@@ -209,18 +215,18 @@ const Course = () => {
                 <h1 className="text-2xl md:text-3xl font-bold text-gray-900">{getPageTitle(session?.user?.role)}</h1>
                 <p className="text-gray-600 mt-1">{getPageDescription(session?.user?.role)}</p>
               </div>
-            </div>
+            </div> */}
 
             {!loading && !error && (
               <div className="flex items-center gap-2 text-sm text-gray-600 mt-4">
                 <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full font-medium">
                   {courses.length} {courses.length === 1 ? 'Course' : 'Courses'}
                 </span>
-                {session?.user?.role && (
+                {/* {session?.user?.role && (
                   <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full font-medium capitalize">
                     {session.user.role}
                   </span>
-                )}
+                )} */}
               </div>
             )}
           </div>

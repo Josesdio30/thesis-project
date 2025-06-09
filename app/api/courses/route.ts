@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
         start_date: enrollment.class_courses?.start_date,
         end_date: enrollment.class_courses?.end_date,
         is_active: enrollment.class_courses?.is_active,
-        syllabus: enrollment.class_courses?.syllabus,
+        // syllabus: enrollment.class_courses?.syllabus,
       }));
     } else {
       // Get all courses
@@ -94,49 +94,49 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
-  try {
-    const body = await request.json();
-    const { course_code, course_name, description, created_by } = body;
+// export async function POST(request: NextRequest) {
+//   try {
+//     const body = await request.json();
+//     const { course_code, course_name, description, created_by } = body;
 
-    // Validate required fields
-    if (!course_code || !course_name) {
-      const response: ApiResponse<null> = {
-        success: false,
-        error: 'Validation error',
-        message: 'Course code and name are required',
-      };
-      return NextResponse.json(response, { status: 400 });
-    }
+//     // Validate required fields
+//     if (!course_code || !course_name) {
+//       const response: ApiResponse<null> = {
+//         success: false,
+//         error: 'Validation error',
+//         message: 'Course code and name are required',
+//       };
+//       return NextResponse.json(response, { status: 400 });
+//     }
 
-    const course = await courseService.create({
-      course_code,
-      course_name,
-      description,
-      created_by,
-    });
+//     const course = await courseService.create({
+//       course_code,
+//       course_name,
+//       description,
+//       created_by,
+//     });
 
-    const response: ApiResponse<typeof course> = {
-      success: true,
-      data: course,
-      message: 'Course created successfully',
-    };
+//     const response: ApiResponse<typeof course> = {
+//       success: true,
+//       data: course,
+//       message: 'Course created successfully',
+//     };
 
-    return NextResponse.json(response, { status: 201 });
-  } catch (error: any) {
-    console.error('Error creating course:', error);
+//     return NextResponse.json(response, { status: 201 });
+//   } catch (error: any) {
+//     console.error('Error creating course:', error);
 
-    let errorMessage = 'Failed to create course';
-    if (error.code === 'P2002') {
-      errorMessage = 'Course code already exists';
-    }
+//     let errorMessage = 'Failed to create course';
+//     if (error.code === 'P2002') {
+//       errorMessage = 'Course code already exists';
+//     }
 
-    const response: ApiResponse<null> = {
-      success: false,
-      error: 'Database error',
-      message: errorMessage,
-    };
+//     const response: ApiResponse<null> = {
+//       success: false,
+//       error: 'Database error',
+//       message: errorMessage,
+//     };
 
-    return NextResponse.json(response, { status: 400 });
-  }
-}
+//     return NextResponse.json(response, { status: 400 });
+//   }
+// }

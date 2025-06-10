@@ -2,17 +2,17 @@
 
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import { 
-  FaBold, 
-  FaItalic, 
-  FaStrikethrough, 
-  FaUnderline, 
-  FaListUl, 
+import {
+  FaBold,
+  FaItalic,
+  FaStrikethrough,
+  FaUnderline,
+  FaListUl,
   FaListOl,
   FaQuoteLeft,
   FaCode,
   FaUndo,
-  FaRedo
+  FaRedo,
 } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -55,12 +55,12 @@ const TextEditor = ({ content, onChange, placeholder = '', disabled = false, cla
     return null;
   }
 
-  const ToolbarButton = ({ 
-    onClick, 
-    isActive = false, 
-    disabled = false, 
-    children, 
-    title 
+  const ToolbarButton = ({
+    onClick,
+    isActive = false,
+    disabled = false,
+    children,
+    title,
   }: {
     onClick: () => void;
     isActive?: boolean;
@@ -171,11 +171,7 @@ const TextEditor = ({ content, onChange, placeholder = '', disabled = false, cla
 
       {/* Editor Content */}
       <div className="bg-white">
-        <EditorContent 
-          editor={editor} 
-          className="min-h-[150px]"
-          placeholder={placeholder}
-        />
+        <EditorContent editor={editor} className="min-h-[150px]" placeholder={placeholder} />
       </div>
     </div>
   );

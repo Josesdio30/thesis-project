@@ -1,34 +1,39 @@
-"use client";
+'use client';
 
-import Sidebar from "../_components/sidebar";
-import Topbar from "../_components/topbar";
-import Footer from "../../components/common/footer";
-import { useState } from "react";
+import Sidebar from '../_components/sidebar';
+import Topbar from '../_components/topbar';
+import Footer from '../../components/common/footer';
+import { useState } from 'react';
+import { FaClock, FaUser, FaUserFriends, FaClipboard } from 'react-icons/fa';
+import { Card, CardContent } from '@/components/ui/card';
+import { useSchedule, getUpcomingClass } from '@/hooks';
+import { useRouter } from 'next/navigation';
+import { format } from 'date-fns';
 
 export default function Home() {
+  const router = useRouter();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Get schedule data for upcoming class
+  const { scheduleData, loading } = useSchedule();
+  const upcomingClass = getUpcomingClass(scheduleData);
+
   const latestForumPosts = [
     {
       id: 1,
-      author: "Benedictus Dhaniar Ardra",
-      date: "18 Feb 2025, 08:00 GMT+7",
-      title: "Pembahasan Future Past",
-      subject: "IX - 1 Bahasa Inggris Lanjut (A) (Peminatan) XI MIPA",
+      author: 'Benedictus Dhaniar Ardra',
+      date: '18 Feb 2025, 08:00 GMT+7',
+      title: 'Pembahasan Future Past',
+      subject: 'IX - 1 Bahasa Inggris Lanjut (A) (Peminatan) XI MIPA',
     },
     {
       id: 2,
-      author: "Samuel Prakoso",
-      date: "18 Feb 2025, 08:00 GMT+7",
-      title: "Pembahasan Future Past",
-      subject: "IX - 1 Bahasa Inggris Lanjut (A) (Peminatan) XI MIPA",
+      author: 'Samuel Prakoso',
+      date: '18 Feb 2025, 08:00 GMT+7',
+      title: 'Pembahasan Future Past',
+      subject: 'IX - 1 Bahasa Inggris Lanjut (A) (Peminatan) XI MIPA',
     },
   ];
-
-  const upcomingClass = {
-    className: "IX - 1",
-    subject: "Bahasa Inggris Lanjut (A) (Peminatan) XI MIPA",
-    time: "08:00 - 09:30",
-  };
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -44,7 +49,7 @@ export default function Home() {
             <div className="md:col-span-2 bg-white p-4 rounded-md shadow">
               <h2 className="text-xl font-semibold mb-4 text-gray-600">Latest Forum Post</h2>
               <div className="space-y-4">
-                {latestForumPosts.map((post) => (
+                {latestForumPosts.map(post => (
                   <div key={post.id} className="p-4 border rounded-md shadow-sm">
                     <p className="font-medium text-gray-600">{post.author}</p>
                     <p className="text-xs text-gray-600">{post.date}</p>
@@ -53,15 +58,61 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-            </div>
-
+            </div>{' '}
             <div className="bg-white p-4 rounded-md shadow">
               <h2 className="text-xl font-semibold mb-4 text-gray-600">Upcoming Class</h2>
-              <div className="p-4 border rounded-md shadow-sm">
-                <p className="font-medium text-gray-600">{upcomingClass.className}</p>
-                <p className="text-sm text-gray-600">{upcomingClass.subject}</p>
-                <p className="text-xs text-gray-600 mt-2">🕒 {upcomingClass.time}</p>
-              </div>
+              {loading ? (
+                <div className="p-4 border rounded-md shadow-sm">
+                  <p className="text-gray-500">Loading...</p>
+                </div>
+              ) : upcomingClass ? (
+                <Card
+                  className="border border-gray-300 shadow-sm transition-all duration-200 hover:shadow-lg hover:border-blue-300 cursor-pointer hover:bg-blue-50"
+                  onClick={() => {
+                    if (upcomingClass.course_code && upcomingClass.id) {
+                      router.push(`/course/${upcomingClass.course_code}?sessionId=${upcomingClass.id}`);
+                    }
+                  }}
+                >
+                  <CardContent className="p-4">
+                    <p className="text-sm font-bold text-gray-700 flex items-center gap-2 mb-2">
+                      <FaUser className="text-blue-500" /> {upcomingClass.teacher}
+                    </p>
+
+                    <p className="text-sm text-gray-600 flex items-center gap-2 mb-2">
+                      <FaClipboard className="text-green-500" /> {upcomingClass.course_code}
+                    </p>
+
+                    <p className="text-sm text-gray-600 flex items-center gap-2 mb-2">
+                      <FaUserFriends className="text-green-500" /> {upcomingClass.class_name}
+                    </p>
+
+                    <p className="text-sm text-gray-600 flex items-center gap-2 mb-2">
+                      <FaClock className="text-green-500" /> {upcomingClass.time}
+                    </p>
+
+                    <p className="text-sm text-gray-600 mb-1">
+                      {format(new Date(upcomingClass.start_time), 'EEEE, MMM dd, yyyy')}
+                    </p>
+
+                    {upcomingClass.session_title && (
+                      <p className="text-sm text-gray-800 font-medium mb-1">
+                        Session {upcomingClass.session_number}: {upcomingClass.session_title}
+                      </p>
+                    )}
+
+                    {/* <div className="mt-3">
+                      <span className="text-xs text-blue-600 font-medium">
+                        Click to view session {upcomingClass.session_number} →
+                      </span>
+                    </div> */}
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="p-4 border rounded-md shadow-sm">
+                  <p className="text-gray-500">No upcoming classes</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

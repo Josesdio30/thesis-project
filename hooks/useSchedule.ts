@@ -8,6 +8,7 @@ export interface ScheduleItem {
   subject: string;
   teacher: string;
   session_title: string;
+  class_name: string;
   description?: string;
   start_time: string;
   end_time: string;
@@ -25,20 +26,36 @@ export interface ScheduleData {
   user_role: 'student' | 'teacher' | 'admin';
 }
 
-export function useSchedule(selectedDate?: Date) {
+export function useSchedule(selectedDate?: Date, currentMonth?: Date) {
   const [scheduleData, setScheduleData] = useState<ScheduleData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchSchedule = useCallback(async (date?: Date) => {
+  const fetchSchedule = useCallback(async (date?: Date, month?: Date) => {
     try {
       setLoading(true);
       setError(null);
 
       let url = '/api/schedule';
+      const params = new URLSearchParams();
+
       if (date) {
-        const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD format
-        url += `?date=${dateString}`;
+        // Use local date formatting to avoid timezone conversion issues
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const dateString = `${year}-${month}-${day}`;
+        params.append('date', dateString);
+      } else if (month) {
+        // Add month parameter for monthly filtering
+        const year = month.getFullYear();
+        const monthNum = String(month.getMonth() + 1).padStart(2, '0');
+        const monthString = `${year}-${monthNum}`;
+        params.append('month', monthString);
+      }
+
+      if (params.toString()) {
+        url += `?${params.toString()}`;
       }
 
       const response = await fetch(url);
@@ -59,15 +76,22 @@ export function useSchedule(selectedDate?: Date) {
     }
   }, []);
 
-  // Fetch all schedule data on mount
+  // Fetch schedule data on mount - default to current month
   useEffect(() => {
-    fetchSchedule();
-  }, [fetchSchedule]);
-
+    fetchSchedule(undefined, currentMonth || new Date());
+  }, [fetchSchedule, currentMonth]);
   // Fetch specific date schedule when selectedDate changes
   const fetchDateSchedule = useCallback(
     (date: Date) => {
       fetchSchedule(date);
+    },
+    [fetchSchedule]
+  );
+
+  // Fetch schedule for a specific month
+  const fetchMonthSchedule = useCallback(
+    (month: Date) => {
+      fetchSchedule(undefined, month);
     },
     [fetchSchedule]
   );
@@ -78,6 +102,44 @@ export function useSchedule(selectedDate?: Date) {
     error,
     fetchSchedule,
     fetchDateSchedule,
-    refetch: () => fetchSchedule(selectedDate),
+    fetchMonthSchedule,
+    refetch: () => fetchSchedule(selectedDate, currentMonth || new Date()),
   };
+}
+
+// Function to get the next upcoming class from today onwards
+export function getUpcomingClass(scheduleData: ScheduleData | null): ScheduleItem | null {
+  if (!scheduleData) return null;
+
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  let allSessions: ScheduleItem[] = [];
+
+  // Flatten schedule data
+  if (Array.isArray(scheduleData.schedule)) {
+    allSessions = scheduleData.schedule;
+  } else if (typeof scheduleData.schedule === 'object') {
+    allSessions = Object.values(scheduleData.schedule).flat();
+  }
+
+  // Filter sessions from today onwards and sort by start time
+  const upcomingSessions = allSessions
+    .filter(session => {
+      const sessionDate = new Date(session.start_time);
+      const sessionDay = new Date(sessionDate.getFullYear(), sessionDate.getMonth(), sessionDate.getDate());
+
+      // Include sessions from today onwards
+      if (sessionDay >= today) {
+        // If it's today, only include sessions that haven't started yet
+        if (sessionDay.getTime() === today.getTime()) {
+          return sessionDate > now;
+        }
+        return true;
+      }
+      return false;
+    })
+    .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+
+  return upcomingSessions.length > 0 ? upcomingSessions[0] : null;
 }

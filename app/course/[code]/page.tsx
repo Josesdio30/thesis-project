@@ -4,7 +4,7 @@ import Sidebar from '../../_components/sidebar';
 import Topbar from '../../_components/topbar';
 import Footer from '@/components/common/footer';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Forum from '../_components/forum';
 import Session from '../_components/session';
@@ -13,14 +13,17 @@ import SimpleEditor from '../_components/syllabus';
 
 const CourseDetail = () => {
   const params = useParams();
+  const searchParams = useSearchParams();
   const code = typeof params === 'object' && 'code' in params ? params['code'] : null;
+
+  // Get sessionId from URL search params
+  const sessionIdParam = searchParams.get('sessionId');
 
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('Session');
   const [activeSession, setActiveSession] = useState(1);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-
   useEffect(() => {
     if (!code) return;
     const fetchCourse = async () => {
@@ -36,6 +39,17 @@ const CourseDetail = () => {
     };
     fetchCourse();
   }, [code]);
+
+  // Handle sessionId from URL params
+  useEffect(() => {
+    if (sessionIdParam) {
+      const sessionId = parseInt(sessionIdParam);
+      if (!isNaN(sessionId)) {
+        setActiveSession(sessionId);
+        setActiveTab('Session'); // Auto-switch to Session tab when sessionId is provided
+      }
+    }
+  }, [sessionIdParam]);
 
   if (loading) {
     return (

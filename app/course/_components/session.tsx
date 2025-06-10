@@ -100,7 +100,7 @@ const SessionSelector = ({
       if (!containerRef.current) return;
 
       const containerWidth = containerRef.current.offsetWidth;
-      const buttonWidth = 110;
+      const buttonWidth = 120;
       const dropdownButtonWidth = 60;
       const maxVisibleButtons = Math.floor((containerWidth - dropdownButtonWidth) / buttonWidth);
       if (maxVisibleButtons >= sessions.length) {
@@ -179,7 +179,7 @@ const SessionSelector = ({
 
   return (
     <div className="mb-6" ref={containerRef}>
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 scrollbar-hide" style={{ minHeight: '48px' }}>
         {/* Visible session buttons */}
         {visibleSessions.map(session => (
           <button

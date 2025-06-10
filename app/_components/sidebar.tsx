@@ -16,7 +16,7 @@ import {
 } from 'react-icons/fa';
 import { NAVIGATION_ITEMS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 
 const iconMap = {
   FaTachometerAlt: FaTachometerAlt,
@@ -65,29 +65,36 @@ const SidebarItem = ({ icon, text, path, isActive, onClick }: SidebarItemProps) 
   );
 };
 
-const UserProfile = ({ userName }: { userName: string | null }) => (
+const UserProfile = ({ userName, userRole }: { userName: string | null; userRole: string | null }) => (
   <div className="flex flex-col items-center mb-8 p-4 bg-gray-700 rounded-lg">
     <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center mb-3">
       <span className="text-white font-bold text-lg">{userName ? userName.charAt(0).toUpperCase() : 'U'}</span>
     </div>
-    <h2 className="text-sm font-semibold text-white text-center">{userName || 'Nama Siswa'}</h2>
+    <h2 className="text-sm font-semibold text-white text-center">{userName || 'User'}</h2>
+    {userRole && (
+      <span className="text-xs text-gray-300 bg-gray-600 px-2 py-1 rounded-full mt-1 capitalize">
+        {userRole.toLowerCase()}
+      </span>
+    )}
   </div>
 );
 
 const SidebarContent = ({
   userName,
+  userRole,
   currentPath,
   onLogout,
   onItemClick,
 }: {
   userName: string | null;
+  userRole: string | null;
   currentPath: string;
   onLogout: () => void;
   onItemClick?: () => void;
 }) => (
   <div className="h-full flex flex-col">
     {/* User Profile */}
-    <UserProfile userName={userName} />
+    <UserProfile userName={userName} userRole={userRole} />
 
     {/* Navigation Items */}
     <nav className="flex-1 space-y-2">
@@ -123,13 +130,19 @@ const SidebarContent = ({
 
 const Sidebar = ({ isMobileOpen, setIsMobileOpen }: SidebarProps) => {
   const [userName, setUserName] = useState<string | null>(null);
+  const { data: session } = useSession();
   const router = useRouter();
   const pathname = usePathname();
-
   useEffect(() => {
-    const storedName = localStorage.getItem('userName');
-    if (storedName) setUserName(storedName);
-  }, []);
+    // Prioritize session data over localStorage
+    if (session?.user?.name) {
+      setUserName(session.user.name);
+    } else {
+      // Fallback to localStorage if session is not available yet
+      const storedName = localStorage.getItem('userName');
+      if (storedName) setUserName(storedName);
+    }
+  }, [session]);
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: '/login' });
@@ -144,7 +157,12 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }: SidebarProps) => {
       {/* Desktop Sidebar - FIXED */}
       <aside className="hidden md:block h-screen bg-gray-800 text-white md:w-56 lg:w-64 flex-shrink-0">
         <div className="p-4 h-full">
-          <SidebarContent userName={userName} currentPath={pathname} onLogout={handleLogout} />
+          <SidebarContent
+            userName={userName}
+            userRole={session?.user?.role || null}
+            currentPath={pathname}
+            onLogout={handleLogout}
+          />
         </div>
       </aside>
 
@@ -167,6 +185,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }: SidebarProps) => {
             <div className="p-4 h-full">
               <SidebarContent
                 userName={userName}
+                userRole={session?.user?.role || null}
                 currentPath={pathname}
                 onLogout={handleLogout}
                 onItemClick={handleMobileItemClick}

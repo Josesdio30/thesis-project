@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaClock, FaUser, FaGraduationCap, FaSpinner } from 'react-icons/fa';
+import { FaClock, FaUser, FaGraduationCap, FaSpinner, FaUserFriends, FaClipboard } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format } from 'date-fns';
@@ -13,49 +13,67 @@ import { useSchedule } from '@/hooks';
 import type { ScheduleItem } from '@/hooks/useSchedule';
 
 const formatDate = (date: Date | undefined): string => {
-  return date ? format(date, 'yyyy-MM-dd') : '';
+  if (!date) return '';
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
 };
 
 const Schedule = () => {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  // Use the schedule hook
-  const { scheduleData, loading, error, fetchDateSchedule } = useSchedule();
+  const { scheduleData, loading, error, fetchDateSchedule, fetchMonthSchedule } = useSchedule(
+    selectedDate,
+    currentMonth
+  );
 
-  // Get schedule for selected date
   const [dailySchedule, setDailySchedule] = useState<ScheduleItem[]>([]);
 
   useEffect(() => {
     if (selectedDate && scheduleData) {
       const formattedDate = formatDate(selectedDate);
 
-      // If scheduleData.schedule is grouped by date
       if (typeof scheduleData.schedule === 'object' && !Array.isArray(scheduleData.schedule)) {
         const schedule = scheduleData.schedule[formattedDate] || [];
         setDailySchedule(schedule);
       } else if (Array.isArray(scheduleData.schedule)) {
-        // If scheduleData.schedule is a single date's schedule
         setDailySchedule(scheduleData.schedule);
       }
     }
   }, [selectedDate, scheduleData]);
 
   const formattedHeaderDate = selectedDate ? format(selectedDate, 'MMM d, yyyy') : '';
-
   const handleDateSelect = (date: Date | undefined) => {
     if (date) {
       setSelectedDate(date);
-      fetchDateSchedule(date);
+
+      const selectedMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+      const currentMonthCheck = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+
+      if (selectedMonth.getTime() !== currentMonthCheck.getTime()) {
+        setCurrentMonth(selectedMonth);
+        fetchMonthSchedule(selectedMonth);
+      } else {
+        fetchDateSchedule(date);
+      }
     }
+  };
+
+  const handleMonthChange = (month: Date) => {
+    setCurrentMonth(month);
+    fetchMonthSchedule(month);
   };
 
   const handleMenuClick = () => {
     setIsMobileOpen(true);
   };
 
-  // Get dates with schedule for calendar highlighting
   const datesWithSchedule = scheduleData?.dates_with_schedule?.map(dateStr => new Date(dateStr)) || [];
 
   return (
@@ -80,7 +98,6 @@ const Schedule = () => {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col lg:flex-row gap-6">
-                {/* Schedule Section - Full width on mobile, left side on desktop */}
                 <div className="flex-1">
                   {loading ? (
                     <div className="flex items-center justify-center py-12">
@@ -97,23 +114,40 @@ const Schedule = () => {
                     dailySchedule.map((item, index) => (
                       <Card
                         key={index}
-                        className="mb-2 border border-gray-300 shadow-sm hover:shadow-md transition-shadow"
+                        className={`mb-2 border border-gray-300 shadow-sm transition-all duration-200 ${
+                          item.course_code
+                            ? 'hover:shadow-lg hover:border-blue-300 cursor-pointer hover:bg-blue-50'
+                            : 'hover:shadow-md'
+                        }`}
+                        onClick={() => {
+                          if (item.course_code && item.id) {
+                            router.push(`/course/${item.course_code}?sessionId=${item.id}`);
+                          }
+                        }}
                       >
                         <CardContent className="p-4">
-                          <div className="flex justify-between items-start mb-2">
+                          {/* <div className="flex justify-between items-start mb-2">
                             <p className="font-bold text-lg text-gray-900">{item.subject}</p>
                             {item.course_code && (
-                              <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-medium">
                                 {item.course_code}
                               </span>
                             )}
-                          </div>
+                          </div> */}
 
-                          <p className="text-sm text-gray-700 flex items-center gap-2 mb-1">
+                          <p className="text-sm font-bold text-gray-700 flex items-center gap-2 mb-2">
                             <FaUser className="text-blue-500" /> {item.teacher}
                           </p>
 
-                          <p className="text-xs text-gray-600 flex items-center gap-2 mb-2">
+                          <p className="text-sm  text-gray-600 flex items-center gap-2 mb-2">
+                            <FaClipboard className="text-green-500" /> {item.course_code}
+                          </p>
+
+                          <p className="text-sm text-gray-600 flex items-center gap-2 mb-2">
+                            <FaUserFriends className="text-green-500" /> {item.class_name}
+                          </p>
+
+                          <p className="text-sm text-gray-600 flex items-center gap-2 mb-2">
                             <FaClock className="text-green-500" /> {item.time}
                           </p>
 
@@ -123,28 +157,23 @@ const Schedule = () => {
                             </p>
                           )}
 
-                          {item.description && <p className="text-xs text-gray-600 mt-2">{item.description}</p>}
+                          {/* {item.description && <p className="text-xs text-gray-600 mt-2">{item.description}</p>} */}
 
                           <div className="flex justify-between items-center mt-3">
                             <div className="flex items-center gap-2">
-                              <span
+                              {/* <span
                                 className={`text-xs px-2 py-1 rounded-full ${
                                   item.is_completed ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                                 }`}
                               >
                                 {item.is_completed ? 'Completed' : 'Scheduled'}
+                              </span> */}
+                            </div>{' '}
+                            {/* {item.course_code && (
+                              <span className="text-xs text-blue-600 font-medium">
+                                Click to view session {item.session_number} →
                               </span>
-                            </div>
-
-                            {item.course_code && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => router.push(`/course/${item.course_code}`)}
-                              >
-                                View Course
-                              </Button>
-                            )}
+                            )} */}
                           </div>
                         </CardContent>
                       </Card>
@@ -159,13 +188,35 @@ const Schedule = () => {
                     </div>
                   )}
                 </div>
-
                 {/* Calendar Section - Right side */}
-                <div className="flex justify-center lg:justify-end items-start">
+                {/* <div className="flex justify-center lg:justify-end items-start">
                   <Calendar
                     mode="single"
                     selected={selectedDate}
                     onSelect={handleDateSelect}
+                    className="rounded-md border shadow-sm bg-white"
+                    captionLayout="dropdown"
+                    modifiers={{
+                      hasSchedule: datesWithSchedule,
+                    }}
+                    modifiersClassNames={{
+                      hasSchedule: 'has-schedule',
+                    }}
+                  />
+                </div> */}{' '}
+                <div className="flex justify-center lg:justify-end items-start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    month={currentMonth}
+                    onSelect={date => {
+                      console.log('Calendar date selected:', {
+                        selected: date?.toDateString(),
+                        formatted: formatDate(date),
+                      });
+                      handleDateSelect(date);
+                    }}
+                    onMonthChange={handleMonthChange}
                     className="rounded-md border shadow-sm bg-white"
                     captionLayout="dropdown"
                     modifiers={{

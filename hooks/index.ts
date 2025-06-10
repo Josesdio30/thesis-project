@@ -68,4 +68,4 @@ export function useDebounce<T>(value: T, delay: number): T {
 
 // Export other hooks
 export { useCourse } from './useCourse';
-export { useSchedule } from './useSchedule';
+export { useSchedule, getUpcomingClass } from './useSchedule';

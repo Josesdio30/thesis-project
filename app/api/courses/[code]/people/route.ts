@@ -6,9 +6,8 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
   try {
     const { code } = await params;
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type') || 'all'; // 'teacher', 'students', or 'all'
+    const type = searchParams.get('type') || 'all';
 
-    // First, verify the course exists
     const course = await prisma.courses.findUnique({
       where: {
         course_code: code,
@@ -46,7 +45,7 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
             teacher_details: true,
           },
         },
-        // Students information through enrollments
+        // Students information enrollments
         enrollments: {
           include: {
             app_user: {
@@ -129,7 +128,6 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
       result.students = students;
     }
 
-    // Add course context
     result.course = {
       course_code: course.course_code,
       course_name: course.course_name,

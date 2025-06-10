@@ -81,7 +81,6 @@ export async function DELETE(request: NextRequest, { params }: { params: RoutePa
     console.log('Resource ID:', resourceId);
     console.log('===============================');
 
-    // Verify resource exists and belongs to the session
     const existingResource = await prisma.resources.findFirst({
       where: {
         id: resourceIdNum,
@@ -114,7 +113,6 @@ export async function DELETE(request: NextRequest, { params }: { params: RoutePa
       },
     });
 
-    // Attempt to delete physical file (if it's not a link)
     if (existingResource.file_type !== 'link' && existingResource.file_url.startsWith('/uploads/')) {
       try {
         const filePath = path.join(process.cwd(), 'public', existingResource.file_url);
@@ -122,7 +120,6 @@ export async function DELETE(request: NextRequest, { params }: { params: RoutePa
         console.log('Physical file deleted:', filePath);
       } catch (fileError) {
         console.warn('Could not delete physical file:', fileError);
-        // Don't fail the API call if file deletion fails
       }
     }
 

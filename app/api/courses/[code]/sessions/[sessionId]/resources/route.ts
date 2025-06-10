@@ -50,10 +50,10 @@ export async function POST(request: NextRequest, { params }: { params: { code: s
     const newResource = await prisma.resources.create({
       data: {
         session_id: sessionIdNum,
-        uploader_id: 1, // TODO: Get actual user ID from auth session
+        uploader_id: 1,
         file_url: body.file_url,
         file_name: body.file_name,
-        file_tittle: body.file_tittle, // Add file_tittle field
+        file_tittle: body.file_tittle,
         file_size: body.file_size || 0,
         file_type: body.file_type,
         content_type: body.content_type || 'application/octet-stream',
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest, { params }: { params: { code: s
       data: {
         id: newResource.id,
         file_name: newResource.file_name,
-        file_tittle: newResource.file_tittle, // Include file_tittle in response
+        file_tittle: newResource.file_tittle,
         file_url: newResource.file_url,
         file_type: newResource.file_type,
         file_size: newResource.file_size,
@@ -167,7 +167,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     console.log('Session ID:', sessionId);
     console.log('===============================');
 
-    // Fetch resources from database using Prisma
     const resources = await prisma.resources.findMany({
       where: {
         session_id: sessionIdNum,
@@ -180,7 +179,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         },
       },
       orderBy: {
-        id: 'desc', // Use id instead of upload_date since upload_date doesn't exist
+        id: 'desc',
       },
     });
 
@@ -189,7 +188,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       data: resources.map(resource => ({
         id: resource.id,
         file_name: resource.file_name,
-        file_tittle: resource.file_tittle, // Include file_tittle field
+        file_tittle: resource.file_tittle,
         file_url: resource.file_url,
         file_type: resource.file_type,
         file_size: resource.file_size,

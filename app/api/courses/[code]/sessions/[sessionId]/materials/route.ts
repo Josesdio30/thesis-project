@@ -6,7 +6,6 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
   try {
     const { code, sessionId } = params;
 
-    // Verify the session exists and belongs to the course
     const session = await prisma.sessions.findFirst({
       where: {
         id: parseInt(sessionId),
@@ -53,7 +52,6 @@ export async function POST(request: NextRequest, { params }: { params: { code: s
       return NextResponse.json({ success: false, error: 'Title is required' }, { status: 400 });
     }
 
-    // Verify the session exists and belongs to the course
     const session = await prisma.sessions.findFirst({
       where: {
         id: parseInt(sessionId),
@@ -69,7 +67,6 @@ export async function POST(request: NextRequest, { params }: { params: { code: s
       return NextResponse.json({ success: false, error: 'Session not found' }, { status: 404 });
     }
 
-    // Get the next order number
     const lastMaterial = await prisma.materials.findFirst({
       where: { session_id: parseInt(sessionId) },
       orderBy: { material_order: 'desc' },

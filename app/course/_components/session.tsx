@@ -100,7 +100,7 @@ const SessionSelector = ({
       if (!containerRef.current) return;
 
       const containerWidth = containerRef.current.offsetWidth;
-      const buttonWidth = 120;
+      const buttonWidth = 140;
       const dropdownButtonWidth = 60;
       const maxVisibleButtons = Math.floor((containerWidth - dropdownButtonWidth) / buttonWidth);
       if (maxVisibleButtons >= sessions.length) {

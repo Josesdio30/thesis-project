@@ -15,7 +15,6 @@ export async function PATCH(
       return NextResponse.json({ success: false, error: 'Invalid direction. Must be "up" or "down"' }, { status: 400 });
     }
 
-    // Verify the material exists and belongs to the session/course
     const material = await prisma.materials.findFirst({
       where: {
         id: parseInt(id),
@@ -45,7 +44,6 @@ export async function PATCH(
     } else {
       targetOrder = currentOrder + 1;
 
-      // Check if there's a material at the target position
       const maxOrder = await prisma.materials.findFirst({
         where: { session_id: parseInt(sessionId) },
         orderBy: { material_order: 'desc' },
@@ -57,7 +55,6 @@ export async function PATCH(
       }
     }
 
-    // Find the material at the target position
     const targetMaterial = await prisma.materials.findFirst({
       where: {
         session_id: parseInt(sessionId),
@@ -69,7 +66,6 @@ export async function PATCH(
       return NextResponse.json({ success: false, error: 'No material found at target position' }, { status: 400 });
     }
 
-    // Swap the order values
     await prisma.$transaction([
       prisma.materials.update({
         where: { id: parseInt(id) },

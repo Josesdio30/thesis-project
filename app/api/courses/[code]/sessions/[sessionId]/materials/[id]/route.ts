@@ -15,7 +15,6 @@ export async function PUT(
       return NextResponse.json({ success: false, error: 'Title is required' }, { status: 400 });
     }
 
-    // Verify the material exists and belongs to the session/course
     const material = await prisma.materials.findFirst({
       where: {
         id: parseInt(id),
@@ -61,7 +60,6 @@ export async function DELETE(
   try {
     const { code, sessionId, id } = params;
 
-    // Verify the material exists and belongs to the session/course
     const material = await prisma.materials.findFirst({
       where: {
         id: parseInt(id),
@@ -85,7 +83,6 @@ export async function DELETE(
       where: { id: parseInt(id) },
     });
 
-    // Reorder remaining materials to close the gap
     await prisma.$executeRaw`
       UPDATE materials 
       SET material_order = material_order - 1 

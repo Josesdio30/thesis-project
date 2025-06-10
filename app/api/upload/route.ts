@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     const file = formData.get('file') as File;
     const courseCode = formData.get('courseCode') as string;
     const sessionId = formData.get('sessionId') as string;
-    const context = formData.get('context') as string; // New parameter for context (e.g., "forum", "materials", etc.)
+    const context = formData.get('context') as string;
 
     console.log('=== FILE UPLOAD REQUEST ===');
     console.log('Course Code:', courseCode);
@@ -94,9 +94,9 @@ export async function POST(request: NextRequest) {
           error: 'File too large',
           message: `File size exceeds 10MB limit. Your file is ${(file.size / 1024 / 1024).toFixed(2)}MB.`,
         },
-        { status: 413 } // 413 Payload Too Large
+        { status: 413 }
       );
-    } // Create upload directory with context support
+    }
     const uploadDir = context
       ? path.join(process.cwd(), 'public', 'uploads', 'courses', courseCode, 'sessions', sessionId, context)
       : path.join(process.cwd(), 'public', 'uploads', 'courses', courseCode, 'sessions', sessionId);
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
     } catch (mkdirError) {
       console.error('Error creating directory:', mkdirError);
       return NextResponse.json({ error: 'Failed to create upload directory' }, { status: 500 });
-    } // Generate unique filename
+    }
     const timestamp = Date.now();
     const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
     const filename = `${timestamp}_${sanitizedName}`;
@@ -137,9 +137,9 @@ export async function POST(request: NextRequest) {
         filename: sanitizedName,
         url: fileUrl,
         size: file.size,
-        type: file.type, // Browser-detected MIME type
-        file_extension: fileExtension, // Actual file extension
-        content_type: detectedContentType, // Proper MIME type based on extension
+        type: file.type,
+        file_extension: fileExtension,
+        content_type: detectedContentType,
         original_name: file.name,
       },
     });

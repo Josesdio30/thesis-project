@@ -20,6 +20,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { useSession } from 'next-auth/react';
 import { Skeleton } from '@/components/ui/skeleton';
+import TextEditor from '@/components/ui/text-editor';
 
 interface Material {
   id: number;
@@ -74,7 +75,7 @@ const MaterialItem = ({
   onDelete: (id: number) => void;
   onReorder: (id: number, direction: 'up' | 'down') => void;
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  // const [isExpanded, setIsExpanded] = useState(false);
   const hasContent = material.content && material.content.trim().length > 0;
 
   return (
@@ -105,9 +106,10 @@ const MaterialItem = ({
           {/* Material content */}
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
+              {' '}
               <div className="flex-1">
-                <h5 className="font-medium text-gray-800 mb-1">{material.title}</h5>
-                {hasContent && (
+                <h5 className="font-bold text-gray-800 mb-1">{material.title}</h5>
+                {/* {hasContent && (
                   <button
                     onClick={() => setIsExpanded(!isExpanded)}
                     className="text-sm text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1"
@@ -124,9 +126,8 @@ const MaterialItem = ({
                       </>
                     )}
                   </button>
-                )}
+                )} */}
               </div>
-
               {/* Action buttons for teachers */}
               {canEdit && (
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -146,12 +147,14 @@ const MaterialItem = ({
                   </button>
                 </div>
               )}
-            </div>
-
-            {/* Expandable content */}
-            {hasContent && isExpanded && (
+            </div>{' '}
+            {/* Content always visible now */}
+            {hasContent && (
               <div className="mt-3 pt-3 border-t border-gray-200">
-                <div className="text-sm text-gray-600 whitespace-pre-wrap">{material.content}</div>
+                <div
+                  className="preview-syllabus-content text-sm"
+                  dangerouslySetInnerHTML={{ __html: material.content || '' }}
+                />
               </div>
             )}
           </div>
@@ -197,19 +200,16 @@ const MaterialForm = ({
             disabled={isLoading}
             required
           />
-        </div>
-
+        </div>{' '}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
-          <Textarea
-            value={formData.content}
-            onChange={e => setFormData({ ...formData, content: e.target.value })}
+          <TextEditor
+            content={formData.content}
+            onChange={content => setFormData({ ...formData, content })}
             placeholder="Enter material content or description..."
-            rows={4}
             disabled={isLoading}
           />
         </div>
-
         <div className="flex items-center gap-2">
           <Button type="submit" disabled={!formData.title.trim() || isLoading} className="flex items-center gap-2">
             {isLoading ? <FaSpinner className="animate-spin" /> : <FaSave />}
@@ -368,11 +368,11 @@ const Materials = ({ sessionId, courseCode, className }: MaterialsProps) => {
     <div className={cn('mb-6', className)}>
       <div className="flex items-center justify-between mb-4">
         <h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
-          <FaBookOpen className="text-sm text-blue-600" />
-          Course Materials
-          {materials.length > 0 && (
+          {/* <FaBookOpen className="text-sm text-blue-600" />
+          Course Materials */}
+          {/* {materials.length > 0 && (
             <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{materials.length}</span>
-          )}
+          )} */}
         </h4>
 
         {canEdit && !isFormOpen && (

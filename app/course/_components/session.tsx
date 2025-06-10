@@ -441,7 +441,7 @@ const ActionsSidebar = ({
             <FaDownload className="text-sm text-blue-600" />
             Available Resources
           </h4> */}
-          <div className="space-y-2 max-h-96">
+          <div className="space-y-2 max-h-screen">
             {loadingResources ? (
               <div className="flex items-center justify-center py-8">
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>

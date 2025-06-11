@@ -163,7 +163,7 @@ const CourseDetail = () => {
             )}{' '}
             {activeTab === 'Forum' && (
               <div>
-                <Forum courseCode={code as string} sessionId={activeSession} />
+                <Forum courseCode={code as string} sessions={sessions} />
               </div>
             )}
             {activeTab === 'People' && <People courseCode={code as string} />}

@@ -4,10 +4,10 @@ import { prisma } from '@/lib/prisma';
 // PUT /api/courses/[code]/sessions/[sessionId]/materials/[id]
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { code: string; sessionId: string; id: string } }
+  { params }: { params: Promise<{ code: string; sessionId: string; id: string }> }
 ) {
   try {
-    const { code, sessionId, id } = params;
+    const { code, sessionId, id } = await params;
     const body = await request.json();
     const { title, content } = body;
 
@@ -55,10 +55,10 @@ export async function PUT(
 // DELETE /api/courses/[code]/sessions/[sessionId]/materials/[id]
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { code: string; sessionId: string; id: string } }
+  { params }: { params: Promise<{ code: string; sessionId: string; id: string }> }
 ) {
   try {
-    const { code, sessionId, id } = params;
+    const { code, sessionId, id } = await params;
 
     const material = await prisma.materials.findFirst({
       where: {

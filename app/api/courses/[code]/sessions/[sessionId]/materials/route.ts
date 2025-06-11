@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 // GET /api/courses/[code]/sessions/[sessionId]/materials
-export async function GET(request: NextRequest, { params }: { params: { code: string; sessionId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ code: string; sessionId: string }> }) {
   try {
-    const { code, sessionId } = params;
+    const { code, sessionId } = await params;
 
     const session = await prisma.sessions.findFirst({
       where: {
@@ -42,9 +42,9 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
 }
 
 // POST /api/courses/[code]/sessions/[sessionId]/materials
-export async function POST(request: NextRequest, { params }: { params: { code: string; sessionId: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ code: string; sessionId: string }> }) {
   try {
-    const { code, sessionId } = params;
+    const { code, sessionId } = await params;
     const body = await request.json();
     const { title, content } = body;
 

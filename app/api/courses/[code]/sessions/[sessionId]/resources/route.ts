@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function POST(request: NextRequest, { params }: { params: { code: string; sessionId: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ code: string; sessionId: string }> }) {
   try {
-    const { code, sessionId } = params;
+    const { code, sessionId } = await params;
     const sessionIdNum = parseInt(sessionId);
     const body = await request.json();
 

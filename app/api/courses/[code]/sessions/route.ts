@@ -1,9 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(request: NextRequest, { params }: { params: { code: string; sessionId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   try {
-    const { code, sessionId } = params;
+    const { code } = await params;
+    const { searchParams } = new URL(request.url);
+    const sessionId = searchParams.get('sessionId');
+
+    if (!sessionId) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Missing session ID',
+          message: 'Session ID is required',
+        },
+        { status: 400 }
+      );
+    }
+
     const sessionIdNum = parseInt(sessionId);
 
     if (isNaN(sessionIdNum)) {
@@ -60,7 +74,7 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
         },
       },
       orderBy: {
-        upload_date: 'desc',
+        id: 'desc',
       },
     });
 
@@ -76,7 +90,6 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
         version: resource.version,
         is_public: resource.is_public,
         download_count: resource.download_count,
-        upload_date: resource.upload_date,
         uploader: resource.app_user?.nama_lengkap,
       })),
     });
@@ -93,11 +106,35 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
   }
 }
 
-export async function POST(request: NextRequest, { params }: { params: { code: string; sessionId: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   try {
-    const { code, sessionId } = params;
-    const sessionIdNum = parseInt(sessionId);
+    const { code } = await params;
     const body = await request.json();
+    const sessionId = body.sessionId;
+
+    if (!sessionId) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Missing session ID',
+          message: 'Session ID is required',
+        },
+        { status: 400 }
+      );
+    }
+
+    const sessionIdNum = parseInt(sessionId);
+
+    if (isNaN(sessionIdNum)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid session ID',
+          message: 'Session ID must be a number',
+        },
+        { status: 400 }
+      );
+    }
 
     const { file_url, file_name, file_type, file_size, content_type, uploader_id } = body;
 
@@ -134,9 +171,7 @@ export async function POST(request: NextRequest, { params }: { params: { code: s
         },
         { status: 404 }
       );
-    }
-
-    // Create new resource
+    } // Create new resource
     const newResource = await prisma.resources.create({
       data: {
         session_id: sessionIdNum,
@@ -149,7 +184,6 @@ export async function POST(request: NextRequest, { params }: { params: { code: s
         version: 1,
         is_public: true,
         download_count: 0,
-        upload_date: new Date(),
       },
       include: {
         app_user: {
@@ -159,7 +193,6 @@ export async function POST(request: NextRequest, { params }: { params: { code: s
         },
       },
     });
-
     return NextResponse.json({
       success: true,
       data: {
@@ -168,7 +201,6 @@ export async function POST(request: NextRequest, { params }: { params: { code: s
         file_url: newResource.file_url,
         file_type: newResource.file_type,
         file_size: newResource.file_size,
-        upload_date: newResource.upload_date,
         uploader: newResource.app_user?.nama_lengkap,
       },
       message: 'Resource uploaded successfully',

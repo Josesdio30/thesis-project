@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
-export async function GET(request: NextRequest, { params }: { params: { code: string; sessionId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ code: string; sessionId: string }> }) {
   try {
     const { code, sessionId } = await params;
     const sessionIdNum = parseInt(sessionId);
@@ -123,7 +123,6 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
       success: true,
       data: sessionData,
     });
-
   } catch (error) {
     console.error('Error fetching session data:', error);
     return NextResponse.json(

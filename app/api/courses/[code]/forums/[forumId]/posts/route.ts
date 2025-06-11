@@ -4,9 +4,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 
 // GET - Get posts in a forum
-export async function GET(request: NextRequest, { params }: { params: { code: string; forumId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ code: string; forumId: string }> }) {
   try {
-    const { forumId } = params;
+    const { forumId } = await params;
     const forumIdNum = parseInt(forumId);
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '20');
@@ -139,9 +139,9 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
 }
 
 // POST - Create new post in forum
-export async function POST(request: NextRequest, { params }: { params: { code: string; forumId: string } }) {
+export async function POST(request: NextRequest, { params }: { params: Promise<{ code: string; forumId: string }> }) {
   try {
-    const { forumId } = params;
+    const { forumId } = await params;
     const forumIdNum = parseInt(forumId);
     const body = await request.json();
 

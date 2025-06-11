@@ -60,9 +60,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { readFile } from 'fs/promises';
 import path from 'path';
 
-export async function GET(request: NextRequest, { params }: { params: { path: string[] } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   try {
-    const filePath = params.path.join('/');
+    const { path: pathArray } = await params;
+    const filePath = pathArray.join('/');
     const fullPath = path.join(process.cwd(), 'public', 'uploads', filePath);
 
     console.log('=== FILE READ REQUEST ===');

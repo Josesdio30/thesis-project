@@ -4,10 +4,10 @@ import { prisma } from '@/lib/prisma';
 // PATCH /api/courses/[code]/sessions/[sessionId]/materials/[id]/reorder
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { code: string; sessionId: string; id: string } }
+  { params }: { params: Promise<{ code: string; sessionId: string; id: string }> }
 ) {
   try {
-    const { code, sessionId, id } = params;
+    const { code, sessionId, id } = await params;
     const body = await request.json();
     const { direction } = body;
 

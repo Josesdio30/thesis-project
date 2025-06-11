@@ -6,10 +6,11 @@ import { authOptions } from '@/auth';
 // GET - Get replies for a specific post
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ code: string; forumId: string; postId: string }> }
+  context: { params: { code: string; forumId: string; postId: string } }
+
 ) {
   try {
-    const { postId } = await params;
+    const { postId } = context.params;
     const postIdNum = parseInt(postId);
     const { searchParams } = new URL(request.url);
     const limit = parseInt(searchParams.get('limit') || '50');
@@ -160,10 +161,10 @@ export async function GET(
 // POST - Create new reply to a post
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ code: string; forumId: string; postId: string }> }
+  context: { params: { code: string; forumId: string; postId: string } }
 ) {
   try {
-    const { postId } = await params;
+    const { postId } = context.params;
     const postIdNum = parseInt(postId);
     const body = await request.json();
 

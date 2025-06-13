@@ -83,7 +83,7 @@ const MaterialItem = ({
       <div className="p-4">
         <div className="flex items-start gap-3">
           {/* Drag handle for reordering (teachers only) */}
-          {canEdit && (
+          {/* {canEdit && (
             <div className="flex flex-col gap-1 mt-1">
               <button
                 onClick={() => onReorder(material.id, 'up')}
@@ -101,7 +101,7 @@ const MaterialItem = ({
                 <FaChevronDown className="text-xs" />
               </button>
             </div>
-          )}
+          )} */}
 
           {/* Material content */}
           <div className="flex-1 min-w-0">

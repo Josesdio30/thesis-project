@@ -18,19 +18,33 @@ const CourseDetail = () => {
 
   // Get sessionId from URL search params
   const sessionIdParam = searchParams.get('sessionId');
-
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('Session');
   const [activeSession, setActiveSession] = useState(1);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+
   useEffect(() => {
     if (!code) return;
     const fetchCourse = async () => {
       try {
         const res = await fetch(`/api/courses/${code}`);
         const data = await res.json();
-        setCourse(data.data || null);
+        const courseData = data.data || null;
+        setCourse(courseData);
+
+        // Set active session logic - URL parameter takes priority
+        if (sessionIdParam) {
+          const sessionId = parseInt(sessionIdParam);
+          if (!isNaN(sessionId)) {
+            setActiveSession(sessionId);
+            setActiveTab('Session');
+          }
+        } else if (courseData?.class_courses?.[0]?.sessions?.length > 0) {
+          // Default to first session if no URL parameter
+          const firstSession = courseData.class_courses[0].sessions[0];
+          setActiveSession(firstSession.id);
+        }
       } catch (err) {
         setCourse(null);
       } finally {
@@ -38,19 +52,7 @@ const CourseDetail = () => {
       }
     };
     fetchCourse();
-  }, [code]);
-
-  // Handle sessionId from URL params
-  useEffect(() => {
-    if (sessionIdParam) {
-      const sessionId = parseInt(sessionIdParam);
-      if (!isNaN(sessionId)) {
-        setActiveSession(sessionId);
-        setActiveTab('Session'); // Auto-switch to Session tab when sessionId is provided
-      }
-    }
-  }, [sessionIdParam]);
-
+  }, [code, sessionIdParam]);
   if (loading) {
     return (
       <div className="flex min-h-screen w-full overflow-hidden">

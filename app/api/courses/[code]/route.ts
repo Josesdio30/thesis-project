@@ -39,8 +39,8 @@ const dummyCourses = [
   },
 ];
 
-export async function GET(req: NextRequest, { params }: { params: { code: string } }) {
-  const { code } = params;
+export async function GET(req: NextRequest, context: { params: { code: string } }) {
+  const { code } = context.params;
   const course = dummyCourses.find(c => c.course_code === code);
   if (course) {
     return NextResponse.json({ success: true, data: course });

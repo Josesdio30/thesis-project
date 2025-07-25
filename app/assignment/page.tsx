@@ -2,7 +2,8 @@
 
 import Sidebar from '../_components/sidebar';
 import Link from 'next/link';
-import { useRouter, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 // Data dummy assignment
 const assignments = [

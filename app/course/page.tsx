@@ -8,7 +8,7 @@ import Topbar from '../_components/topbar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FaBook, FaClipboard, FaCode, FaSpinner, FaUserFriends } from 'react-icons/fa';
 import { cn } from '@/lib/utils';
-import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 interface Course {
   id?: string;
@@ -135,25 +135,31 @@ const getPageDescription = (role?: string) => {
   }
 };
 
-const Course = () => {
-  const { data: session, status } = useSession();
+export default function CoursePage() {
+  const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    const userData = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
+    if (!userData) {
+      router.replace('/login');
+      return;
+    }
+
     const fetchCourses = async () => {
       // Wait for session to load
-      if (status === 'loading') {
-        return;
-      }
+      // if (status === 'loading') {
+      //   return;
+      // }
 
-      if (status === 'unauthenticated' || !session?.user) {
-        setError('Authentication required');
-        setLoading(false);
-        return;
-      }
+      // if (status === 'unauthenticated' || !session?.user) {
+      //   setError('Authentication required');
+      //   setLoading(false);
+      //   return;
+      // }
 
       try {
         setError(null);
@@ -162,10 +168,11 @@ const Course = () => {
         // Build API URL with user-specific filters
         let apiUrl = '/api/courses';
         const params = new URLSearchParams(); // Filter courses based on user role
-        if (session.user.role === 'STUDENT' && session.user.id) {
-          params.append('studentId', session.user.id);
-        } else if (session.user.role === 'TEACHER' && session.user.id) {
-          params.append('teacherId', session.user.id);
+        const user = JSON.parse(userData);
+        if (user.role === 'STUDENT' && user.id) {
+          params.append('studentId', user.id);
+        } else if (user.role === 'TEACHER' && user.id) {
+          params.append('teacherId', user.id);
         }
         // For ADMIN role, no filtering - show all courses
 
@@ -174,8 +181,8 @@ const Course = () => {
         }
 
         console.log('Fetching courses for user:', {
-          role: session.user.role,
-          userId: session.user.id,
+          role: user.role,
+          userId: user.id,
           apiUrl,
         });
 
@@ -196,7 +203,7 @@ const Course = () => {
     };
 
     fetchCourses();
-  }, [session, status]);
+  }, [router]);
 
   return (
     <div className="flex max-h-screen">
@@ -251,7 +258,7 @@ const Course = () => {
                 </button>
               </div>
             ) : courses.length === 0 ? (
-              <EmptyState userRole={session?.user?.role} />
+              <EmptyState userRole={JSON.parse(localStorage.getItem('user') || '{}').role} />
             ) : (
               courses.map((course, index) => <CourseCard key={course.id || index} course={course} />)
             )}
@@ -262,5 +269,3 @@ const Course = () => {
     </div>
   );
 };
-
-export default Course;

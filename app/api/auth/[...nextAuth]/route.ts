@@ -1,6 +1,8 @@
-import { authOptions } from '@/auth';
-import NextAuth from 'next-auth/next';
+import { NextRequest, NextResponse } from 'next/server';
 
-// For App Router in Next.js with NextAuth v4 we need to use this pattern
-const handler = NextAuth(authOptions);
-export { handler as GET, handler as POST };
+export async function GET() {
+  return NextResponse.json({ error: 'Not found' }, { status: 404 });
+}
+export async function POST() {
+  return NextResponse.json({ error: 'Not found' }, { status: 404 });
+}

@@ -4,138 +4,15 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 
 // GET - Get posts in a forum
-export async function GET(request: NextRequest, { params }: { params: Promise<{ code: string; forumId: string }> }) {
-  try {
-    const { forumId } = await params;
-    const forumIdNum = parseInt(forumId);
-    const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit') || '20');
-    const offset = parseInt(searchParams.get('offset') || '0');
-
-    console.log('=== FORUM POSTS FETCH REQUEST ===');
-    console.log('Forum ID:', forumId);
-    console.log('Limit:', limit, 'Offset:', offset);
-    console.log('==================================');
-
-    if (isNaN(forumIdNum)) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Invalid forum ID',
-          message: 'Forum ID must be a number',
-        },
-        { status: 400 }
-      );
-    }
-
-    // Verify forum exists
-    const forum = await prisma.forums.findUnique({
-      where: { id: forumIdNum },
-      select: { id: true, title: true },
-    });
-
-    if (!forum) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Forum not found',
-          message: 'Forum not found',
-        },
-        { status: 404 }
-      );
-    }
-
-    // Get posts with replies count
-    const posts = await prisma.forum_posts.findMany({
-      where: {
-        forum_id: forumIdNum,
-        is_deleted: false,
-      },
-      include: {
-        app_user: {
-          select: {
-            id: true,
-            nama_lengkap: true,
-            profile_picture_url: true,
-          },
-        },
-        forum_replies: {
-          where: {
-            is_deleted: false,
-          },
-          select: {
-            id: true,
-          },
-        },
-        forum_attachments: {
-          select: {
-            id: true,
-            file_name: true,
-            file_url: true,
-            file_size: true,
-          },
-        },
-      },
-      orderBy: {
-        created_at: 'desc',
-      },
-      take: limit,
-      skip: offset,
-    });
-
-    const totalPosts = await prisma.forum_posts.count({
-      where: {
-        forum_id: forumIdNum,
-        is_deleted: false,
-      },
-    });
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        forum: {
-          id: forum.id,
-          title: forum.title,
-        },
-        posts: posts.map(post => ({
-          id: post.id,
-          title: post.title,
-          content: post.content,
-          content_type: post.content_type,
-          created_at: post.created_at,
-          updated_at: post.updated_at,
-          author: {
-            id: post.app_user?.id,
-            nama_lengkap: post.app_user?.nama_lengkap,
-            profile_picture_url: post.app_user?.profile_picture_url,
-          },
-          reply_count: post.forum_replies.length,
-          attachments: post.forum_attachments.map(attachment => ({
-            id: attachment.id,
-            file_name: attachment.file_name,
-            file_url: attachment.file_url,
-            file_size: attachment.file_size,
-          })),
-        })),
-        pagination: {
-          total: totalPosts,
-          limit,
-          offset,
-          hasMore: offset + limit < totalPosts,
-        },
-      },
-    });
-  } catch (error) {
-    console.error('Error fetching forum posts:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Database error',
-        message: 'Failed to fetch forum posts',
-      },
-      { status: 500 }
-    );
-  }
+export async function GET(req: NextRequest) {
+  // Dummy response posts
+  return NextResponse.json({
+    success: true,
+    posts: [
+      { id: 1, content: 'Post 1', author: 'Student A' },
+      { id: 2, content: 'Post 2', author: 'Student B' },
+    ],
+  });
 }
 
 // POST - Create new post in forum

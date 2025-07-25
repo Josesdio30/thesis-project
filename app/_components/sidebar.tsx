@@ -17,7 +17,6 @@ import {
 } from 'react-icons/fa';
 import { NAVIGATION_ITEMS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
-import { signOut, useSession } from 'next-auth/react';
 
 const iconMap = {
   FaTachometerAlt: FaTachometerAlt,
@@ -130,24 +129,27 @@ const SidebarContent = ({
   </div>
 );
 
-const Sidebar = ({ isMobileOpen, setIsMobileOpen }: SidebarProps) => {
-  const [userName, setUserName] = useState<string | null>(null);
-  const { data: session } = useSession();
+export default function Sidebar({ isMobileOpen, setIsMobileOpen }: { isMobileOpen: boolean; setIsMobileOpen: (val: boolean) => void }) {
   const router = useRouter();
   const pathname = usePathname();
+  const [userName, setUserName] = useState<string | null>(null);
+
   useEffect(() => {
     // Prioritize session data over localStorage
-    if (session?.user?.name) {
-      setUserName(session.user.name);
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      const user = JSON.parse(storedUser);
+      setUserName(user.name);
     } else {
       // Fallback to localStorage if session is not available yet
       const storedName = localStorage.getItem('userName');
       if (storedName) setUserName(storedName);
     }
-  }, [session]);
+  }, []);
 
-  const handleLogout = async () => {
-    await signOut({ callbackUrl: '/login' });
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    router.replace('/login');
   };
 
   const handleMobileItemClick = () => {
@@ -161,7 +163,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }: SidebarProps) => {
         <div className="p-4 h-full">
           <SidebarContent
             userName={userName}
-            userRole={session?.user?.role || null}
+            userRole={null} // No longer fetching from session
             currentPath={pathname}
             onLogout={handleLogout}
           />
@@ -187,7 +189,7 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }: SidebarProps) => {
             <div className="p-4 h-full">
               <SidebarContent
                 userName={userName}
-                userRole={session?.user?.role || null}
+                userRole={null}
                 currentPath={pathname}
                 onLogout={handleLogout}
                 onItemClick={handleMobileItemClick}
@@ -198,6 +200,4 @@ const Sidebar = ({ isMobileOpen, setIsMobileOpen }: SidebarProps) => {
       )}
     </>
   );
-};
-
-export default Sidebar;
+}

@@ -1,9 +1,9 @@
-import { useSession } from 'next-auth/react';
+'use client';
+
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 
 const AdminDashboard = () => {
-  const { data: session, status } = useSession();
   const router = useRouter();
   const [form, setForm] = useState({
     kodeGuru: '',
@@ -17,11 +17,18 @@ const AdminDashboard = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (status === 'loading') return;
-    if (status === 'unauthenticated' || session?.user.role !== 'ADMIN') {
+    // Cek user dari localStorage
+    const userData = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
+    if (!userData) {
       router.replace('/login');
+      return;
     }
-  }, [session, status, router]);
+    const user = JSON.parse(userData);
+    if (user.role !== 'ADMIN') {
+      router.replace('/login');
+      return;
+    }
+  }, [router]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });

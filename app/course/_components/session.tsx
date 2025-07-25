@@ -20,7 +20,7 @@ import UploadModal from './upload-modal';
 import DeleteConfirmModal from './delete-confirm-modal';
 import Materials from './materials';
 import { useToast } from './toast';
-import { useSession } from 'next-auth/react';
+// Tidak ada import useSession dari next-auth/react
 
 interface Material {
   id: number;
@@ -409,7 +409,7 @@ const ActionsSidebar = ({
   onDeleteResource,
   courseCode,
 }: ActionsSidebarProps) => {
-  const { data: sessionData, status } = useSession();
+  // Tidak ada import useSession dari next-auth/react
   const [resourceMenuOpen, setResourceMenuOpen] = useState<number | null>(null);
 
   const handleDeleteClick = async (resource: Resource) => {
@@ -418,7 +418,8 @@ const ActionsSidebar = ({
   };
 
   // Check if user can manage resources (teachers and admins only)
-  const canManageResources = sessionData?.user?.role === 'TEACHER' || sessionData?.user?.role === 'ADMIN';
+  // Tidak ada import useSession dari next-auth/react
+  const canManageResources = false; // Placeholder, actual logic needs to be implemented
 
   useEffect(() => {
     const handleClickOutside = () => {
@@ -615,7 +616,7 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode }: Sess
   const [loadingResources, setLoadingResources] = useState(false);
 
   const { success, error, info, ToastContainer } = useToast();
-  const { data: sessionData } = useSession();
+  // Tidak ada import useSession dari next-auth/react
 
   const currentSession = sessions.find(s => s.id === activeSession);
   const fetchResources = async () => {

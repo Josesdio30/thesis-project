@@ -18,21 +18,22 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-
     try {
-      const result = await signIn('credentials', {
-        username,
-        password,
-        redirect: false,
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
       });
-
-      if (result?.error) {
-        setError('Invalid username or password');
+      const data = await res.json();
+      if (data.success) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+        if (data.user.role === 'ADMIN') router.push('/admin');
+        else router.push('/dashboard');
       } else {
-        router.push('/dashboard');
+        setError(data.message || 'Login gagal');
       }
-    } catch (error) {
-      setError('An error occurred during login');
+    } catch (err) {
+      setError('Terjadi kesalahan saat login');
     } finally {
       setIsLoading(false);
     }
@@ -53,33 +54,38 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && <div className="text-red-500 text-sm text-center">{error}</div>}
           <div>
-            <Input
+            <input
               type="text"
               placeholder="Username"
               value={username}
               onChange={e => setUsername(e.target.value)}
-              className="w-full border-gray-300 rounded-md"
+              className="w-full border-gray-300 rounded-md px-2 py-1"
               required
             />
           </div>
           <div>
-            <Input
+            <input
               type="password"
               placeholder="Password"
               value={password}
               onChange={e => setPassword(e.target.value)}
-              className="w-full border-gray-300 rounded-md"
+              className="w-full border-gray-300 rounded-md px-2 py-1"
               required
             />
           </div>
-          <Button
+          <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-orange-400 hover:bg-orange-600 text-white rounded-full"
+            className="w-full bg-orange-400 hover:bg-orange-600 text-white rounded-full py-2"
           >
             {isLoading ? 'Signing in...' : 'Login'}
-          </Button>
+          </button>
         </form>
+        <div className="mt-4 text-sm text-gray-500">
+          <div>Admin: admin / admin123</div>
+          <div>Guru: guru / guru123</div>
+          <div>Student: student / student123</div>
+        </div>
       </div>
     </div>
   );

@@ -10,14 +10,16 @@ import Forum from '../_components/forum';
 import Session from '../_components/session';
 import People from '../_components/people';
 import SimpleEditor from '../_components/syllabus';
+import AssignmentTab from '../_components/assignment';
 
 const CourseDetail = () => {
   const params = useParams();
   const searchParams = useSearchParams();
   const code = typeof params === 'object' && 'code' in params ? params['code'] : null;
 
-  // Get sessionId from URL search params
+  // Get sessionId and tab from URL search params
   const sessionIdParam = searchParams.get('sessionId');
+  const tabParam = searchParams.get('tab');
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('Session');
@@ -53,6 +55,13 @@ const CourseDetail = () => {
     };
     fetchCourse();
   }, [code, sessionIdParam]);
+
+  // Tambahkan efek untuk membaca tab dari query param
+  useEffect(() => {
+    if (tabParam) {
+      setActiveTab(tabParam);
+    }
+  }, [tabParam]);
   if (loading) {
     return (
       <div className="flex min-h-screen w-full overflow-hidden">
@@ -163,13 +172,16 @@ const CourseDetail = () => {
                 <SimpleEditor courseCode={code as string} />
               </div>
             )}{' '}
+            {activeTab === 'Assignment' && (
+              <AssignmentTab />
+            )}
             {activeTab === 'Forum' && (
               <div>
                 <Forum courseCode={code as string} sessions={sessions} />
               </div>
             )}
             {activeTab === 'People' && <People courseCode={code as string} />}
-            {activeTab !== 'Session' && activeTab !== 'Syllabus' && activeTab !== 'Forum' && activeTab !== 'People' && (
+            {activeTab !== 'Session' && activeTab !== 'Syllabus' && activeTab !== 'Forum' && activeTab !== 'People' && activeTab !== 'Assignment' &&(
               <div>
                 <p className="text-gray-700">Content for {activeTab} will be added here.</p>
               </div>

@@ -5,7 +5,7 @@ import StarterKit from '@tiptap/starter-kit';
 import { useState, useEffect, useCallback } from 'react';
 import { EditorToolbar } from './syllabus-editor';
 import { Save, RefreshCw, Lock } from 'lucide-react';
-import { useSession } from 'next-auth/react';
+// Tidak ada import useSession dari next-auth/react
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface SimpleEditorProps {
@@ -98,7 +98,7 @@ const SyllabusSkeleton = ({ isStudentView = false }: { isStudentView?: boolean }
 };
 
 export const SimpleEditor = ({ courseCode }: SimpleEditorProps) => {
-  const { data: session, status } = useSession();
+  // Tidak ada import useSession dari next-auth/react
   const [isPreview, setIsPreview] = useState(true);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -109,6 +109,10 @@ export const SimpleEditor = ({ courseCode }: SimpleEditorProps) => {
 
   // Check if user can edit syllabus (teachers and admins only)
   useEffect(() => {
+    // Tidak ada import useSession dari next-auth/react
+    const session = null; // Placeholder for session data
+    const status = 'idle'; // Placeholder for session status
+
     if (status === 'loading') return;
 
     if (session?.user?.role === 'TEACHER' || session?.user?.role === 'ADMIN') {
@@ -117,7 +121,7 @@ export const SimpleEditor = ({ courseCode }: SimpleEditorProps) => {
       setCanEdit(false);
       setIsPreview(true); // Force students to preview mode
     }
-  }, [session, status]);
+  }, []); // Removed session and status from dependency array
   const editor = useEditor({
     extensions: [StarterKit],
     content: '<p>Loading syllabus...</p>',
@@ -178,7 +182,7 @@ export const SimpleEditor = ({ courseCode }: SimpleEditorProps) => {
         },
         body: JSON.stringify({
           syllabus: editor.getHTML(),
-          updated_by: session?.user?.id, // Use actual user ID from session
+          updated_by: null, // Placeholder for user ID
         }),
       });
 

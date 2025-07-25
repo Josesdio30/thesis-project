@@ -1,38 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Pool } from 'pg';
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-});
+// Data dummy user
+const users = [
+  { username: 'admin', password: 'admin123', role: 'ADMIN' },
+  { username: 'guru', password: 'guru123', role: 'GURU' },
+  { username: 'student', password: 'student123', role: 'STUDENT' },
+];
 
 export async function POST(req: NextRequest) {
-  const { user_name, password } = await req.json();
-
-  try {
-    const result = await pool.query(
-      `SELECT * FROM app_user WHERE user_name = $1 AND is_deleted = false AND is_active = true`,
-      [user_name]
-    );
-
-    if (result.rows.length === 0) {
-      return NextResponse.json({ message: 'User not found' }, { status: 401 });
-    }
-
-    const user = result.rows[0];
-
-    if (user.password !== password) {
-      return NextResponse.json({ message: 'Invalid password' }, { status: 401 });
-    }
-
+  const { username, password } = await req.json();
+  const user = users.find(
+    (u) => u.username === username && u.password === password
+  );
+  if (user) {
+    // Return user data (tanpa password)
     return NextResponse.json({
-      message: 'Login successful',
-      user: {
-        id: user.id,
-        name: user.nama_lengkap,
-        email: user.email,
-      },
+      success: true,
+      user: { username: user.username, role: user.role },
     });
-  } catch (error) {
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
   }
+  return NextResponse.json(
+    { success: false, message: 'Username/password salah' },
+    { status: 401 }
+  );
 }

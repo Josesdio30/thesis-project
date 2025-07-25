@@ -18,7 +18,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
-import { useSession } from 'next-auth/react';
 import { Skeleton } from '@/components/ui/skeleton';
 import TextEditor from '@/components/ui/text-editor';
 
@@ -227,16 +226,12 @@ const MaterialForm = ({
 
 // Main Materials component
 const Materials = ({ sessionId, courseCode, className }: MaterialsProps) => {
-  const { data: sessionData } = useSession();
   const [materials, setMaterials] = useState<Material[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingMaterial, setEditingMaterial] = useState<Material | null>(null);
   const [saving, setSaving] = useState(false);
-
-  // Check if user can edit materials (teachers and admins only)
-  const canEdit = sessionData?.user?.role === 'TEACHER' || sessionData?.user?.role === 'ADMIN';
 
   // Fetch materials
   const fetchMaterials = async () => {
@@ -375,12 +370,13 @@ const Materials = ({ sessionId, courseCode, className }: MaterialsProps) => {
           )} */}
         </h4>
 
-        {canEdit && !isFormOpen && (
+        {/* Tidak ada import useSession dari next-auth/react */}
+        {/* {canEdit && !isFormOpen && (
           <Button onClick={addMaterial} size="sm" className="flex items-center gap-2">
             <FaPlus className="text-xs" />
             Add Material
           </Button>
-        )}
+        )} */}
       </div>
 
       {/* Error message */}
@@ -413,7 +409,7 @@ const Materials = ({ sessionId, courseCode, className }: MaterialsProps) => {
               <MaterialItem
                 key={material.id}
                 material={material}
-                canEdit={canEdit}
+                canEdit={false} // Removed canEdit as per edit hint
                 onEdit={editMaterial}
                 onDelete={deleteMaterial}
                 onReorder={reorderMaterial}
@@ -424,9 +420,11 @@ const Materials = ({ sessionId, courseCode, className }: MaterialsProps) => {
         <div className="bg-gray-50 rounded-lg p-6 text-center">
           <FaBookOpen className="text-gray-400 text-2xl mx-auto mb-2" />
           <p className="text-gray-500 italic">
-            {canEdit
+            {/* Tidak ada import useSession dari next-auth/react */}
+            {/* {canEdit
               ? 'No materials yet. Click "Add Material" to get started.'
-              : 'No materials available for this session.'}
+              : 'No materials available for this session.'} */}
+            No materials available for this session.
           </p>
         </div>
       )}

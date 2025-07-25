@@ -21,38 +21,42 @@ model admin_details {
 }
 
 model app_user {
-  id                                          Int                 @id @default(autoincrement())
-  email                                       String              @unique @db.VarChar(100)
-  password                                    String              @db.VarChar(255)
-  user_name                                   String              @unique @db.VarChar(50)
-  nama_lengkap                                String              @db.VarChar(255)
-  last_login                                  DateTime?
-  profile_picture_url                         String?             @db.VarChar(255)
-  is_active                                   Boolean             @default(true)
-  is_deleted                                  Boolean             @default(false)
-  deleted_at                                  DateTime?
-  deleted_by                                  Int?
-  created_date                                DateTime            @default(now())
-  created_by                                  Int?
-  updated_date                                DateTime?
-  updated_by                                  Int?
-  admin_details                               admin_details?
-  announcements                               announcements[]
-  app_user_role                               app_user_role[]
-  attendance_attendance_recorded_byToapp_user attendance[]        @relation("attendance_recorded_byToapp_user")
-  attendance_attendance_student_idToapp_user  attendance[]        @relation("attendance_student_idToapp_user")
-  class_courses                               class_courses[]
-  classes                                     classes[]
-  enrollments                                 enrollments[]
-  forum_attachments                           forum_attachments[]
-  forum_posts                                 forum_posts[]
-  forum_replies                               forum_replies[]
-  forums                                      forums[]
-  notifications                               notifications[]
-  resources                                   resources[]
-  student_details                             student_details?
-  teacher_details                             teacher_details?
-  user_profile                                user_profile?
+  id                                                                 Int                      @id @default(autoincrement())
+  email                                                              String                   @unique @db.VarChar(100)
+  password                                                           String                   @db.VarChar(255)
+  user_name                                                          String                   @unique @db.VarChar(50)
+  nama_lengkap                                                       String                   @db.VarChar(255)
+  last_login                                                         DateTime?
+  profile_picture_url                                                String?                  @db.VarChar(255)
+  is_active                                                          Boolean                  @default(true)
+  is_deleted                                                         Boolean                  @default(false)
+  deleted_at                                                         DateTime?
+  deleted_by                                                         Int?
+  created_date                                                       DateTime                 @default(now())
+  created_by                                                         Int?
+  updated_date                                                       DateTime?
+  updated_by                                                         Int?
+  admin_details                                                      admin_details?
+  announcements                                                      announcements[]
+  app_user_role                                                      app_user_role[]
+  assignment_submissions_assignment_submissions_graded_byToapp_user  assignment_submissions[] @relation("assignment_submissions_graded_byToapp_user")
+  assignment_submissions_assignment_submissions_student_idToapp_user assignment_submissions[] @relation("assignment_submissions_student_idToapp_user")
+  assignments_assignments_created_byToapp_user                       assignments[]            @relation("assignments_created_byToapp_user")
+  assignments_assignments_updated_byToapp_user                       assignments[]            @relation("assignments_updated_byToapp_user")
+  attendance_attendance_recorded_byToapp_user                        attendance[]             @relation("attendance_recorded_byToapp_user")
+  attendance_attendance_student_idToapp_user                         attendance[]             @relation("attendance_student_idToapp_user")
+  class_courses                                                      class_courses[]
+  classes                                                            classes[]
+  enrollments                                                        enrollments[]
+  forum_attachments                                                  forum_attachments[]
+  forum_posts                                                        forum_posts[]
+  forum_replies                                                      forum_replies[]
+  forums                                                             forums[]
+  notifications                                                      notifications[]
+  resources                                                          resources[]
+  student_details                                                    student_details?
+  teacher_details                                                    teacher_details?
+  user_profile                                                       user_profile?
 }
 
 model app_user_role {
@@ -69,14 +73,17 @@ model app_user_role {
 }
 
 model enumeration {
-  id            Int             @id @default(autoincrement())
-  name          String          @db.VarChar(100)
-  alt_name      String?         @db.VarChar(100)
-  is_active     Boolean         @default(true)
-  is_default    Boolean         @default(false)
-  category      String          @db.VarChar(100)
-  created_by    Int?
-  app_user_role app_user_role[]
+  id                     Int                      @id @default(autoincrement())
+  name                   String                   @db.VarChar(100)
+  alt_name               String?                  @db.VarChar(100)
+  is_active              Boolean                  @default(true)
+  is_default             Boolean                  @default(false)
+  category               String                   @db.VarChar(100)
+  created_by             Int?
+  app_user_role          app_user_role[]
+  assignment_questions   assignment_questions[]
+  assignment_submissions assignment_submissions[]
+  assignments            assignments[]
 
   @@unique([name, category])
 }
@@ -398,6 +405,7 @@ model sessions {
   end_time        DateTime
   is_completed    Boolean?       @default(false)
   completed_at    DateTime?
+  assignments     assignments[]
   attendance      attendance[]
   forums          forums?
   materials       materials[]
@@ -408,4 +416,121 @@ model sessions {
   @@index([is_completed], map: "idx_sessions_completed")
   @@index([session_number], map: "idx_sessions_number")
   @@index([start_time, end_time], map: "idx_sessions_time")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model assignment_answers {
+  id                          Int                          @id @default(autoincrement())
+  submission_id               Int
+  question_id                 Int
+  answer_text                 String?
+  selected_option_id          Int?
+  points_earned               Decimal?                     @default(0) @db.Decimal(5, 2)
+  feedback                    String?
+  created_date                DateTime?                    @default(now()) @db.Timestamptz(6)
+  updated_date                DateTime?                    @db.Timestamptz(6)
+  assignment_questions        assignment_questions         @relation(fields: [question_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  assignment_question_options assignment_question_options? @relation(fields: [selected_option_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  assignment_submissions      assignment_submissions       @relation(fields: [submission_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([submission_id, question_id])
+  @@index([selected_option_id], map: "idx_assignment_answers_option")
+  @@index([question_id], map: "idx_assignment_answers_question")
+  @@index([submission_id], map: "idx_assignment_answers_submission")
+}
+
+model assignment_question_options {
+  id                   Int                  @id @default(autoincrement())
+  question_id          Int
+  option_text          String
+  is_correct           Boolean?             @default(false)
+  order_number         Int
+  created_date         DateTime?            @default(now()) @db.Timestamptz(6)
+  assignment_answers   assignment_answers[]
+  assignment_questions assignment_questions @relation(fields: [question_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([is_correct], map: "idx_assignment_question_options_correct")
+  @@index([question_id], map: "idx_assignment_question_options_question")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model assignment_questions {
+  id                          Int                           @id @default(autoincrement())
+  assignment_id               Int
+  question_type_id            Int
+  question_text               String
+  points                      Int?                          @default(1)
+  order_number                Int
+  required                    Boolean?                      @default(true)
+  created_date                DateTime?                     @default(now()) @db.Timestamptz(6)
+  updated_date                DateTime?                     @db.Timestamptz(6)
+  assignment_answers          assignment_answers[]
+  assignment_question_options assignment_question_options[]
+  assignments                 assignments                   @relation(fields: [assignment_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  enumeration                 enumeration                   @relation(fields: [question_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([assignment_id, order_number], map: "idx_assignment_questions_assignment")
+  @@index([question_type_id], map: "idx_assignment_questions_type")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model assignment_submissions {
+  id                                                   Int                  @id @default(autoincrement())
+  assignment_id                                        Int
+  student_id                                           Int
+  attempt_number                                       Int?                 @default(1)
+  started_at                                           DateTime?            @default(now()) @db.Timestamptz(6)
+  submitted_at                                         DateTime?            @db.Timestamptz(6)
+  status_id                                            Int
+  total_score                                          Decimal?             @db.Decimal(5, 2)
+  feedback                                             String?
+  graded_by                                            Int?
+  graded_at                                            DateTime?            @db.Timestamptz(6)
+  created_date                                         DateTime?            @default(now()) @db.Timestamptz(6)
+  updated_date                                         DateTime?            @db.Timestamptz(6)
+  assignment_answers                                   assignment_answers[]
+  assignments                                          assignments          @relation(fields: [assignment_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  app_user_assignment_submissions_graded_byToapp_user  app_user?            @relation("assignment_submissions_graded_byToapp_user", fields: [graded_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  enumeration                                          enumeration          @relation(fields: [status_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  app_user_assignment_submissions_student_idToapp_user app_user             @relation("assignment_submissions_student_idToapp_user", fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([assignment_id, student_id, attempt_number])
+  @@index([assignment_id], map: "idx_assignment_submissions_assignment")
+  @@index([graded_by], map: "idx_assignment_submissions_graded_by")
+  @@index([status_id], map: "idx_assignment_submissions_status")
+  @@index([student_id], map: "idx_assignment_submissions_student")
+  @@index([submitted_at], map: "idx_assignment_submissions_submitted")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model assignments {
+  id                                        Int                      @id @default(autoincrement())
+  session_id                                Int
+  assignment_type_id                        Int
+  title                                     String                   @db.VarChar(200)
+  description                               String?
+  instructions                              String?
+  total_points                              Int?                     @default(100)
+  due_date                                  DateTime?                @db.Timestamptz(6)
+  start_date                                DateTime?                @default(now()) @db.Timestamptz(6)
+  time_limit                                Int?
+  attempts_allowed                          Int?                     @default(1)
+  show_results                              Boolean?                 @default(true)
+  is_published                              Boolean?                 @default(false)
+  created_by                                Int
+  created_date                              DateTime?                @default(now()) @db.Timestamptz(6)
+  updated_date                              DateTime?                @db.Timestamptz(6)
+  updated_by                                Int?
+  assignment_questions                      assignment_questions[]
+  assignment_submissions                    assignment_submissions[]
+  enumeration                               enumeration              @relation(fields: [assignment_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  app_user_assignments_created_byToapp_user app_user                 @relation("assignments_created_byToapp_user", fields: [created_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sessions                                  sessions                 @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  app_user_assignments_updated_byToapp_user app_user?                @relation("assignments_updated_byToapp_user", fields: [updated_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([created_by], map: "idx_assignments_created_by")
+  @@index([due_date], map: "idx_assignments_due_date")
+  @@index([is_published], map: "idx_assignments_published")
+  @@index([session_id], map: "idx_assignments_session")
+  @@index([assignment_type_id], map: "idx_assignments_type")
 }

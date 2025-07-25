@@ -11,30 +11,30 @@ datasource db {
 model admin_details {
   id           Int       @id @default(autoincrement())
   user_id      Int       @unique
-  kode_admin   String    @unique
-  nip          String?
-  created_date DateTime  @default(now())
+  kode_admin   String    @unique @db.VarChar(100)
+  nip          String?   @db.VarChar(100)
+  created_date DateTime  @default(now()) @db.Timestamp(3)
   created_by   Int?
-  updated_date DateTime?
+  updated_date DateTime? @db.Timestamp(3)
   updated_by   Int?
   app_user     app_user  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model app_user {
   id                                          Int                 @id @default(autoincrement())
-  email                                       String              @unique
-  password                                    String
-  user_name                                   String              @unique
-  nama_lengkap                                String
-  last_login                                  DateTime?
-  profile_picture_url                         String?
+  email                                       String              @unique @db.VarChar(100)
+  password                                    String              @db.VarChar(255)
+  user_name                                   String              @unique @db.VarChar(50)
+  nama_lengkap                                String              @db.VarChar(255)
+  last_login                                  DateTime?           @db.Timestamp(3)
+  profile_picture_url                         String?             @db.VarChar(255)
   is_active                                   Boolean             @default(true)
   is_deleted                                  Boolean             @default(false)
-  deleted_at                                  DateTime?
+  deleted_at                                  DateTime?           @db.Timestamp(3)
   deleted_by                                  Int?
-  created_date                                DateTime            @default(now())
+  created_date                                DateTime            @default(now()) @db.Timestamp(3)
   created_by                                  Int?
-  updated_date                                DateTime?
+  updated_date                                DateTime?           @db.Timestamp(3)
   updated_by                                  Int?
   admin_details                               admin_details?
   announcements                               announcements[]
@@ -70,11 +70,11 @@ model app_user_role {
 
 model enumeration {
   id            Int             @id @default(autoincrement())
-  name          String
-  alt_name      String?
+  name          String          @db.VarChar(100)
+  alt_name      String?         @db.VarChar(100)
   is_active     Boolean         @default(true)
   is_default    Boolean         @default(false)
-  category      String
+  category      String          @db.VarChar(100)
   created_by    Int?
   app_user_role app_user_role[]
 
@@ -84,9 +84,9 @@ model enumeration {
 model student_details {
   id             Int       @id @default(autoincrement())
   user_id        Int       @unique
-  nis            String    @unique
-  nisn           String?
-  parent_contact String?
+  nis            String    @unique @db.VarChar(100)
+  nisn           String?   @db.VarChar(100)
+  parent_contact String?   @db.VarChar(100)
   created_date   DateTime  @default(now())
   created_by     Int?
   updated_date   DateTime?
@@ -97,8 +97,8 @@ model student_details {
 model teacher_details {
   id           Int       @id @default(autoincrement())
   user_id      Int       @unique
-  kode_guru    String    @unique
-  niy          String?
+  kode_guru    String    @unique @db.VarChar(100)
+  niy          String?   @db.VarChar(100)
   created_date DateTime  @default(now())
   created_by   Int?
   updated_date DateTime?
@@ -110,15 +110,15 @@ model teacher_details {
 model user_profile {
   id           Int       @id @default(autoincrement())
   user_id      Int       @unique
-  tmp_lahir    String?
-  tgl_lahir    DateTime?
-  gender       String?
-  telepon      String?
-  alamat       String?
-  agama        String?
-  created_date DateTime  @default(now())
+  tmp_lahir    String?   @db.VarChar(100)
+  tgl_lahir    DateTime? @db.Timestamp(3)
+  gender       String?   @db.VarChar(10)
+  telepon      String?   @db.VarChar(20)
+  alamat       String?   @db.VarChar(200)
+  agama        String?   @db.VarChar(30)
+  created_date DateTime  @default(now()) @db.Timestamp(3)
   created_by   Int?
-  updated_date DateTime?
+  updated_date DateTime? @db.Timestamp(3)
   updated_by   Int?
   app_user     app_user  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
@@ -126,14 +126,14 @@ model user_profile {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model academic_years {
   id         Int       @id @default(autoincrement())
-  year_name  String    @unique @db.VarChar(20)
+  year_name  String    @unique @db.VarChar(100)
   start_date DateTime  @db.Date
   end_date   DateTime  @db.Date
   is_active  Boolean?  @default(false)
   created_by Int?
   updated_by Int?
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-  updated_at DateTime? @default(now()) @db.Timestamp(6)
+  created_at DateTime? @default(now()) @db.Timestamp(3)
+  updated_at DateTime? @default(now()) @db.Timestamp(3)
   classes    classes[]
 
   @@index([is_active], map: "idx_academic_years_active")
@@ -148,9 +148,9 @@ model announcements {
   content     String
   target_type String    @db.VarChar(20)
   target_id   Int?
-  start_date  DateTime  @db.Timestamp(6)
-  end_date    DateTime? @db.Timestamp(6)
-  created_at  DateTime? @default(now()) @db.Timestamp(6)
+  start_date  DateTime  @db.Timestamp(3)
+  end_date    DateTime? @db.Timestamp(3)
+  created_at  DateTime? @default(now()) @db.Timestamp(3)
   app_user    app_user? @relation(fields: [author_id], references: [id], onUpdate: NoAction)
 
   @@index([target_type, target_id], map: "idx_announcements_active")
@@ -167,7 +167,7 @@ model attendance {
   status                                    String    @db.VarChar(20)
   recorded_by                               Int?
   notes                                     String?
-  recorded_at                               DateTime? @default(now()) @db.Timestamp(6)
+  recorded_at                               DateTime? @default(now()) @db.Timestamp(3)
   app_user_attendance_recorded_byToapp_user app_user? @relation("attendance_recorded_byToapp_user", fields: [recorded_by], references: [id], onUpdate: NoAction)
   sessions                                  sessions? @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   app_user_attendance_student_idToapp_user  app_user? @relation("attendance_student_idToapp_user", fields: [student_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -207,13 +207,13 @@ model class_courses {
 model classes {
   id             Int             @id @default(autoincrement())
   class_name     String          @db.VarChar(100)
-  grade_level    String          @db.VarChar(5)
+  grade_level    String          @db.VarChar(100)
   year_id        Int?
   wali_kelas     Int?
   created_by     Int?
   updated_by     Int?
-  created_at     DateTime?       @default(now()) @db.Timestamp(6)
-  updated_at     DateTime?       @default(now()) @db.Timestamp(6)
+  created_at     DateTime?       @default(now()) @db.Timestamp(3)
+  updated_at     DateTime?       @default(now()) @db.Timestamp(3)
   class_courses  class_courses[]
   app_user       app_user?       @relation(fields: [wali_kelas], references: [id], onUpdate: NoAction)
   academic_years academic_years? @relation(fields: [year_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -226,13 +226,13 @@ model classes {
 
 model courses {
   id            Int             @id @default(autoincrement())
-  course_code   String          @unique @db.VarChar(20)
-  course_name   String          @db.VarChar(100)
+  course_code   String          @unique @db.VarChar(50)
+  course_name   String          @db.VarChar(50)
   description   String?
   created_by    Int?
   updated_by    Int?
-  created_at    DateTime?       @default(now()) @db.Timestamp(6)
-  updated_at    DateTime?       @default(now()) @db.Timestamp(6)
+  created_at    DateTime?       @default(now()) @db.Timestamp(3)
+  updated_at    DateTime?       @default(now()) @db.Timestamp(3)
   class_courses class_courses[]
 
   @@index([course_name], map: "idx_courses_name")
@@ -262,7 +262,7 @@ model forum_attachments {
   file_url      String         @db.VarChar(255)
   file_name     String         @db.VarChar(100)
   file_size     Int
-  uploaded_at   DateTime?      @default(now()) @db.Timestamp(6)
+  uploaded_at   DateTime?      @default(now()) @db.Timestamp(3)
   forum_posts   forum_posts?   @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   forum_replies forum_replies? @relation(fields: [reply_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   app_user      app_user?      @relation(fields: [uploader_id], references: [id], onUpdate: NoAction)
@@ -277,10 +277,10 @@ model forum_posts {
   user_id           Int?
   title             String              @db.VarChar(100)
   content           String
-  content_type      String?             @default("plaintext") @db.VarChar(10)
+  content_type      String?             @default("plaintext") @db.VarChar(100)
   is_deleted        Boolean?            @default(false)
-  created_at        DateTime?           @default(now()) @db.Timestamp(6)
-  updated_at        DateTime?           @default(now()) @db.Timestamp(6)
+  created_at        DateTime?           @default(now()) @db.Timestamp(3)
+  updated_at        DateTime?           @default(now()) @db.Timestamp(3)
   forum_attachments forum_attachments[]
   forums            forums?             @relation(fields: [forum_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   app_user          app_user?           @relation(fields: [user_id], references: [id], onUpdate: NoAction)
@@ -299,10 +299,10 @@ model forum_replies {
   user_id             Int?
   parent_reply_id     Int?
   content             String
-  content_type        String?             @default("plaintext") @db.VarChar(10)
+  content_type        String?             @default("plaintext") @db.VarChar(100)
   is_deleted          Boolean?            @default(false)
-  created_at          DateTime?           @default(now()) @db.Timestamp(6)
-  updated_at          DateTime?           @default(now()) @db.Timestamp(6)
+  created_at          DateTime?           @default(now()) @db.Timestamp(3)
+  updated_at          DateTime?           @default(now()) @db.Timestamp(3)
   forum_attachments   forum_attachments[]
   forum_replies       forum_replies?      @relation("forum_repliesToforum_replies", fields: [parent_reply_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   other_forum_replies forum_replies[]     @relation("forum_repliesToforum_replies")
@@ -320,7 +320,7 @@ model forums {
   id          Int           @id @default(autoincrement())
   session_id  Int?          @unique
   title       String        @db.VarChar(100)
-  created_at  DateTime?     @default(now()) @db.Timestamp(6)
+  created_at  DateTime?     @default(now()) @db.Timestamp(3)
   creator_id  Int?
   description String?
   forum_posts forum_posts[]
@@ -338,7 +338,7 @@ model materials {
   title          String    @db.VarChar(100)
   content        String?
   material_order Int
-  created_at     DateTime? @default(now()) @db.Timestamp(6)
+  created_at     DateTime? @default(now()) @db.Timestamp(3)
   sessions       sessions? @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([material_order], map: "idx_materials_order")
@@ -354,8 +354,8 @@ model notifications {
   notification_type   String    @db.VarChar(50)
   related_entity_type String?   @db.VarChar(50)
   related_entity_id   Int?
-  created_at          DateTime? @default(now()) @db.Timestamp(6)
-  read_at             DateTime? @db.Timestamp(6)
+  created_at          DateTime? @default(now()) @db.Timestamp(3)
+  read_at             DateTime? @db.Timestamp(3)
   app_user            app_user? @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@index([created_at], map: "idx_notifications_created")
@@ -376,7 +376,7 @@ model resources {
   version         Int?      @default(1)
   is_public       Boolean?  @default(false)
   download_count  Int?      @default(0)
-  last_downloaded DateTime? @db.Timestamp(6)
+  last_downloaded DateTime? @db.Timestamp(3)
   checksum        String?   @db.VarChar(64)
   file_tittle     String?   @db.VarChar
   sessions        sessions? @relation(fields: [session_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -394,10 +394,10 @@ model sessions {
   title           String         @db.VarChar(100)
   description     String?
   session_number  Int
-  start_time      DateTime       @db.Timestamp(6)
-  end_time        DateTime       @db.Timestamp(6)
+  start_time      DateTime       @db.Timestamp(3)
+  end_time        DateTime       @db.Timestamp(3)
   is_completed    Boolean?       @default(false)
-  completed_at    DateTime?      @db.Timestamp(6)
+  completed_at    DateTime?      @db.Timestamp(3)
   attendance      attendance[]
   forums          forums?
   materials       materials[]

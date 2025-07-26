@@ -95,7 +95,7 @@ const SidebarContent = ({
   onItemClick?: () => void;
 }) => {
   // Pilih navigation items berdasarkan role
-  const navigationItems = userRole === 'ADMIN' ? ADMIN_NAVIGATION_ITEMS : NAVIGATION_ITEMS;
+  const navigationItems = userRole?.toLowerCase() === 'admin' ? ADMIN_NAVIGATION_ITEMS : NAVIGATION_ITEMS;
 
   return (
     <div className="h-full flex flex-col">

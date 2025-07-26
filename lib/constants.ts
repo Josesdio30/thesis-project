@@ -12,7 +12,6 @@ export const NAVIGATION_ITEMS = [
   { icon: 'FaClipboardCheck', text: 'Exam', path: '/exam' },
   { icon: 'FaChartBar', text: 'Score', path: '/score' },
   { icon: 'FaBullhorn', text: 'Announcement', path: '/announcement' },
-  { icon: 'FaUsers', text: 'User Management', path: '/user' },
 ] as const;
 
 // Navigation items untuk admin - hanya session

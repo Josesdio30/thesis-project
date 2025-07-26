@@ -29,10 +29,13 @@ interface Role {
   category: string;
 }
 
-const AddUserModal = ({ isOpen, onClose, onSave }: {
+const AddUserModal = ({ isOpen, onClose, onSave, initialData = null, isEditMode = false, classCourses = [] }: {
   isOpen: boolean;
   onClose: () => void;
   onSave: (userData: any) => void;
+  initialData?: any;
+  isEditMode?: boolean;
+  classCourses?: any[];
 }) => {
   const [formData, setFormData] = useState({
     nama_lengkap: '',
@@ -49,7 +52,8 @@ const AddUserModal = ({ isOpen, onClose, onSave }: {
     niy: '',
     kode_admin: '',
     nip: '',
-          class_id: '', // Tambahkan field untuk kelas
+    class_id: '',
+    id: undefined,
   });
 
   const [roles] = useState<Role[]>([
@@ -59,10 +63,65 @@ const AddUserModal = ({ isOpen, onClose, onSave }: {
   ]);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [classCourses, setClassCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch class courses data
+  useEffect(() => {
+    if (isEditMode && initialData) {
+      let tanggalLahir = '';
+      if (initialData.tanggal_lahir) {
+        const tgl = new Date(initialData.tanggal_lahir);
+        tanggalLahir = tgl.toISOString().slice(0, 10);
+      }
+      let classId = '';
+      if (initialData.class_id) {
+        classId = initialData.class_id.toString();
+      } else if (initialData.class_info && initialData.class_info.class_id) {
+        classId = initialData.class_info.class_id.toString();
+      }
+      if (!classId && classCourses.length > 0) {
+        classId = classCourses[0].id.toString();
+      }
+      setFormData({
+        nama_lengkap: initialData.nama_lengkap || '',
+        email: initialData.email || '',
+        user_name: initialData.user_name || '',
+        password: '',
+        confirmPassword: '',
+        role: initialData.roles ? (initialData.roles[0] === 'ADMIN' ? '3' : initialData.roles[0] === 'TEACHER' ? '2' : '1') : '',
+        tanggal_lahir: tanggalLahir,
+        nis: initialData.nis || '',
+        nisn: initialData.nisn || '',
+        parent_contact: initialData.parent_contact || '',
+        kode_guru: initialData.kode_guru || '',
+        niy: initialData.niy || '',
+        kode_admin: initialData.kode_admin || '',
+        nip: initialData.nip || '',
+        class_id: classId,
+        id: initialData.id,
+      });
+    } else if (!isEditMode) {
+      setFormData({
+        nama_lengkap: '',
+        email: '',
+        user_name: '',
+        password: '',
+        confirmPassword: '',
+        role: '',
+        tanggal_lahir: '',
+        nis: '',
+        nisn: '',
+        parent_contact: '',
+        kode_guru: '',
+        niy: '',
+        kode_admin: '',
+        nip: '',
+        class_id: '',
+        id: undefined,
+      });
+    }
+    // eslint-disable-next-line
+  }, [isEditMode, initialData, isOpen, classCourses]);
+
   useEffect(() => {
     if (isOpen) {
       fetchClassCourses();
@@ -84,7 +143,6 @@ const AddUserModal = ({ isOpen, onClose, onSave }: {
             grade_level: classData.grade_level,
             year_name: classData.year_name,
           }));
-          setClassCourses(classOptions);
         }
       }
     } catch (error) {
@@ -103,35 +161,29 @@ const AddUserModal = ({ isOpen, onClose, onSave }: {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Basic validation for required fields
     if (!formData.nama_lengkap || !formData.email || !formData.user_name || 
         !formData.role || !formData.tanggal_lahir) {
       alert('Mohon lengkapi semua field yang diperlukan');
       return;
     }
 
-    // Auto-generate password based on tanggal lahir
-    const tanggalLahir = new Date(formData.tanggal_lahir);
-    const day = tanggalLahir.getDate().toString().padStart(2, '0');
-    const month = (tanggalLahir.getMonth() + 1).toString().padStart(2, '0');
-    const year = tanggalLahir.getFullYear();
-    const autoPassword = `s!nLui2+${day}${month}${year}`;
+    let autoPassword = formData.password;
+    if (!isEditMode) {
+      const tanggalLahir = new Date(formData.tanggal_lahir);
+      const day = tanggalLahir.getDate().toString().padStart(2, '0');
+      const month = (tanggalLahir.getMonth() + 1).toString().padStart(2, '0');
+      const year = tanggalLahir.getFullYear();
+      autoPassword = `s!nLui2+${day}${month}${year}`;
+    }
 
-    // Prepare payload sesuai dengan API
     const payload = {
-      nama_lengkap: formData.nama_lengkap,
-      email: formData.email,
-      user_name: formData.user_name,
+      ...formData,
       password: autoPassword,
-      role: formData.role,
-      tanggal_lahir: formData.tanggal_lahir,
-      // Optional fields based on role
       ...(formData.role === '1' && {
         nis: formData.nis,
         nisn: formData.nisn,
         parent_contact: formData.parent_contact,
-        class_id: formData.class_id, // Tambahkan class_id untuk enrollment
+        class_id: formData.class_id,
       }),
       ...(formData.role === '2' && {
         kode_guru: formData.kode_guru,
@@ -146,31 +198,33 @@ const AddUserModal = ({ isOpen, onClose, onSave }: {
     onSave(payload);
     onClose();
     
-    // Reset form
-    setFormData({
-      nama_lengkap: '',
-      email: '',
-      user_name: '',
-      password: '',
-      confirmPassword: '',
-      role: '',
-      tanggal_lahir: '',
-      nis: '',
-      nisn: '',
-      parent_contact: '',
-      kode_guru: '',
-      niy: '',
-      kode_admin: '',
-      nip: '',
-      class_id: '',
-    });
+    if (!isEditMode) {
+      setFormData({
+        nama_lengkap: '',
+        email: '',
+        user_name: '',
+        password: '',
+        confirmPassword: '',
+        role: '',
+        tanggal_lahir: '',
+        nis: '',
+        nisn: '',
+        parent_contact: '',
+        kode_guru: '',
+        niy: '',
+        kode_admin: '',
+        nip: '',
+        class_id: '',
+        id: undefined,
+      });
+    }
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Tambah User Baru</DialogTitle>
+          <DialogTitle>{isEditMode ? 'Edit User' : 'Tambah User Baru'}</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -274,17 +328,22 @@ const AddUserModal = ({ isOpen, onClose, onSave }: {
                 <div className="col-span-2">
                   <Label htmlFor="class_id">Pembagian Kelas</Label>
                   <Select
-                    value={formData.class_id}
+                    value={
+                      classCourses.length === 0 || !formData.class_id
+                        ? ""
+                        : formData.class_id
+                    }
                     onValueChange={(value) => setFormData({ ...formData, class_id: value })}
+                    disabled={classCourses.length === 0 || loading}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder="Pilih kelas" />
+                      <SelectValue placeholder={classCourses.length === 0 || loading ? "Tidak ada kelas tersedia" : "Pilih kelas"} />
                     </SelectTrigger>
                     <SelectContent>
                       {loading ? (
-                        <SelectItem value="" disabled>
-                          Loading kelas...
-                        </SelectItem>
+                        <div className="px-4 py-2 text-gray-500">Loading kelas...</div>
+                      ) : classCourses.length === 0 ? (
+                        <div className="px-4 py-2 text-gray-500">Tidak ada kelas tersedia</div>
                       ) : (
                         classCourses.map((classCourse) => (
                           <SelectItem key={classCourse.id} value={classCourse.id.toString()}>
@@ -355,7 +414,7 @@ const AddUserModal = ({ isOpen, onClose, onSave }: {
 
           <div className="flex gap-2 pt-4">
             <Button type="submit" className="flex-1">
-              Simpan User
+              {isEditMode ? 'Update User' : 'Simpan User'}
             </Button>
             <Button type="button" variant="outline" onClick={onClose} className="flex-1">
               Batal
@@ -371,25 +430,89 @@ const UserManagement = () => {
   const router = useRouter();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editUserData, setEditUserData] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [classCourses, setClassCourses] = useState<any[]>([]);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
+  const fetchData = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/users');
-      if (response.ok) {
-        const data = await response.json();
-        setUsers(data.data.users);
+      const userResponse = await fetch('/api/admin/users');
+      if (userResponse.ok) {
+        const userData = await userResponse.json();
+        setUsers(userData.data.users);
+      }
+
+      const classResponse = await fetch('/api/admin/classes');
+      if (classResponse.ok) {
+        const classData = await classResponse.json();
+        if (classData.success) {
+          const classOptions = classData.data.classes.map((classData: any) => ({
+            id: classData.id,
+            name: `${classData.name} - ${classData.grade_level} (${classData.year_name})`,
+            class_id: classData.id,
+            class_name: classData.name,
+            grade_level: classData.grade_level,
+            year_name: classData.year_name,
+          }));
+          setClassCourses(classOptions);
+        }
       }
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const handleEditClick = (user: any) => {
+    console.log('handleEditClick called with user:', user);
+    console.log('classCourses:', classCourses);
+
+    let classId = '';
+    if (user.class_info && user.class_info.class_id) {
+      classId = user.class_info.class_id.toString();
+    } else if (classCourses.length > 0) {
+      classId = classCourses[0].id.toString();
+    }
+
+    const updatedUserData = {
+      ...user,
+      class_id: classId,
+    };
+
+    console.log('Setting editUserData:', updatedUserData);
+    setEditUserData(updatedUserData);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditUser = async (userData: any) => {
+    try {
+      const response = await fetch(`/api/admin/users/${userData.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+      });
+      if (response.ok) {
+        alert('User berhasil diupdate!');
+        await fetchData();
+        setIsEditModalOpen(false);
+        setEditUserData(null);
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.message || errorData.error || 'Failed to update user'}`);
+      }
+    } catch (error) {
+      console.error('Error updating user:', error);
+      alert('Error updating user');
     }
   };
 
@@ -404,10 +527,9 @@ const UserManagement = () => {
       });
 
       if (response.ok) {
-        const result = await response.json();
         alert('User berhasil ditambahkan!');
-        fetchUsers(); // Refresh user list
-        setIsAddModalOpen(false); // Close modal
+        await fetchData();
+        setIsAddModalOpen(false);
       } else {
         const errorData = await response.json();
         alert(`Error: ${errorData.message || errorData.error || 'Failed to create user'}`);
@@ -496,11 +618,20 @@ const UserManagement = () => {
                           </td>
                           <td className="p-3">
                             <div className="flex gap-2">
-                              <Button size="sm" variant="outline" className="flex items-center gap-1">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="flex items-center gap-1" 
+                                onClick={() => handleEditClick(user)}
+                              >
                                 <FaEdit className="text-xs" />
                                 Edit
                               </Button>
-                              <Button size="sm" variant="outline" className="flex items-center gap-1 text-red-600 hover:text-red-700">
+                              <Button 
+                                size="sm" 
+                                variant="outline" 
+                                className="flex items-center gap-1 text-red-600 hover:text-red-700"
+                              >
                                 <FaTrash className="text-xs" />
                                 Hapus
                               </Button>
@@ -517,7 +648,7 @@ const UserManagement = () => {
                   <Button onClick={() => setIsAddModalOpen(true)}>
                     Tambah User Pertama
                   </Button>
-        </div>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -528,7 +659,21 @@ const UserManagement = () => {
         isOpen={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
         onSave={handleAddUser}
+        classCourses={classCourses}
       />
+      {isEditModalOpen && editUserData && (
+        <AddUserModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false);
+            setEditUserData(null);
+          }}
+          onSave={handleEditUser}
+          initialData={editUserData}
+          isEditMode={true}
+          classCourses={classCourses}
+        />
+      )}
     </div>
   );
 };

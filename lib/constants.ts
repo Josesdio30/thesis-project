@@ -15,6 +15,14 @@ export const NAVIGATION_ITEMS = [
   { icon: 'FaUsers', text: 'User Management', path: '/user' },
 ] as const;
 
+// Navigation items untuk admin - hanya session
+export const ADMIN_NAVIGATION_ITEMS = [
+  { icon: 'FaCalendarAlt', text: 'Session Management', path: '/schedule' },
+  { icon: 'FaBook', text: 'Course Management', path: '/admin/courses' },
+  { icon: 'FaUniversity', text: 'Class Management', path: '/admin/classes' },
+  { icon: 'FaUsers', text: 'User Management', path: '/user' },
+] as const;
+
 // User roles
 export const USER_ROLES = {
   STUDENT: 'student',

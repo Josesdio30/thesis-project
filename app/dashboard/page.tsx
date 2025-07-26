@@ -3,7 +3,7 @@
 import Sidebar from '../_components/sidebar';
 import Topbar from '../_components/topbar';
 import Footer from '../../components/common/footer';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaClock, FaUser, FaUserFriends, FaClipboard } from 'react-icons/fa';
 import { Card, CardContent } from '@/components/ui/card';
 import { useSchedule, getUpcomingClass } from '@/hooks';
@@ -13,6 +13,28 @@ import { format } from 'date-fns';
 export default function Home() {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userRole, setUserRole] = useState<string>('');
+
+  // Check user role and redirect admin to schedule
+  useEffect(() => {
+    const checkUserRole = async () => {
+      try {
+        const response = await fetch('/api/auth/session');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.user?.role === 'ADMIN') {
+            router.push('/schedule');
+            return;
+          }
+          setUserRole(data.user?.role || '');
+        }
+      } catch (error) {
+        console.error('Error checking user role:', error);
+      }
+    };
+
+    checkUserRole();
+  }, [router]);
 
   // Get schedule data for upcoming class
   const { scheduleData, loading } = useSchedule();
@@ -34,6 +56,24 @@ export default function Home() {
       subject: 'IX - 1 Bahasa Inggris Lanjut (A) (Peminatan) XI MIPA',
     },
   ];
+
+  // Show loading while checking role
+  if (userRole === '') {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <Sidebar isMobileOpen={sidebarOpen} setIsMobileOpen={setSidebarOpen} />
+        <div className="flex flex-col flex-1">
+          <Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-100">
@@ -100,12 +140,6 @@ export default function Home() {
                         Session {upcomingClass.session_number}: {upcomingClass.session_title}
                       </p>
                     )}
-
-                    {/* <div className="mt-3">
-                      <span className="text-xs text-blue-600 font-medium">
-                        Click to view session {upcomingClass.session_number} →
-                      </span>
-                    </div> */}
                   </CardContent>
                 </Card>
               ) : (

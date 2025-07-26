@@ -26,6 +26,7 @@ model app_user {
   password                                                           String                   @db.VarChar(255)
   user_name                                                          String                   @unique @db.VarChar(50)
   nama_lengkap                                                       String                   @db.VarChar(255)
+  tanggal_lahir                                                      DateTime?
   last_login                                                         DateTime?
   profile_picture_url                                                String?                  @db.VarChar(255)
   is_active                                                          Boolean                  @default(true)

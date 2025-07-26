@@ -1,132 +1,167 @@
-// 'use client';
-
-// import Sidebar from '../_components/sidebar';
-// import Link from 'next/link';
-// import { useState } from 'react';
-
-// export default function AssignmentPage() {
-//   const [isMobileOpen, setIsMobileOpen] = useState(false);
-
-//   return (
-//     <div className="flex min-h-screen bg-gray-100">
-//       <Sidebar isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
-//       <div className="flex-1 p-6">
-//         <div className="flex justify-between items-center bg-gray-800 text-white p-2 rounded-md mb-6">
-//           <Link
-//             href="/dashboard"
-//             className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-800 shadow-md hover:bg-gray-200"
-//           >
-//             ⬅
-//           </Link>
-//           <h1 className="text-2xl font-bold">Assignment</h1>
-//           <div></div>
-//         </div>
-
-//         <div className="bg-white p-6 rounded-md shadow">
-//           <p className="text-gray-600">Assignment page - Coming soon</p>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-
-// new
-
 'use client';
 
-import Sidebar from '../_components/sidebar';
-import Link from 'next/link';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { FaBook, FaCalendarAlt, FaClock, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import Sidebar from '../_components/sidebar';
+import Topbar from '../_components/topbar';
 
-// Data dummy assignment
-const assignments = [
-  {
-    id: 1,
-    courseName: 'BIOLOGI',
-    courseCode: 'BIO6713004',
-    className: 'X-MIPA',
-    courseType: 'Core Courses',
-    done: true,
-  },
-  {
-    id: 2,
-    courseName: 'FISIKA',
-    courseCode: 'FIS6713005',
-    className: 'X-MIPA',
-    courseType: 'Core Courses',
-    done: true,
-  },
-  {
-    id: 3,
-    courseName: 'MATEMATIKA',
-    courseCode: 'MTK6713006',
-    className: 'X-MIPA',
-    courseType: 'Elective',
-    done: true,
-  },
-];
+interface Assignment {
+  id: number;
+  title: string;
+  description: string;
+  total_points: number;
+  due_date: string;
+  time_limit: number;
+  attempts_allowed: number;
+  is_published: boolean;
+  sessions: {
+    class_courses: {
+      courses: {
+        course_name: string;
+        course_code: string;
+      };
+      classes: {
+        class_name: string;
+      };
+    };
+  };
+  enumeration: {
+    name: string;
+  };
+}
 
 export default function AssignmentPage() {
+  const { data: session, status } = useSession();
   const router = useRouter();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const unfinished = assignments.filter(a => !a.done).length;
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [assignments, setAssignments] = useState<Assignment[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const handleCardClick = (courseCode: string) => {
-    router.push(`/course/${courseCode}?tab=Assignment`);
+  useEffect(() => {
+    if (status === 'unauthenticated') {
+      router.push('/login');
+    }
+  }, [status, router]);
+
+  useEffect(() => {
+    fetchAssignments();
+  }, []);
+
+  const fetchAssignments = async () => {
+    try {
+      const response = await fetch('/api/assignments');
+      if (response.ok) {
+        const data = await response.json();
+        setAssignments(data.data.assignments);
+      }
+    } catch (error) {
+      console.error('Error fetching assignments:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const handleMenuClick = () => {
+    setIsMobileOpen(true);
+  };
+
+  if (status === 'loading' || loading) {
+    return (
+      <div className="flex min-h-screen bg-gray-100">
+        <div className="flex items-center justify-center w-full">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex min-h-screen bg-gray-100">
-      <Sidebar isMobileOpen={sidebarOpen} setIsMobileOpen={setSidebarOpen} />
-      <div className="flex-1 p-6">
-        <div className="flex justify-between items-center bg-gray-800 text-white p-2 rounded-md mb-6">
-          <Link
-            href="/dashboard"
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-gray-800 shadow-md hover:bg-gray-200"
-          >
-            ⬅
-          </Link>
-          <h1 className="text-2xl font-bold">Assignment</h1>
-          <div></div>
-        </div>
+    <div className="flex max-h-screen">
+      <Sidebar isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-          {assignments.map(a => (
-            <div
-              key={a.id}
-              onClick={() => handleCardClick(a.courseCode)}
-              className={`relative bg-white p-6 rounded-md shadow border transition hover:shadow-lg group cursor-pointer ${
-                a.done ? 'opacity-80' : ''
-              }`}
-            >
-              <div className="font-bold text-lg mb-1">{a.courseName}</div>
-              <div className="text-gray-600 flex items-center mb-1">
-                <span className="mr-2">Kode:</span> <span className="font-mono">{a.courseCode}</span>
-              </div>
-              <div className="text-gray-600 flex items-center mb-4">
-                <span className="mr-2">Kelas:</span> <span>{a.className}</span>
-              </div>
-              {/* Hover: tampilkan course type */}
-              <div className="absolute left-0 right-0 bottom-0 px-6 py-2 bg-gray-800 text-white text-sm rounded-b-md opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-                Course type: <span className="font-semibold">{a.courseType}</span>
-              </div>
-              {/* Status selesai */}
-              {a.done ? (
-                <div className="text-green-600 font-semibold mt-2">Selesai</div>
+      <div className="p-3 sm:p-4 md:p-6 bg-gray-100 flex-1 min-w-0 overflow-y-auto">
+        <Topbar onMenuClick={handleMenuClick} />
+
+        <div className="grid grid-cols-1 gap-6 pt-8">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-gray-900 flex items-center gap-2">
+                <FaBook className="text-blue-600" />
+                My Assignments
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {assignments.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {assignments.map((assignment) => (
+                    <Card key={assignment.id} className="hover:shadow-lg transition-shadow">
+                      <CardHeader className="pb-3">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <CardTitle className="text-lg font-semibold text-gray-900">
+                              {assignment.title}
+                            </CardTitle>
+                            <p className="text-sm text-gray-600 mt-1">
+                              {assignment.sessions.class_courses.courses.course_name} - {assignment.sessions.class_courses.courses.course_code}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {assignment.sessions.class_courses.classes.class_name}
+                            </p>
+                          </div>
+                          <Badge variant={assignment.enumeration.name === 'EXAM' ? 'destructive' : 'default'}>
+                            {assignment.enumeration.name}
+                          </Badge>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <p className="text-sm text-gray-700 mb-3">
+                          {assignment.description}
+                        </p>
+                        
+                        <div className="space-y-2 mb-4">
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <FaCalendarAlt className="text-blue-500" />
+                            <span>Due: {new Date(assignment.due_date).toLocaleDateString()}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <FaClock className="text-green-500" />
+                            <span>Time Limit: {assignment.time_limit} minutes</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <span>Points: {assignment.total_points}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                          <Button size="sm" className="bg-blue-600 hover:bg-blue-700">
+                            Start Assignment
+                          </Button>
+                          <div className="flex items-center gap-1">
+                            <FaCheckCircle className="text-green-500 text-sm" />
+                            <span className="text-xs text-gray-500">Completed</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               ) : (
-                <div className="text-red-600 font-semibold mt-2">Belum Selesai</div>
+                <div className="text-center py-12">
+                  <FaBook className="mx-auto h-12 w-12 text-gray-400" />
+                  <h3 className="mt-2 text-sm font-medium text-gray-900">No assignments</h3>
+                  <p className="mt-1 text-sm text-gray-500">
+                    You don't have any assignments yet.
+                  </p>
+                </div>
               )}
-            </div>
-          ))}
+            </CardContent>
+          </Card>
         </div>
-
-        {/* Status global */}
-        {unfinished === 0 ? (
-          <div className="text-green-600 font-bold text-lg text-center">All Done</div>
-        ) : (
-          <div className="text-red-600 font-bold text-lg text-center">Sisa {unfinished} assignment</div>
-        )}
       </div>
     </div>
   );

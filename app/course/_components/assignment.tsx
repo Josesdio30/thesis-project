@@ -376,7 +376,7 @@ export default function AssignmentTab() {
                 ) : null;
               })()}
             {/* Untuk guru: lihat jawaban murid */}
-            {userRole === 'GURU' && (
+            {userRole === 'TEACHER' && (
               <div className="mt-4">
                 <h3 className="font-semibold mb-2">Jawaban Murid</h3>
                 <ul>

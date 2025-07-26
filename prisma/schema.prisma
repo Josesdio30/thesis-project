@@ -427,8 +427,8 @@ model assignment_answers {
   selected_option_id          Int?
   points_earned               Decimal?                     @default(0) @db.Decimal(5, 2)
   feedback                    String?
-  created_date                DateTime?                    @default(now()) @db.Timestamptz(6)
-  updated_date                DateTime?                    @db.Timestamptz(6)
+  created_date                DateTime?                    @default(now()) @db.Timestamp(3)
+  updated_date                DateTime?                    @db.Timestamp(3)
   assignment_questions        assignment_questions         @relation(fields: [question_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   assignment_question_options assignment_question_options? @relation(fields: [selected_option_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   assignment_submissions      assignment_submissions       @relation(fields: [submission_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -445,7 +445,7 @@ model assignment_question_options {
   option_text          String
   is_correct           Boolean?             @default(false)
   order_number         Int
-  created_date         DateTime?            @default(now()) @db.Timestamptz(6)
+  created_date         DateTime?            @default(now()) @db.Timestamp(3)
   assignment_answers   assignment_answers[]
   assignment_questions assignment_questions @relation(fields: [question_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
@@ -462,8 +462,8 @@ model assignment_questions {
   points                      Int?                          @default(1)
   order_number                Int
   required                    Boolean?                      @default(true)
-  created_date                DateTime?                     @default(now()) @db.Timestamptz(6)
-  updated_date                DateTime?                     @db.Timestamptz(6)
+  created_date                DateTime?                     @default(now()) @db.Timestamp(3)
+  updated_date                DateTime?                     @db.Timestamp(3)
   assignment_answers          assignment_answers[]
   assignment_question_options assignment_question_options[]
   assignments                 assignments                   @relation(fields: [assignment_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
@@ -479,15 +479,15 @@ model assignment_submissions {
   assignment_id                                        Int
   student_id                                           Int
   attempt_number                                       Int?                 @default(1)
-  started_at                                           DateTime?            @default(now()) @db.Timestamptz(6)
-  submitted_at                                         DateTime?            @db.Timestamptz(6)
+  started_at                                           DateTime?            @default(now()) @db.Timestamp(3)
+  submitted_at                                         DateTime?            @db.Timestamp(3)
   status_id                                            Int
   total_score                                          Decimal?             @db.Decimal(5, 2)
   feedback                                             String?
   graded_by                                            Int?
-  graded_at                                            DateTime?            @db.Timestamptz(6)
-  created_date                                         DateTime?            @default(now()) @db.Timestamptz(6)
-  updated_date                                         DateTime?            @db.Timestamptz(6)
+  graded_at                                            DateTime?            @db.Timestamp(3)
+  created_date                                         DateTime?            @default(now()) @db.Timestamp(3)
+  updated_date                                         DateTime?            @db.Timestamp(3)
   assignment_answers                                   assignment_answers[]
   assignments                                          assignments          @relation(fields: [assignment_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
   app_user_assignment_submissions_graded_byToapp_user  app_user?            @relation("assignment_submissions_graded_byToapp_user", fields: [graded_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -511,15 +511,15 @@ model assignments {
   description                               String?
   instructions                              String?
   total_points                              Int?                     @default(100)
-  due_date                                  DateTime?                @db.Timestamptz(6)
-  start_date                                DateTime?                @default(now()) @db.Timestamptz(6)
+  due_date                                  DateTime?                @db.Timestamp(3)
+  start_date                                DateTime?                @default(now()) @db.Timestamp(3)
   time_limit                                Int?
   attempts_allowed                          Int?                     @default(1)
   show_results                              Boolean?                 @default(true)
   is_published                              Boolean?                 @default(false)
   created_by                                Int
-  created_date                              DateTime?                @default(now()) @db.Timestamptz(6)
-  updated_date                              DateTime?                @db.Timestamptz(6)
+  created_date                              DateTime?                @default(now()) @db.Timestamp(3)
+  updated_date                              DateTime?                @db.Timestamp(3)
   updated_by                                Int?
   assignment_questions                      assignment_questions[]
   assignment_submissions                    assignment_submissions[]

@@ -123,13 +123,17 @@ export default function AssignmentPage() {
     try {
       setLoading(true);
 
-      // Get all courses for the user
-      const coursesResponse = await fetch('/api/courses');
+      // Get courses for the user based on their role
+      const queryParam = isTeacher ? `teacherId=${currentUserId}` : `studentId=${currentUserId}`;
+      console.log('Fetching courses with:', queryParam, { isTeacher, currentUserId });
+
+      const coursesResponse = await fetch(`/api/courses?${queryParam}`);
       if (!coursesResponse.ok) {
         throw new Error('Failed to fetch courses');
       }
 
       const coursesData = await coursesResponse.json();
+      console.log('Courses response:', coursesData);
       const courses = coursesData.data || [];
 
       const allAssignments: Assignment[] = [];
@@ -137,51 +141,73 @@ export default function AssignmentPage() {
 
       // Fetch assignments for each course using the new efficient endpoint
       for (const course of courses) {
-        if (course.class_courses && course.class_courses.length > 0) {
-          const classCourse = course.class_courses[0];
+        console.log('Processing course:', course);
 
-          try {
-            // Use the new single API call for all assignments in a course
-            const assignmentsResponse = await fetch(`/api/courses/${course.course_code}/assignments`);
+        // Handle different data structures for teachers vs students
+        let courseCode, courseName, className, courseDescription;
 
-            if (assignmentsResponse.ok) {
-              const assignmentsData = await assignmentsResponse.json();
-              const courseAssignments = (assignmentsData.data || []).map((assignment: any) => ({
-                ...assignment,
-                course_name: course.course_name,
-                course_code: course.course_code,
-                class_name: classCourse.class_name,
-              }));
+        if (isTeacher) {
+          // Teacher structure: direct properties from class_courses response
+          courseCode = course.course_code;
+          courseName = course.course_name;
+          className = course.class_name;
+          courseDescription = course.description;
+        } else {
+          // Student structure: direct properties from enrollment
+          courseCode = course.course_code;
+          courseName = course.course_name;
+          className = course.class_name;
+          courseDescription = course.description;
+        }
 
-              allAssignments.push(...courseAssignments);
+        if (!courseCode) continue;
 
-              if (courseAssignments.length > 0) {
-                const published = courseAssignments.filter((a: Assignment) => a.is_published);
-                const submitted = isTeacher
-                  ? 0
-                  : courseAssignments.filter((a: Assignment) => getUserSubmission(a)).length;
-                const overdue = isTeacher
-                  ? 0
-                  : courseAssignments.filter((a: Assignment) => isOverdue(a.due_date) && !getUserSubmission(a)).length;
+        try {
+          // Use the new single API call for all assignments in a course
+          console.log('Fetching assignments for course:', courseCode);
+          const assignmentsResponse = await fetch(`/api/courses/${courseCode}/assignments`);
 
-                courseAssignmentGroups.push({
-                  course_code: course.course_code,
-                  course_name: course.course_name,
-                  class_name: classCourse.class_name,
-                  course_description: course.description,
-                  assignments: courseAssignments,
-                  totalAssignments: courseAssignments.length,
-                  publishedAssignments: published.length,
-                  submittedAssignments: submitted,
-                  overdueAssignments: overdue,
-                });
-              }
+          if (assignmentsResponse.ok) {
+            const assignmentsData = await assignmentsResponse.json();
+            console.log('Assignments response for', courseCode, ':', assignmentsData);
+            const courseAssignments = (assignmentsData.data || []).map((assignment: any) => ({
+              ...assignment,
+              course_name: courseName,
+              course_code: courseCode,
+              class_name: className,
+            }));
+
+            allAssignments.push(...courseAssignments);
+
+            if (courseAssignments.length > 0) {
+              const published = courseAssignments.filter((a: Assignment) => a.is_published);
+              const submitted = isTeacher
+                ? 0
+                : courseAssignments.filter((a: Assignment) => getUserSubmission(a)).length;
+              const overdue = isTeacher
+                ? 0
+                : courseAssignments.filter((a: Assignment) => isOverdue(a.due_date) && !getUserSubmission(a)).length;
+
+              courseAssignmentGroups.push({
+                course_code: courseCode,
+                course_name: courseName,
+                class_name: className,
+                course_description: courseDescription,
+                assignments: courseAssignments,
+                totalAssignments: courseAssignments.length,
+                publishedAssignments: published.length,
+                submittedAssignments: submitted,
+                overdueAssignments: overdue,
+              });
             }
-          } catch (error) {
-            console.error(`Error fetching assignments for course ${course.course_code}:`, error);
           }
+        } catch (error) {
+          console.error(`Error fetching assignments for course ${courseCode}:`, error);
         }
       }
+
+      console.log('Final assignments:', allAssignments);
+      console.log('Final course assignment groups:', courseAssignmentGroups);
 
       setAssignments(allAssignments);
       setCourseAssignments(courseAssignmentGroups);
@@ -415,7 +441,7 @@ export default function AssignmentPage() {
                   <Card>
                     <CardContent className="p-4">
                       <div className="text-2xl font-bold text-yellow-600">{stats.pending}</div>
-                      <div className="text-sm text-gray-600">Pending</div>
+                      {/* <div className="text-sm text-gray-600">Pending</div> */}
                     </CardContent>
                   </Card>
                   <Card>
@@ -471,7 +497,7 @@ export default function AssignmentPage() {
 
                 return (
                   <div
-                    key={`${assignment.course_code}-${assignment.id}`}
+                    key={`${assignment.course_code}-${assignment.class_name}-${assignment.id}`}
                     onClick={() => handleAssignmentClick(assignment)}
                     className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer group"
                   >
@@ -581,7 +607,10 @@ export default function AssignmentPage() {
             // By Course View - Card Layout
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {courseAssignments.map(courseGroup => (
-                <Card key={courseGroup.course_code} className="hover:shadow-lg transition-shadow">
+                <Card
+                  key={`${courseGroup.course_code}-${courseGroup.class_name}`}
+                  className="hover:shadow-lg transition-shadow"
+                >
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
                       <div>

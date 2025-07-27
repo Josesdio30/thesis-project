@@ -2,6 +2,14 @@
 
 import { useState, useEffect } from 'react';
 
+// Assignment-related hooks
+export { useAssignmentData, type Assignment } from './useAssignmentData';
+export { useAssignmentActions } from './useAssignmentActions';
+
+// Course-related hooks
+export { useCourse } from './useCourse';
+export { useSchedule, getUpcomingClass } from './useSchedule';
+
 // Hook untuk local storage
 export function useLocalStorage<T>(key: string, initialValue: T) {
   const [storedValue, setStoredValue] = useState<T>(() => {
@@ -65,7 +73,3 @@ export function useDebounce<T>(value: T, delay: number): T {
 
   return debouncedValue;
 }
-
-// Export other hooks
-export { useCourse } from './useCourse';
-export { useSchedule, getUpcomingClass } from './useSchedule';

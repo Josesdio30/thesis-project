@@ -16,6 +16,7 @@ interface Course {
   course_code: string;
   description: string;
   class_name: string;
+  grade_level: string;
 }
 
 const LoadingCard = () => (
@@ -253,7 +254,24 @@ const Course = () => {
             ) : courses.length === 0 ? (
               <EmptyState userRole={session?.user?.role} />
             ) : (
-              courses.map((course, index) => <CourseCard key={course.id || index} course={course} />)
+              // courses.map((course, index) => <CourseCard key={course.id || index} course={course} />)
+              // courses.map((course, index) => (
+              //   <CourseCard
+              //     key={`${course.course_code}-${course.class_name}-${course.grade_level || index}`}
+              //     course={course}
+              //   />
+              // ))
+              // courses.map((course, index) => (
+              // <CourseCard
+              //   key={`${course.course_code}-${course.class_name}-${course.grade_level || index}`}
+              //   course={course} />
+              // ))
+              courses.map((course, index) => (
+                <CourseCard
+                  key={course.id} // Now this will be unique class_course.id
+                  course={course}
+                />
+              ))
             )}
           </div>
         </main>

@@ -10,14 +10,17 @@ import Forum from '../_components/forum';
 import Session from '../_components/session';
 import People from '../_components/people';
 import SimpleEditor from '../_components/syllabus';
+import AssignmentTab from '../_components/assignment';
+import ScoreTab from '../_components/score';
 
 const CourseDetail = () => {
   const params = useParams();
   const searchParams = useSearchParams();
   const code = typeof params === 'object' && 'code' in params ? params['code'] : null;
 
-  // Get sessionId from URL search params
+  // Get sessionId and tab from URL search params
   const sessionIdParam = searchParams.get('sessionId');
+  const tabParam = searchParams.get('tab');
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('Session');
@@ -44,6 +47,11 @@ const CourseDetail = () => {
           // Default to first session if no URL parameter
           const firstSession = courseData.class_courses[0].sessions[0];
           setActiveSession(firstSession.id);
+        }
+
+        // Set active tab from URL parameter
+        if (tabParam && ['Session', 'Syllabus', 'Assignment', 'Forum', 'Scoring', 'People'].includes(tabParam)) {
+          setActiveTab(tabParam);
         }
       } catch (err) {
         setCourse(null);
@@ -168,8 +176,18 @@ const CourseDetail = () => {
                 <Forum courseCode={code as string} sessions={sessions} />
               </div>
             )}
+            {activeTab === 'Assignment' && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <AssignmentTab courseCode={code as string} sessionId={activeSession} />
+              </div>
+            )}
+            {activeTab === 'Scoring' && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <ScoreTab courseCode={code as string} />
+              </div>
+            )}
             {activeTab === 'People' && <People courseCode={code as string} />}
-            {activeTab !== 'Session' && activeTab !== 'Syllabus' && activeTab !== 'Forum' && activeTab !== 'People' && (
+            {!['Session', 'Syllabus', 'Forum', 'Assignment', 'Scoring', 'People'].includes(activeTab) && (
               <div>
                 <p className="text-gray-700">Content for {activeTab} will be added here.</p>
               </div>

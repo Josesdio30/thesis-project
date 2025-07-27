@@ -39,7 +39,7 @@ const CourseCard = ({ course }: { course: Course }) => (
     }}
     className="block group"
   >
-    <Card className="h-full transition-all duration-300 hover:shadow-lg hover:scale-105">
+    <Card className="h-full transition-all duration-300 hover:shadow-lg hover:scale-100">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2">
@@ -109,31 +109,31 @@ const LoadingState = () => (
   </div>
 );
 
-const getPageTitle = (role?: string) => {
-  switch (role) {
-    case 'STUDENT':
-      return 'My Courses';
-    case 'TEACHER':
-      return 'Teaching Courses';
-    case 'ADMIN':
-      return 'All Courses';
-    default:
-      return 'Courses';
-  }
-};
+// const getPageTitle = (role?: string) => {
+//   switch (role) {
+//     case 'STUDENT':
+//       return 'My Courses';
+//     case 'TEACHER':
+//       return 'Teaching Courses';
+//     case 'ADMIN':
+//       return 'All Courses';
+//     default:
+//       return 'Courses';
+//   }
+// };
 
-const getPageDescription = (role?: string) => {
-  switch (role) {
-    case 'STUDENT':
-      return 'View and access your enrolled courses';
-    case 'TEACHER':
-      return 'Manage your teaching courses';
-    case 'ADMIN':
-      return 'Manage all courses in the system';
-    default:
-      return 'Browse and access your available courses';
-  }
-};
+// const getPageDescription = (role?: string) => {
+//   switch (role) {
+//     case 'STUDENT':
+//       return 'View and access your enrolled courses';
+//     case 'TEACHER':
+//       return 'Manage your teaching courses';
+//     case 'ADMIN':
+//       return 'Manage all courses in the system';
+//     default:
+//       return 'Browse and access your available courses';
+//   }
+// };
 
 const Course = () => {
   const { data: session, status } = useSession();

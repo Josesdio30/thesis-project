@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@/lib/generated/prisma';
 import { SubmissionStatus } from '@/lib/enumeration-service';
+import { calculateAssignmentScore } from '@/lib/scoringUtils';
 
 const prisma = new PrismaClient();
 
@@ -29,6 +30,7 @@ export async function POST(
         assignment_questions: {
           include: {
             assignment_question_options: true,
+            enumeration: true, // Include question type
           },
         },
       },
@@ -79,23 +81,90 @@ export async function POST(
         },
       });
 
-      // Create answers
+      // Create answers and collect them for scoring
+      const submissionAnswers = [];
       for (const answer of answers) {
         const question = assignment.assignment_questions.find(q => q.id === answer.question_id);
         if (!question) continue;
 
-        await tx.assignment_answers.create({
+        const submissionAnswer = await tx.assignment_answers.create({
           data: {
             submission_id: submission.id,
             question_id: answer.question_id,
             answer_text: answer.answer_text || null,
             selected_option_id: answer.selected_option_id || null,
-            points_earned: 0, // Will be calculated during grading
+            points_earned: 0, // Will be calculated during scoring
           },
+        });
+
+        submissionAnswers.push({
+          id: submissionAnswer.id, // Keep id for database updates
+          question_id: answer.question_id,
+          selected_option_id: answer.selected_option_id,
+          answer_text: answer.answer_text,
         });
       }
 
-      return submission;
+      // Calculate scores
+      const scoreResult = calculateAssignmentScore(
+        assignment.assignment_questions.map(q => ({
+          id: q.id,
+          question_type_id: q.question_type_id,
+          question_text: q.question_text,
+          points: q.points || 1,
+          options:
+            q.assignment_question_options?.map(opt => ({
+              id: opt.id,
+              option_text: opt.option_text,
+              is_correct: opt.is_correct || false,
+            })) || [], // Include properly formatted options for auto-grading
+        })),
+        assignment.assignment_questions.map(q => ({
+          id: q.enumeration.id,
+          name: q.enumeration.name,
+          category: q.enumeration.category,
+          is_active: q.enumeration.is_active,
+        })),
+        submissionAnswers.map(sa => ({
+          question_id: sa.question_id,
+          selected_option_id: sa.selected_option_id,
+          answer_text: sa.answer_text,
+        }))
+      );
+
+      // Check if assignment needs manual grading (has essay questions)
+      const hasEssayQuestions = assignment.assignment_questions.some(
+        q => q.enumeration.name === 'ESSAY' || q.enumeration.name === 'FILE_UPLOAD'
+      );
+
+      // Update submission with score - null if needs manual grading for essays
+      await tx.assignment_submissions.update({
+        where: { id: submission.id },
+        data: {
+          total_score: hasEssayQuestions ? null : scoreResult.totalScore,
+        },
+      });
+
+      // Update individual question scores
+      for (const questionScore of scoreResult.questionScores) {
+        const submissionAnswer = submissionAnswers.find(sa => sa.question_id === questionScore.questionId);
+        if (submissionAnswer) {
+          await tx.assignment_answers.update({
+            where: { id: submissionAnswer.id },
+            data: {
+              points_earned: questionScore.score,
+              feedback: questionScore.isAutoGraded ? 'Auto-graded' : 'Requires manual grading',
+            },
+          });
+        }
+      }
+
+      return {
+        ...submission,
+        total_score: hasEssayQuestions ? null : scoreResult.totalScore,
+        scoreResult,
+        needsManualGrading: hasEssayQuestions,
+      };
     });
 
     return NextResponse.json({

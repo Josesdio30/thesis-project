@@ -109,7 +109,8 @@ export default function ScorePage() {
       const courseGroups: Record<string, CourseScore> = {};
 
       fetchedSubmissions.forEach((submission: Submission) => {
-        const courseKey = submission.course_code;
+        // Use course_code + class_name as key to separate different classes with same course
+        const courseKey = `${submission.course_code}-${submission.class_name}`;
 
         if (!courseGroups[courseKey]) {
           courseGroups[courseKey] = {
@@ -147,7 +148,6 @@ export default function ScorePage() {
       console.error('Error fetching scores:', error);
       setSubmissions([]);
       setCourseScores([]);
-      // You might want to show a toast or alert here
       alert(`Error loading scores: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
@@ -158,8 +158,8 @@ export default function ScorePage() {
     router.push(`/course/${submission.course_code}?sessionId=${submission.assignment_id}&tab=Assignment`);
   };
 
-  const handleCourseClick = (courseCode: string) => {
-    router.push(`/course/${courseCode}?tab=Assignment`);
+  const handleCourseClick = (courseCode: string, className: string) => {
+    router.push(`/course/${courseCode}?tab=Scoring`);
   };
 
   const formatDateTime = (dateString: string) => {
@@ -250,9 +250,10 @@ export default function ScorePage() {
 
   if (status === 'loading') {
     return (
-      <div className="flex min-h-screen bg-gray-100">
+      <div className="flex max-h-screen">
         <Sidebar isMobileOpen={sidebarOpen} setIsMobileOpen={setSidebarOpen} />
-        <div className="flex-1 bg-gray-50 flex flex-col min-w-0">
+
+        <div className="flex flex-col flex-1 bg-gray-50">
           <Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
@@ -267,9 +268,10 @@ export default function ScorePage() {
 
   if (status === 'unauthenticated' || !session?.user) {
     return (
-      <div className="flex min-h-screen bg-gray-100">
+      <div className="flex max-h-screen">
         <Sidebar isMobileOpen={sidebarOpen} setIsMobileOpen={setSidebarOpen} />
-        <div className="flex-1 bg-gray-50 flex flex-col min-w-0">
+
+        <div className="flex flex-col flex-1 bg-gray-50">
           <Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
@@ -284,9 +286,10 @@ export default function ScorePage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen bg-gray-100">
+      <div className="flex max-h-screen">
         <Sidebar isMobileOpen={sidebarOpen} setIsMobileOpen={setSidebarOpen} />
-        <div className="flex-1 bg-gray-50 flex flex-col min-w-0">
+
+        <div className="flex flex-col flex-1 bg-gray-50">
           <Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
@@ -300,11 +303,11 @@ export default function ScorePage() {
   }
 
   return (
-    <div className="flex min-h-screen bg-gray-100">
+    <div className="flex max-h-screen">
       <Sidebar isMobileOpen={sidebarOpen} setIsMobileOpen={setSidebarOpen} />
-      <div className="flex-1 bg-gray-50 flex flex-col min-w-0">
-        <Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
 
+      <div className="flex flex-col flex-1 bg-gray-50">
+        <Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
         <div className="flex-1 overflow-y-auto p-6">
           {/* Header */}
           <div className="mb-6">
@@ -478,7 +481,7 @@ export default function ScorePage() {
                         </span>
                       </div>
 
-                      {submission.total_score !== null && submission.total_score !== undefined && (
+                      {/* {submission.total_score !== null && submission.total_score !== undefined && (
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-gray-600">Percentage:</span>
                           <span
@@ -493,7 +496,7 @@ export default function ScorePage() {
                             {((submission.total_score / submission.assignment_total_points) * 100).toFixed(1)}%
                           </span>
                         </div>
-                      )}
+                      )} */}
 
                       <div className="flex items-center text-sm text-gray-600">
                         <FaFileAlt className="mr-2 text-xs" />
@@ -626,7 +629,7 @@ export default function ScorePage() {
                     {/* View Course Button */}
                     <div className="mt-4 pt-3 border-t">
                       <button
-                        onClick={() => handleCourseClick(courseScore.course_code)}
+                        onClick={() => handleCourseClick(courseScore.course_code, courseScore.class_name)}
                         className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg flex items-center justify-center gap-2 transition-colors"
                       >
                         <FaEye />

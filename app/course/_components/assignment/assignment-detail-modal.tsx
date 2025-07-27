@@ -7,7 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-// Simple Badge component inline
+import { Loader2 } from 'lucide-react';
+import { useAssignmentContext } from '@/lib/contexts/AssignmentContext';
+
 const Badge = ({
   children,
   variant = 'default',
@@ -25,7 +27,6 @@ const Badge = ({
   };
   return <span className={`${baseClasses} ${variantClasses[variant]} ${className}`}>{children}</span>;
 };
-import { Loader2 } from 'lucide-react';
 
 interface Question {
   id: number;
@@ -37,21 +38,9 @@ interface Question {
   options?: Array<{
     id: number;
     option_text: string;
-    is_correct: boolean;
+    is_correct?: boolean;
     order_number: number;
   }>;
-}
-
-interface QuestionType {
-  id: number;
-  name: string;
-  alt_name: string | null;
-}
-
-interface SubmissionStatus {
-  id: number;
-  name: string;
-  alt_name: string | null;
 }
 
 interface Assignment {
@@ -109,36 +98,17 @@ const AssignmentDetailModal = ({
   const [answers, setAnswers] = useState<any[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [userSubmission, setUserSubmission] = useState<any>(null);
-  const [questionTypes, setQuestionTypes] = useState<QuestionType[]>([]);
-  const [submissionStatuses, setSubmissionStatuses] = useState<SubmissionStatus[]>([]);
-  const [typesLoading, setTypesLoading] = useState(true);
+  const [userSubmittedAnswers, setUserSubmittedAnswers] = useState<any[]>([]);
+  const [loadingUserAnswers, setLoadingUserAnswers] = useState(false);
 
-  // Fetch types when component mounts
-  useEffect(() => {
-    const fetchTypes = async () => {
-      try {
-        setTypesLoading(true);
-        const [questionTypesResponse, submissionStatusesResponse] = await Promise.all([
-          fetch('/api/question-types'),
-          fetch('/api/submission-statuses'),
-        ]);
+  // Submission viewing state
+  const [selectedSubmission, setSelectedSubmission] = useState<any>(null);
+  const [submissionModalOpen, setSubmissionModalOpen] = useState(false);
+  const [submissionAnswers, setSubmissionAnswers] = useState<any[]>([]);
+  const [loadingSubmission, setLoadingSubmission] = useState(false);
 
-        if (questionTypesResponse.ok && submissionStatusesResponse.ok) {
-          const questionTypesData = await questionTypesResponse.json();
-          const submissionStatusesData = await submissionStatusesResponse.json();
-
-          setQuestionTypes(questionTypesData);
-          setSubmissionStatuses(submissionStatusesData);
-        }
-      } catch (error) {
-        console.error('Error fetching types:', error);
-      } finally {
-        setTypesLoading(false);
-      }
-    };
-
-    fetchTypes();
-  }, []);
+  // Use context for types data
+  const { questionTypes, submissionStatuses, loading: typesLoading } = useAssignmentContext();
 
   useEffect(() => {
     if (assignment && !isTeacher && currentUserId) {
@@ -150,8 +120,32 @@ const AssignmentDetailModal = ({
       if (assignment.questions) {
         setAnswers(new Array(assignment.questions.length).fill(''));
       }
+
+      // Fetch user's submitted answers if they have a submission
+      if (submission) {
+        fetchUserSubmittedAnswers(submission.id);
+      }
     }
   }, [assignment, isTeacher, currentUserId]);
+
+  const fetchUserSubmittedAnswers = async (submissionId: number) => {
+    setLoadingUserAnswers(true);
+    try {
+      const response = await fetch(`/api/submissions/${submissionId}/answers`);
+      if (response.ok) {
+        const answers = await response.json();
+        setUserSubmittedAnswers(answers);
+      } else {
+        console.error('Failed to fetch user submitted answers');
+        setUserSubmittedAnswers([]);
+      }
+    } catch (error) {
+      console.error('Error fetching user submitted answers:', error);
+      setUserSubmittedAnswers([]);
+    } finally {
+      setLoadingUserAnswers(false);
+    }
+  };
 
   if (!assignment) return null;
 
@@ -170,28 +164,21 @@ const AssignmentDetailModal = ({
   };
 
   const handleAnswerChange = (questionIndex: number, value: string) => {
-    console.log('handleAnswerChange called:', { questionIndex, value, currentAnswers: answers });
     const newAnswers = [...answers];
+    const question = assignment!.questions![questionIndex];
+    const qt = questionTypes.find(qt => qt.id === question.question_type_id);
+    const isSelect = qt && ['MULTIPLE CHOICE', 'TRUE FALSE'].includes(qt.name);
 
-    // For multiple choice questions, value is now the option ID, we need to store option ID for submission
-    // but we need to find the option text for display
-    const question = assignment?.questions?.[questionIndex];
-    if (question && question.options) {
-      const selectedOption = question.options.find(opt => opt.id.toString() === value);
-      if (selectedOption) {
-        // Store an object with both ID and text for proper submission handling
-        newAnswers[questionIndex] = {
-          selected_option_id: selectedOption.id,
-          option_text: selectedOption.option_text,
-        };
-      }
+    if (isSelect) {
+      // student picked from a select
+      const opt = question.options?.find(o => o.id.toString() === value);
+      newAnswers[questionIndex] = opt ? { selected_option_id: opt.id, option_text: opt.option_text } : {};
     } else {
-      // For text-based questions (essay, short answer, etc.)
+      // free‐text answer
       newAnswers[questionIndex] = value;
     }
 
     setAnswers(newAnswers);
-    console.log('Updated answers:', newAnswers);
   };
 
   const handleSubmitAnswers = async () => {
@@ -218,6 +205,29 @@ const AssignmentDetailModal = ({
 
   const isDueDate = () => {
     return assignment.due_date && new Date(assignment.due_date) < new Date();
+  };
+
+  const handleViewSubmission = async (submission: any) => {
+    setLoadingSubmission(true);
+    setSelectedSubmission(submission);
+
+    try {
+      // Fetch the submission answers
+      const response = await fetch(`/api/submissions/${submission.id}/answers`);
+      if (response.ok) {
+        const answers = await response.json();
+        setSubmissionAnswers(answers);
+      } else {
+        console.error('Failed to fetch submission answers');
+        setSubmissionAnswers([]);
+      }
+    } catch (error) {
+      console.error('Error fetching submission answers:', error);
+      setSubmissionAnswers([]);
+    } finally {
+      setLoadingSubmission(false);
+      setSubmissionModalOpen(true);
+    }
   };
 
   return (
@@ -393,8 +403,11 @@ const AssignmentDetailModal = ({
                     <div className="mt-4">
                       <h5 className="font-medium text-gray-700 mb-2">Your Answer:</h5>
                       {(() => {
-                        const type = questionTypes.find(qt => qt.id === question.question_type_id);
-                        return type && ['MULTIPLE CHOICE', 'TRUE FALSE'].includes(type.name);
+                        //   const type = questionTypes.find(qt => qt.id === question.question_type_id);
+                        //   return type && ['MULTIPLE CHOICE', 'TRUE FALSE'].includes(type.name);
+                        // })() ? (
+                        const qt = questionTypes.find(qt => qt.id === question.question_type_id);
+                        return qt && ['MULTIPLE CHOICE', 'TRUE FALSE'].includes(qt.name);
                       })() ? (
                         // Multiple choice or True/False
                         <Select
@@ -434,10 +447,15 @@ const AssignmentDetailModal = ({
                         </Select>
                       ) : (
                         // Essay, Short Answer, Fill in the Blank
+                        // <Textarea
+                        //   value={answers[index] || ''}
+                        //   onChange={e => handleAnswerChange(index, e.target.value)}
+                        //   placeholder="Enter your answer here..."
+                        //   className="min-h-[100px]"
+                        // />
                         <Textarea
-                          value={answers[index] || ''}
+                          value={(answers[index] as string) || ''}
                           onChange={e => handleAnswerChange(index, e.target.value)}
-                          placeholder="Enter your answer here..."
                           className="min-h-[100px]"
                         />
                       )}
@@ -447,11 +465,42 @@ const AssignmentDetailModal = ({
                   {/* Show submitted answer if exists */}
                   {!isTeacher && userSubmission && (
                     <div className="mt-4 bg-gray-50 p-3 rounded">
-                      <h5 className="font-medium text-gray-700 mb-2">Your Submitted Answer:</h5>
-                      <p className="text-gray-800">
-                        {/* You would need to fetch the actual answers from assignment_answers table */}
-                        [Answer would be displayed here from the database]
-                      </p>
+                      <h5 className="font-medium text-gray-700 mb-2">Your Answer:</h5>
+                      {loadingUserAnswers ? (
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span className="text-gray-600">Loading your answer...</span>
+                        </div>
+                      ) : (
+                        (() => {
+                          const submittedAnswer = userSubmittedAnswers.find(
+                            (answer: any) => answer.question_id === question.id
+                          );
+
+                          if (!submittedAnswer) {
+                            return <p className="text-gray-500 italic">No answer submitted</p>;
+                          }
+
+                          if (submittedAnswer.selected_option_id) {
+                            // Multiple choice answer
+                            const selectedOption = question.options?.find(
+                              opt => opt.id === submittedAnswer.selected_option_id
+                            );
+                            return (
+                              <div className="text-gray-800">
+                                <strong>Selected:</strong> {selectedOption?.option_text || 'Unknown option'}
+                              </div>
+                            );
+                          } else {
+                            // Text answer
+                            return (
+                              <p className="text-gray-800 whitespace-pre-wrap">
+                                {submittedAnswer.answer_text || 'No answer provided'}
+                              </p>
+                            );
+                          }
+                        })()
+                      )}
                     </div>
                   )}
                 </div>
@@ -533,7 +582,12 @@ const AssignmentDetailModal = ({
                               : '-'}
                           </td>
                           <td className="border border-gray-300 px-4 py-2">
-                            <Button size="sm" variant="outline">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleViewSubmission(submission)}
+                              disabled={loadingSubmission}
+                            >
                               <FaEye className="mr-1 h-3 w-3" />
                               View
                             </Button>
@@ -560,6 +614,165 @@ const AssignmentDetailModal = ({
           </Button>
         </div>
       </DialogContent>
+
+      {/* Submission Detail Modal */}
+      <Dialog open={submissionModalOpen} onOpenChange={setSubmissionModalOpen}>
+        <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FaEye className="text-blue-600" />
+              Submission Details - {selectedSubmission?.student?.nama_lengkap}
+            </DialogTitle>
+            <DialogDescription>View and grade student submission for "{assignment?.title}"</DialogDescription>
+          </DialogHeader>
+
+          {selectedSubmission && (
+            <div className="space-y-6">
+              {/* Submission Info */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="font-medium text-gray-700">Student</h4>
+                    <p className="text-lg">{selectedSubmission.student.nama_lengkap}</p>
+                    <p className="text-sm text-gray-500">@{selectedSubmission.student.user_name}</p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-gray-700">Submission Status</h4>
+                    <Badge
+                      variant={(() => {
+                        const status = submissionStatuses.find(s => s.id === selectedSubmission.status_id);
+                        return status && status.name === 'GRADED' ? 'default' : 'secondary';
+                      })()}
+                    >
+                      {getStatusLabel(selectedSubmission.status_id)}
+                    </Badge>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-gray-700">Submitted At</h4>
+                    <p className="text-lg">
+                      {selectedSubmission.submitted_at
+                        ? formatDateTime(selectedSubmission.submitted_at)
+                        : 'Not submitted'}
+                    </p>
+                  </div>
+                  <div>
+                    <h4 className="font-medium text-gray-700">Current Score</h4>
+                    <p className="text-lg font-semibold">
+                      {selectedSubmission.total_score !== null
+                        ? `${selectedSubmission.total_score}/${assignment?.total_points}`
+                        : 'Not graded'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Questions and Answers */}
+              <div className="space-y-4">
+                {assignment?.questions?.map((question, index) => {
+                  const submissionAnswer = submissionAnswers.find((answer: any) => answer.question_id === question.id);
+
+                  return (
+                    <div key={question.id} className="border rounded-lg p-4">
+                      <div className="flex items-start justify-between mb-3">
+                        <h4 className="font-medium text-lg">Question {question.order_number}</h4>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">{getQuestionTypeLabel(question.question_type_id)}</Badge>
+                          <Badge>{question.points} pts</Badge>
+                        </div>
+                      </div>
+
+                      <p className="text-gray-800 mb-4 whitespace-pre-wrap">{question.question_text}</p>
+
+                      {/* Show options for multiple choice/true-false */}
+                      {question.options && question.options.length > 0 && (
+                        <div className="mb-4">
+                          <h5 className="font-medium text-gray-700 mb-2">Options:</h5>
+                          <div className="space-y-2">
+                            {question.options.map((option, optIndex) => (
+                              <div key={option.id} className="flex items-center gap-2">
+                                <span className="font-medium text-gray-600">{String.fromCharCode(65 + optIndex)}.</span>
+                                <span
+                                  className={`${
+                                    submissionAnswer?.selected_option_id === option.id
+                                      ? 'bg-blue-100 px-2 py-1 rounded font-medium'
+                                      : ''
+                                  }`}
+                                >
+                                  {option.option_text}
+                                </span>
+                                {option.is_correct && (
+                                  <Badge variant="default" className="ml-2">
+                                    Correct
+                                  </Badge>
+                                )}
+                                {submissionAnswer?.selected_option_id === option.id && (
+                                  <Badge variant="outline" className="ml-2">
+                                    Selected
+                                  </Badge>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Student's Answer */}
+                      <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <h5 className="font-medium text-blue-800 mb-2">Student's Answer:</h5>
+                        {submissionAnswer ? (
+                          <div className="text-gray-800">
+                            {submissionAnswer.selected_option_id ? (
+                              <p>
+                                <strong>Selected:</strong>{' '}
+                                {question.options?.find(opt => opt.id === submissionAnswer.selected_option_id)
+                                  ?.option_text || 'Unknown option'}
+                              </p>
+                            ) : (
+                              <p className="whitespace-pre-wrap">
+                                {submissionAnswer.answer_text || 'No answer provided'}
+                              </p>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-gray-500 italic">No answer provided</p>
+                        )}
+                      </div>
+
+                      {/* Score for this question */}
+                      {submissionAnswer && (
+                        <div className="mt-3 flex items-center justify-between">
+                          <span className="text-sm text-gray-600">
+                            Question Score: {submissionAnswer.points_earned || 0} / {question.points}
+                          </span>
+                          {submissionAnswer.points_earned === question.points && (
+                            <Badge variant="default">Correct</Badge>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Grading Actions */}
+              <div className="flex justify-between items-center pt-4 border-t">
+                <div className="text-lg font-semibold">
+                  Total Score:{' '}
+                  {selectedSubmission.total_score !== null
+                    ? `${selectedSubmission.total_score}/${assignment?.total_points}`
+                    : 'Not graded'}
+                </div>
+                <div className="flex gap-2">
+                  <Button variant="outline" onClick={() => setSubmissionModalOpen(false)}>
+                    Close
+                  </Button>
+                  {selectedSubmission.total_score === null && <Button>Grade Submission</Button>}
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </Dialog>
   );
 };

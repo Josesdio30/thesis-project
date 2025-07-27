@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/auth';
 import { PrismaClient } from '@/lib/generated/prisma';
 
 const prisma = new PrismaClient();
@@ -6,8 +8,15 @@ const prisma = new PrismaClient();
 // GET /api/courses/[code]/assignments - Get all assignments for a course
 export async function GET(request: NextRequest, { params }: { params: { code: string } }) {
   try {
+    const session = await getServerSession(authOptions);
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { code } = await params;
     const courseCode = code;
+    const isTeacher = session.user.role === 'TEACHER' || session.user.role === 'ADMIN';
 
     // Get the course with all its sessions and assignments
     const courseData = await prisma.courses.findUnique({
@@ -90,7 +99,8 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
               options: question.assignment_question_options.map(option => ({
                 id: option.id,
                 option_text: option.option_text,
-                is_correct: option.is_correct,
+                // Only include is_correct for teachers/admins
+                ...(isTeacher && { is_correct: option.is_correct }),
                 order_number: option.order_number,
               })),
             })),

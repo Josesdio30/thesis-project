@@ -1,7 +1,13 @@
 import React from 'react';
 import { Assignment } from '../../../../hooks/useAssignmentData';
-import { getAssignmentStatus, getUserSubmission, formatDateTime } from '../../../../lib/assignmentUtils';
-import { FaEdit, FaGlobe, FaEye, FaClock, FaEyeSlash, FaUser } from 'react-icons/fa';
+import {
+  getAssignmentStatus,
+  getUserSubmission,
+  formatDateTime,
+  getScoreDisplay,
+  getSubmissionStatusColor,
+} from '../../../../lib/assignmentUtils';
+import { FaEdit, FaGlobe, FaEye, FaClock, FaEyeSlash, FaUser, FaGraduationCap } from 'react-icons/fa';
 
 interface AssignmentCardProps {
   assignment: Assignment;
@@ -10,6 +16,7 @@ interface AssignmentCardProps {
   onAssignmentClick: (assignment: Assignment) => void;
   onEditClick: (assignment: Assignment, e: React.MouseEvent) => void;
   onPublishToggle: (assignment: Assignment, e: React.MouseEvent) => void;
+  onGradeClick?: (assignment: Assignment, e: React.MouseEvent) => void;
 }
 
 const getStatusIcon = (iconName: string) => {
@@ -34,6 +41,7 @@ export const AssignmentCard = ({
   onAssignmentClick,
   onEditClick,
   onPublishToggle,
+  onGradeClick,
 }: AssignmentCardProps) => {
   const status = getAssignmentStatus(assignment, isTeacher, currentUserId);
   const userSubmission = currentUserId ? getUserSubmission(assignment, currentUserId) : null;
@@ -67,6 +75,15 @@ export const AssignmentCard = ({
             >
               <FaEdit />
             </button>
+            {onGradeClick && assignment.submissions && assignment.submissions.length > 0 && (
+              <button
+                onClick={e => onGradeClick(assignment, e)}
+                className="opacity-0 group-hover:opacity-100 p-2 text-gray-400 hover:text-purple-600 transition-all"
+                title="Grade Submissions"
+              >
+                <FaGraduationCap />
+              </button>
+            )}
             <button
               onClick={e => onPublishToggle(assignment, e)}
               className={`opacity-0 group-hover:opacity-100 p-2 transition-all ${
@@ -101,11 +118,45 @@ export const AssignmentCard = ({
             <span className="text-blue-700">
               Submitted: {userSubmission.submitted_at ? formatDateTime(userSubmission.submitted_at) : 'N/A'}
             </span>
-            {userSubmission.total_score !== null && (
-              <span className="font-medium text-blue-800">
-                Score: {userSubmission.total_score}/{assignment.total_points}
-              </span>
-            )}
+            {(() => {
+              const scoreInfo = getScoreDisplay(userSubmission.total_score, assignment.total_points, assignment);
+
+              if (scoreInfo.status === 'pending') {
+                return (
+                  <div className="text-right">
+                    <div className="text-amber-700 bg-amber-50 px-2 py-1 rounded text-xs font-medium">
+                      ⏳ Awaiting Review
+                    </div>
+                  </div>
+                );
+              }
+
+              if (scoreInfo.status === 'partial') {
+                return (
+                  <div className="text-right">
+                    <div className="font-medium text-blue-800">{scoreInfo.raw}</div>
+                    <div className="text-blue-600 bg-blue-50 px-2 py-1 rounded text-xs mt-1">📝 Partially graded</div>
+                  </div>
+                );
+              }
+
+              // Fully graded
+              return (
+                <div className="text-right">
+                  <div className="font-medium text-blue-800">{scoreInfo.raw}</div>
+                  <div
+                    className={`text-xs mt-1 px-2 py-1 rounded-full ${
+                      getSubmissionStatusColor(userSubmission.total_score, assignment.total_points, scoreInfo.status).bg
+                    } ${
+                      getSubmissionStatusColor(userSubmission.total_score, assignment.total_points, scoreInfo.status)
+                        .color
+                    }`}
+                  >
+                    {scoreInfo.percentage} - {scoreInfo.letterGrade}
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       )}

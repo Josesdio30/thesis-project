@@ -36,7 +36,6 @@ const CourseDetail = () => {
         const courseData = data.data || null;
         setCourse(courseData);
 
-        // Set active session logic - URL parameter takes priority
         if (sessionIdParam) {
           const sessionId = parseInt(sessionIdParam);
           if (!isNaN(sessionId)) {
@@ -183,7 +182,7 @@ const CourseDetail = () => {
             )}
             {activeTab === 'Scoring' && (
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <ScoreTab courseCode={code as string} />
+                <ScoreTab courseCode={code as string} className={course?.class_courses?.[0]?.classes?.class_name} />
               </div>
             )}
             {activeTab === 'People' && <People courseCode={code as string} />}

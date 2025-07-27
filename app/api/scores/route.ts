@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma';
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -14,20 +14,56 @@ export async function GET(request: NextRequest) {
     const userId = parseInt(session.user.id);
     const isTeacher = session.user.role === 'TEACHER' || session.user.role === 'GURU';
 
-    console.log('Fetching scores for user:', userId, 'isTeacher:', isTeacher);
+    // Get query parameters
+    const { searchParams } = new URL(request.url);
+    const courseCode = searchParams.get('course');
+    const className = searchParams.get('class');
+
+    console.log(
+      'Fetching scores for user:',
+      userId,
+      'isTeacher:',
+      isTeacher,
+      'courseCode:',
+      courseCode,
+      'className:',
+      className
+    );
 
     // Simple test query first
     const totalSubmissions = await prisma.assignment_submissions.count();
     console.log('Total submissions in database:', totalSubmissions);
 
     if (isTeacher) {
-      // For teachers: Get all submissions for assignments they created
-      const submissions = await prisma.assignment_submissions.findMany({
-        where: {
-          assignments: {
-            created_by: userId,
-          },
+      // Build where clause for filtering
+      let whereClause: any = {
+        assignments: {
+          created_by: userId,
         },
+      };
+
+      // Add course and class filtering if provided
+      if (courseCode || className) {
+        whereClause.assignments.sessions = {
+          class_courses: {},
+        };
+
+        if (courseCode) {
+          whereClause.assignments.sessions.class_courses.courses = {
+            course_code: courseCode,
+          };
+        }
+
+        if (className) {
+          whereClause.assignments.sessions.class_courses.classes = {
+            class_name: className,
+          };
+        }
+      }
+
+      // For teachers: Get submissions for assignments they created, filtered by course/class
+      const submissions = await prisma.assignment_submissions.findMany({
+        where: whereClause,
         include: {
           assignments: {
             select: {
@@ -79,10 +115,7 @@ export async function GET(request: NextRequest) {
             },
           },
         },
-        orderBy: [
-          { submitted_at: 'desc' },
-          { created_date: 'desc' },
-        ],
+        orderBy: [{ submitted_at: 'desc' }, { created_date: 'desc' }],
       });
 
       console.log('Found submissions for teacher:', submissions.length);
@@ -128,11 +161,35 @@ export async function GET(request: NextRequest) {
         data: formattedSubmissions,
       });
     } else {
-      // For students: Get their own submissions
+      // Build where clause for students
+      let whereClause: any = {
+        student_id: userId,
+      };
+
+      // Add course and class filtering if provided
+      if (courseCode || className) {
+        whereClause.assignments = {
+          sessions: {
+            class_courses: {},
+          },
+        };
+
+        if (courseCode) {
+          whereClause.assignments.sessions.class_courses.courses = {
+            course_code: courseCode,
+          };
+        }
+
+        if (className) {
+          whereClause.assignments.sessions.class_courses.classes = {
+            class_name: className,
+          };
+        }
+      }
+
+      // For students: Get their own submissions, filtered by course/class
       const submissions = await prisma.assignment_submissions.findMany({
-        where: {
-          student_id: userId,
-        },
+        where: whereClause,
         include: {
           assignments: {
             select: {
@@ -177,10 +234,7 @@ export async function GET(request: NextRequest) {
             },
           },
         },
-        orderBy: [
-          { submitted_at: 'desc' },
-          { created_date: 'desc' },
-        ],
+        orderBy: [{ submitted_at: 'desc' }, { created_date: 'desc' }],
       });
 
       console.log('Found submissions for student:', submissions.length);

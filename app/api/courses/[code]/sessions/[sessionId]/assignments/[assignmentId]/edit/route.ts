@@ -58,15 +58,29 @@ export async function PUT(
       return NextResponse.json({ error: 'Forbidden: You can only edit assignments you created' }, { status: 403 });
     }
 
-    // Check if assignment has submissions - restrict editing if it does
-    if (existingAssignment.assignment_submissions.length > 0) {
-      return NextResponse.json(
-        {
-          error:
-            'Cannot edit assignment: Students have already submitted responses. You can only change the publication status.',
+    const hasSubmissions = existingAssignment.assignment_submissions.length > 0;
+
+    if (hasSubmissions) {
+      // For assignments with submissions, only allow safe field updates
+      const updatedAssignment = await prisma.assignments.update({
+        where: { id: assignmentId },
+        data: {
+          title,
+          description: description || null,
+          instructions: instructions || null,
+          due_date: due_date ? new Date(due_date) : null,
+          show_results: Boolean(show_results),
+          is_published: Boolean(is_published),
+          updated_date: new Date(),
         },
-        { status: 400 }
-      );
+      });
+
+      return NextResponse.json({
+        success: true,
+        data: updatedAssignment,
+        message: 'Assignment updated successfully (limited fields due to existing submissions)',
+        warning: 'Some fields cannot be modified because students have already submitted responses.',
+      });
     }
 
     // Use transaction to update assignment and questions

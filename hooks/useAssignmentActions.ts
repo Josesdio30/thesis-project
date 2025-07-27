@@ -118,5 +118,37 @@ export const useAssignmentActions = (courseCode: string, onRefresh: () => void) 
     [courseCode]
   );
 
-  return { handlePublishToggle, handleBulkPublish, handleSubmitAnswer };
+  const handleGradeAssignment = useCallback(
+    async (assignmentId: number, submissionId: number, grades: any[], feedback: string, graderId: number) => {
+      try {
+        const response = await fetch(
+          `/api/courses/${courseCode}/sessions/${assignmentId}/assignments/${assignmentId}/grade`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              submission_id: submissionId,
+              grader_id: graderId,
+              grades,
+              feedback,
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to grade assignment');
+        }
+
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error grading assignment:', error);
+        throw error;
+      }
+    },
+    [courseCode]
+  );
+
+  return { handlePublishToggle, handleBulkPublish, handleSubmitAnswer, handleGradeAssignment };
 };

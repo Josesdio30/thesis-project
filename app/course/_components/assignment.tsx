@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useSession } from 'next-auth/react';
+import { AssignmentProvider } from '@/lib/contexts/AssignmentContext';
 import AssignmentCreateModal from './assignment/assignment-create-modal';
 import AssignmentDetailModal from './assignment/assignment-detail-modal';
+import { GradingModal } from './assignment/GradingModal';
 import { AssignmentHeader } from './assignment/AssignmentHeader';
 import { AssignmentGrid } from './assignment/AssignmentGrid';
 import { EmptyState } from './assignment/EmptyState';
@@ -21,6 +23,7 @@ export default function AssignmentTab({ courseCode, sessionId }: AssignmentTabPr
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showGradingModal, setShowGradingModal] = useState(false);
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
 
   // Custom hooks
@@ -55,6 +58,12 @@ export default function AssignmentTab({ courseCode, sessionId }: AssignmentTabPr
     }
   };
 
+  const handleGradeClick = (assignment: Assignment, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedAssignment(assignment);
+    setShowGradingModal(true);
+  };
+
   const handleBulkPublishWrapper = async (publish: boolean) => {
     await handleBulkPublish(assignments, publish);
   };
@@ -86,67 +95,83 @@ export default function AssignmentTab({ courseCode, sessionId }: AssignmentTabPr
   }
 
   return (
-    <div className="space-y-6">
-      <AssignmentHeader
-        filteredAssignments={filteredAssignments}
-        assignments={assignments}
-        isTeacher={isTeacher}
-        viewMode={viewMode}
-        onViewModeChange={setViewMode}
-        onCreateClick={() => setShowCreateModal(true)}
-        onBulkPublish={handleBulkPublishWrapper}
-      />
-
-      {filteredAssignments.length === 0 ? (
-        <EmptyState isTeacher={isTeacher} onCreateClick={isTeacher ? () => setShowCreateModal(true) : undefined} />
-      ) : (
-        <AssignmentGrid
-          assignments={filteredAssignments}
+    <AssignmentProvider>
+      <div className="space-y-6">
+        <AssignmentHeader
+          filteredAssignments={filteredAssignments}
+          assignments={assignments}
+          isTeacher={isTeacher}
           viewMode={viewMode}
+          onViewModeChange={setViewMode}
+          onCreateClick={() => setShowCreateModal(true)}
+          onBulkPublish={handleBulkPublishWrapper}
+        />
+
+        {filteredAssignments.length === 0 ? (
+          <EmptyState isTeacher={isTeacher} onCreateClick={isTeacher ? () => setShowCreateModal(true) : undefined} />
+        ) : (
+          <AssignmentGrid
+            assignments={filteredAssignments}
+            viewMode={viewMode}
+            isTeacher={isTeacher}
+            currentUserId={currentUserId || undefined}
+            onAssignmentClick={handleAssignmentClick}
+            onEditClick={handleEditClick}
+            onPublishToggle={handlePublishToggleWrapper}
+            onGradeClick={isTeacher ? handleGradeClick : undefined}
+          />
+        )}
+
+        <AssignmentCreateModal
+          sessionId={sessionId}
+          courseCode={courseCode}
+          isOpen={showCreateModal}
+          onClose={() => setShowCreateModal(false)}
+          onSuccess={handleCreateSuccess}
+        />
+
+        <AssignmentCreateModal
+          sessionId={sessionId}
+          courseCode={courseCode}
+          isOpen={showEditModal}
+          onClose={() => {
+            setShowEditModal(false);
+            setSelectedAssignment(null);
+          }}
+          onSuccess={handleEditSuccess}
+          editAssignment={selectedAssignment}
+        />
+
+        <AssignmentDetailModal
+          assignment={selectedAssignment}
+          isOpen={showDetailModal}
+          onClose={() => {
+            setShowDetailModal(false);
+            setSelectedAssignment(null);
+          }}
           isTeacher={isTeacher}
           currentUserId={currentUserId || undefined}
-          onAssignmentClick={handleAssignmentClick}
-          onEditClick={handleEditClick}
-          onPublishToggle={handlePublishToggleWrapper}
+          onSubmitAnswer={handleSubmitAnswerWrapper}
+          onEdit={assignment => {
+            setShowDetailModal(false);
+            setSelectedAssignment(assignment);
+            setShowEditModal(true);
+          }}
         />
-      )}
 
-      <AssignmentCreateModal
-        sessionId={sessionId}
-        courseCode={courseCode}
-        isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onSuccess={handleCreateSuccess}
-      />
-
-      <AssignmentCreateModal
-        sessionId={sessionId}
-        courseCode={courseCode}
-        isOpen={showEditModal}
-        onClose={() => {
-          setShowEditModal(false);
-          setSelectedAssignment(null);
-        }}
-        onSuccess={handleEditSuccess}
-        editAssignment={selectedAssignment}
-      />
-
-      <AssignmentDetailModal
-        assignment={selectedAssignment}
-        isOpen={showDetailModal}
-        onClose={() => {
-          setShowDetailModal(false);
-          setSelectedAssignment(null);
-        }}
-        isTeacher={isTeacher}
-        currentUserId={currentUserId || undefined}
-        onSubmitAnswer={handleSubmitAnswerWrapper}
-        onEdit={assignment => {
-          setShowDetailModal(false);
-          setSelectedAssignment(assignment);
-          setShowEditModal(true);
-        }}
-      />
-    </div>
+        {isTeacher && selectedAssignment && (
+          <GradingModal
+            assignment={selectedAssignment}
+            courseCode={courseCode}
+            sessionId={sessionId.toString()}
+            isOpen={showGradingModal}
+            onClose={() => {
+              setShowGradingModal(false);
+              setSelectedAssignment(null);
+            }}
+          />
+        )}
+      </div>
+    </AssignmentProvider>
   );
 }

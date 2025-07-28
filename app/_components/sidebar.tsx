@@ -15,7 +15,7 @@ import {
   FaTimes,
   FaUsers,
 } from 'react-icons/fa';
-import { NAVIGATION_ITEMS } from '@/lib/constants';
+import { NAVIGATION_ITEMS, ADMIN_NAVIGATION_ITEMS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
 import { signOut, useSession } from 'next-auth/react';
 
@@ -93,42 +93,47 @@ const SidebarContent = ({
   currentPath: string;
   onLogout: () => void;
   onItemClick?: () => void;
-}) => (
-  <div className="h-full flex flex-col">
-    {/* User Profile */}
-    <UserProfile userName={userName} userRole={userRole} />
+}) => {
+  // Pilih navigation items berdasarkan role
+  const navigationItems = userRole?.toLowerCase() === 'admin' ? ADMIN_NAVIGATION_ITEMS : NAVIGATION_ITEMS;
 
-    {/* Navigation Items */}
-    <nav className="flex-1 space-y-2">
-      {NAVIGATION_ITEMS.map(item => {
-        const IconComponent = iconMap[item.icon as keyof typeof iconMap];
-        const isActive = currentPath === item.path;
+  return (
+    <div className="h-full flex flex-col">
+      {/* User Profile */}
+      <UserProfile userName={userName} userRole={userRole} />
 
-        return (
-          <SidebarItem
-            key={item.path}
-            icon={<IconComponent />}
-            text={item.text}
-            path={item.path}
-            isActive={isActive}
-            onClick={onItemClick}
-          />
-        );
-      })}
-    </nav>
+      {/* Navigation Items */}
+      <nav className="flex-1 space-y-2">
+        {navigationItems.map(item => {
+          const IconComponent = iconMap[item.icon as keyof typeof iconMap];
+          const isActive = currentPath === item.path;
 
-    {/* Logout Button */}
-    <div className="mt-auto pt-4 border-t border-gray-600">
-      <button
-        onClick={onLogout}
-        className="flex items-center gap-3 p-3 rounded-lg transition-all duration-200 w-full text-left text-red-400 hover:text-red-300 hover:bg-red-900/20"
-      >
-        <FaSignOutAlt className="text-lg flex-shrink-0" />
-        <span className="text-sm font-medium">Logout</span>
-      </button>
+          return (
+            <SidebarItem
+              key={item.path}
+              icon={<IconComponent />}
+              text={item.text}
+              path={item.path}
+              isActive={isActive}
+              onClick={onItemClick}
+            />
+          );
+        })}
+      </nav>
+
+      {/* Logout Button */}
+      <div className="mt-auto pt-4 border-t border-gray-600">
+        <button
+          onClick={onLogout}
+          className="flex items-center gap-3 p-3 rounded-lg transition-all duration-200 w-full text-left text-red-400 hover:text-red-300 hover:bg-red-900/20"
+        >
+          <FaSignOutAlt className="text-lg flex-shrink-0" />
+          <span className="text-sm font-medium">Logout</span>
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const Sidebar = ({ isMobileOpen, setIsMobileOpen }: SidebarProps) => {
   const [userName, setUserName] = useState<string | null>(null);

@@ -370,139 +370,141 @@ const Schedule = () => {
       <div className="flex flex-col flex-1 bg-gray-50">
         <Topbar onMenuClick={handleMenuClick} />
 
-        <div className="grid grid-cols-1 gap-6 pt-8">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle className="text-gray-900 flex items-center gap-2">
-                  <FaGraduationCap className="text-blue-600" />
-                  {userRole === 'ADMIN' ? 'Session Management' : 'My Schedule'} ({formattedHeaderDate})
-                  {scheduleData?.user_role && (
-                    <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full capitalize">
-                      {scheduleData.user_role}
-                    </span>
+        <div className="flex-1 overflow-y-auto p-6">
+          <div className="grid grid-cols-1 gap-6 pt-8">
+            <Card>
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-gray-900 flex items-center gap-2">
+                    <FaGraduationCap className="text-blue-600" />
+                    {userRole === 'ADMIN' ? 'Session Management' : 'My Schedule'} ({formattedHeaderDate})
+                    {scheduleData?.user_role && (
+                      <span className="text-sm bg-blue-100 text-blue-800 px-2 py-1 rounded-full capitalize">
+                        {scheduleData.user_role}
+                      </span>
+                    )}
+                  </CardTitle>
+                  {userRole === 'ADMIN' && (
+                    <Button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-2">
+                      <FaPlus className="text-sm" />
+                      Tambah Session
+                    </Button>
                   )}
-                </CardTitle>
-                {userRole === 'ADMIN' && (
-                  <Button onClick={() => setIsAddModalOpen(true)} className="flex items-center gap-2">
-                    <FaPlus className="text-sm" />
-                    Tambah Session
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-col lg:flex-row gap-6">
-                <div className="flex-1">
-                  {loading ? (
-                    <div className="flex items-center justify-center py-12">
-                      <FaSpinner className="animate-spin text-blue-500 mr-2" />
-                      <span className="text-gray-600">Loading schedule...</span>
-                    </div>
-                  ) : error ? (
-                    <div className="text-center py-12">
-                      <div className="text-red-600 font-semibold mb-2">Error loading schedule</div>
-                      <div className="text-gray-600 mb-4">{error}</div>
-                      <Button onClick={() => fetchDateSchedule(selectedDate || new Date())}>Try Again</Button>
-                    </div>
-                  ) : dailySchedule.length > 0 ? (
-                    dailySchedule.map((item, index) => (
-                      <Card
-                        key={index}
-                        className={`mb-2 border border-gray-300 shadow-sm transition-all duration-200 ${
-                          item.course_code
-                            ? 'hover:shadow-lg hover:border-blue-300 cursor-pointer hover:bg-blue-50'
-                            : 'hover:shadow-md'
-                        }`}
-                        onClick={() => {
-                          if (item.course_code && item.id) {
-                            router.push(`/course/${item.course_code}?sessionId=${item.id}`);
-                          }
-                        }}
-                      >
-                        <CardContent className="p-4">
-                          <p className="text-sm font-bold text-gray-700 flex items-center gap-2 mb-2">
-                            <FaUser className="text-blue-500" /> {item.teacher}
-                          </p>
-
-                          <p className="text-sm  text-gray-600 flex items-center gap-2 mb-2">
-                            <FaClipboard className="text-green-500" /> {item.course_code}
-                          </p>
-
-                          <p className="text-sm text-gray-600 flex items-center gap-2 mb-2">
-                            <FaUserFriends className="text-green-500" /> {item.class_name}
-                          </p>
-
-                          <p className="text-sm text-gray-600 flex items-center gap-2 mb-2">
-                            <FaClock className="text-green-500" /> {item.time}
-                          </p>
-
-                          {item.session_title && (
-                            <p className="text-sm text-gray-800 font-medium mb-1">
-                              Session {item.session_number}: {item.session_title}
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col lg:flex-row gap-6">
+                  <div className="flex-1">
+                    {loading ? (
+                      <div className="flex items-center justify-center py-12">
+                        <FaSpinner className="animate-spin text-blue-500 mr-2" />
+                        <span className="text-gray-600">Loading schedule...</span>
+                      </div>
+                    ) : error ? (
+                      <div className="text-center py-12">
+                        <div className="text-red-600 font-semibold mb-2">Error loading schedule</div>
+                        <div className="text-gray-600 mb-4">{error}</div>
+                        <Button onClick={() => fetchDateSchedule(selectedDate || new Date())}>Try Again</Button>
+                      </div>
+                    ) : dailySchedule.length > 0 ? (
+                      dailySchedule.map((item, index) => (
+                        <Card
+                          key={index}
+                          className={`mb-2 border border-gray-300 shadow-sm transition-all duration-200 ${
+                            item.course_code
+                              ? 'hover:shadow-lg hover:border-blue-300 cursor-pointer hover:bg-blue-50'
+                              : 'hover:shadow-md'
+                          }`}
+                          onClick={() => {
+                            if (item.course_code && item.id) {
+                              router.push(`/course/${item.course_code}?sessionId=${item.id}`);
+                            }
+                          }}
+                        >
+                          <CardContent className="p-4">
+                            <p className="text-sm font-bold text-gray-700 flex items-center gap-2 mb-2">
+                              <FaUser className="text-blue-500" /> {item.teacher}
                             </p>
-                          )}
 
-                          {userRole === 'ADMIN' && (
-                            <div className="flex gap-2 mt-3">
-                              <Button size="sm" variant="outline" className="flex items-center gap-1">
-                                <FaEdit className="text-xs" />
-                                Edit
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="flex items-center gap-1 text-red-600 hover:text-red-700"
-                              >
-                                <FaTrash className="text-xs" />
-                                Hapus
-                              </Button>
-                            </div>
-                          )}
-                        </CardContent>
-                      </Card>
-                    ))
-                  ) : (
-                    <div className="text-gray-800 text-center lg:text-left py-12">
-                      <div className="font-semibold mb-2">
-                        {userRole === 'ADMIN' ? 'Belum ada session' : 'No scheduled activities'}
+                            <p className="text-sm  text-gray-600 flex items-center gap-2 mb-2">
+                              <FaClipboard className="text-green-500" /> {item.course_code}
+                            </p>
+
+                            <p className="text-sm text-gray-600 flex items-center gap-2 mb-2">
+                              <FaUserFriends className="text-green-500" /> {item.class_name}
+                            </p>
+
+                            <p className="text-sm text-gray-600 flex items-center gap-2 mb-2">
+                              <FaClock className="text-green-500" /> {item.time}
+                            </p>
+
+                            {item.session_title && (
+                              <p className="text-sm text-gray-800 font-medium mb-1">
+                                Session {item.session_number}: {item.session_title}
+                              </p>
+                            )}
+
+                            {userRole === 'ADMIN' && (
+                              <div className="flex gap-2 mt-3">
+                                <Button size="sm" variant="outline" className="flex items-center gap-1">
+                                  <FaEdit className="text-xs" />
+                                  Edit
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="flex items-center gap-1 text-red-600 hover:text-red-700"
+                                >
+                                  <FaTrash className="text-xs" />
+                                  Hapus
+                                </Button>
+                              </div>
+                            )}
+                          </CardContent>
+                        </Card>
+                      ))
+                    ) : (
+                      <div className="text-gray-800 text-center lg:text-left py-12">
+                        <div className="font-semibold mb-2">
+                          {userRole === 'ADMIN' ? 'Belum ada session' : 'No scheduled activities'}
+                        </div>
+                        <div className="text-gray-600">
+                          {userRole === 'ADMIN'
+                            ? 'Belum ada session yang dijadwalkan untuk tanggal ini'
+                            : `You don't have any scheduled activities for ${
+                                selectedDate ? format(selectedDate, 'MMM dd, yyyy') : 'this date'
+                              }`}
+                        </div>
                       </div>
-                      <div className="text-gray-600">
-                        {userRole === 'ADMIN'
-                          ? 'Belum ada session yang dijadwalkan untuk tanggal ini'
-                          : `You don't have any scheduled activities for ${
-                              selectedDate ? format(selectedDate, 'MMM dd, yyyy') : 'this date'
-                            }`}
-                      </div>
-                    </div>
-                  )}
+                    )}
+                  </div>
+                  <div className="flex justify-center lg:justify-end items-start">
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      month={currentMonth}
+                      onSelect={date => {
+                        console.log('Calendar date selected:', {
+                          selected: date?.toDateString(),
+                          formatted: formatDate(date),
+                        });
+                        handleDateSelect(date);
+                      }}
+                      onMonthChange={handleMonthChange}
+                      className="rounded-md border shadow-sm bg-white"
+                      captionLayout="dropdown"
+                      modifiers={{
+                        hasSchedule: datesWithSchedule,
+                      }}
+                      modifiersClassNames={{
+                        hasSchedule: 'has-schedule',
+                      }}
+                    />
+                  </div>
                 </div>
-                <div className="flex justify-center lg:justify-end items-start">
-                  <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    month={currentMonth}
-                    onSelect={date => {
-                      console.log('Calendar date selected:', {
-                        selected: date?.toDateString(),
-                        formatted: formatDate(date),
-                      });
-                      handleDateSelect(date);
-                    }}
-                    onMonthChange={handleMonthChange}
-                    className="rounded-md border shadow-sm bg-white"
-                    captionLayout="dropdown"
-                    modifiers={{
-                      hasSchedule: datesWithSchedule,
-                    }}
-                    modifiersClassNames={{
-                      hasSchedule: 'has-schedule',
-                    }}
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
 

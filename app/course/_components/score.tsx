@@ -572,9 +572,9 @@ export default function ScoreTab({ courseCode, className }: ScoreTabProps) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">Scores</h2>
-          <p className="text-gray-600">
+          {/* <p className="text-gray-600">
             {isTeacher ? 'View and manage student submission scores' : 'Track your assignment scores and performance'}
-          </p>
+          </p> */}
         </div>
 
         {/* View Toggle */}

@@ -18,15 +18,15 @@ export const EmptyState = ({ isTeacher, onCreateClick }: EmptyStateProps) => {
           ? 'Create your first assignment to get started with course assessments.'
           : "Your teacher hasn't published any assignments yet. Check back later!"}
       </p>
-      {isTeacher && onCreateClick && (
+      {/* {isTeacher && onCreateClick && (
         <button
           onClick={onCreateClick}
           className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
         >
           <FaPlus className="text-sm" />
-          Create Your First Assignment
+          Create Assignment
         </button>
-      )}
+      )} */}
     </div>
   );
 };

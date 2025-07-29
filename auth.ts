@@ -100,7 +100,8 @@ export const authOptions: NextAuthOptions = {
     maxAge: 24 * 60 * 60, // 24 hours
     updateAge: 60 * 60, // 1 hour
   },
-  secret: process.env.NEXTAUTH_SECRET,
+  secret: process.env.NEXTAUTH_SECRET || 'your-secret-key-here',
+  debug: process.env.NODE_ENV === 'development',
 };
 
 export default NextAuth(authOptions);

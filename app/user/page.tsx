@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { FaUsers, FaPlus, FaEdit, FaTrash, FaSpinner, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaUsers, FaPlus, FaEdit, FaTrash, FaSpinner, FaEye, FaEyeSlash, FaSearch } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Sidebar from '../_components/sidebar';
@@ -21,6 +21,13 @@ interface User {
   is_active: boolean;
   roles: string[];
   created_date: string;
+  class_info?: {
+    class_id: number;
+    class_name: string;
+    grade_level: string;
+    year_name: string;
+  };
+  kode_guru?: string;
 }
 
 interface Role {
@@ -28,6 +35,29 @@ interface Role {
   name: string;
   category: string;
 }
+
+// Toggle Switch Component
+const ToggleSwitch = ({ isActive, onToggle }: { isActive: boolean; onToggle: () => void }) => {
+  return (
+    <button
+      onClick={onToggle}
+      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+        isActive ? 'bg-blue-600' : 'bg-gray-200'
+      }`}
+    >
+      <span
+        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+          isActive ? 'translate-x-6' : 'translate-x-1'
+        }`}
+      />
+      <span className={`absolute left-1 text-xs font-medium ${
+        isActive ? 'text-white' : 'text-gray-500'
+      }`}>
+        {isActive ? 'ON' : 'OFF'}
+      </span>
+    </button>
+  );
+};
 
 const AddUserModal = ({ isOpen, onClose, onSave, initialData = null, isEditMode = false, classCourses = [] }: {
   isOpen: boolean;
@@ -433,8 +463,13 @@ const UserManagement = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editUserData, setEditUserData] = useState<User | null>(null);
   const [users, setUsers] = useState<User[]>([]);
+  const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [classCourses, setClassCourses] = useState<any[]>([]);
+  
+  // Filter states
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRole, setSelectedRole] = useState('all');
 
   const fetchData = async () => {
     setLoading(true);
@@ -443,6 +478,7 @@ const UserManagement = () => {
       if (userResponse.ok) {
         const userData = await userResponse.json();
         setUsers(userData.data.users);
+        setFilteredUsers(userData.data.users);
       }
 
       const classResponse = await fetch('/api/admin/classes');
@@ -470,6 +506,27 @@ const UserManagement = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Filter users based on search term and role
+  useEffect(() => {
+    let filtered = users;
+
+    // Filter by search term
+    if (searchTerm) {
+      filtered = filtered.filter(user =>
+        user.nama_lengkap.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Filter by role
+    if (selectedRole !== 'all') {
+      filtered = filtered.filter(user =>
+        user.roles.includes(selectedRole)
+      );
+    }
+
+    setFilteredUsers(filtered);
+  }, [users, searchTerm, selectedRole]);
 
   const handleEditClick = (user: any) => {
     console.log('handleEditClick called with user:', user);
@@ -544,6 +601,38 @@ const UserManagement = () => {
     setIsMobileOpen(true);
   };
 
+  const handleToggleStatus = async (userId: number, currentStatus: boolean) => {
+    try {
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          is_active: !currentStatus
+        }),
+      });
+
+      if (response.ok) {
+        // Update local state
+        setUsers(prevUsers => 
+          prevUsers.map(user => 
+            user.id === userId 
+              ? { ...user, is_active: !currentStatus }
+              : user
+          )
+        );
+        alert(`User berhasil ${!currentStatus ? 'diaktifkan' : 'dinonaktifkan'}!`);
+      } else {
+        const errorData = await response.json();
+        alert(`Error: ${errorData.message || errorData.error || 'Failed to update status'}`);
+      }
+    } catch (error) {
+      console.error('Error updating user status:', error);
+      alert('Error updating user status');
+    }
+  };
+
   return (
     <div className="flex max-h-screen">
       <Sidebar isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
@@ -569,12 +658,39 @@ const UserManagement = () => {
               </div>
             </CardHeader>
             <CardContent>
+              {/* Search and Filter Section */}
+              <div className="mb-6 flex flex-col sm:flex-row gap-4">
+                <div className="flex-1 relative">
+                  <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                  <Input
+                    type="text"
+                    placeholder="Cari berdasarkan nama..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <div className="w-full sm:w-48">
+                  <Select value={selectedRole} onValueChange={setSelectedRole}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Filter berdasarkan role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Semua Role</SelectItem>
+                      <SelectItem value="STUDENT">Student</SelectItem>
+                      <SelectItem value="TEACHER">Teacher</SelectItem>
+                      <SelectItem value="ADMIN">Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
               {loading ? (
                 <div className="flex items-center justify-center py-12">
                   <FaSpinner className="animate-spin text-blue-500 mr-2" />
                   <span className="text-gray-600">Loading users...</span>
                 </div>
-              ) : users.length > 0 ? (
+              ) : filteredUsers.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
@@ -583,12 +699,13 @@ const UserManagement = () => {
                         <th className="text-left p-3 border-b">Email</th>
                         <th className="text-left p-3 border-b">Username</th>
                         <th className="text-left p-3 border-b">Role</th>
+                        <th className="text-left p-3 border-b">Kelas/Kode</th>
                         <th className="text-left p-3 border-b">Status</th>
                         <th className="text-left p-3 border-b">Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {users.map((user) => (
+                      {filteredUsers.map((user) => (
                         <tr key={user.id} className="border-b hover:bg-gray-50">
                           <td className="p-3">{user.nama_lengkap}</td>
                           <td className="p-3">{user.email}</td>
@@ -606,15 +723,23 @@ const UserManagement = () => {
                             </div>
                           </td>
                           <td className="p-3">
-                            <span
-                              className={`text-xs px-2 py-1 rounded-full ${
-                                user.is_active
-                                  ? 'bg-green-100 text-green-800'
-                                  : 'bg-red-100 text-red-800'
-                              }`}
-                            >
-                              {user.is_active ? 'Active' : 'Inactive'}
-                            </span>
+                            {user.roles.includes('STUDENT') && user.class_info ? (
+                              <span className="text-sm text-gray-700">
+                                {user.class_info.class_name} - {user.class_info.grade_level} ({user.class_info.year_name})
+                              </span>
+                            ) : user.roles.includes('TEACHER') && user.kode_guru ? (
+                              <span className="text-sm text-gray-700">
+                                {user.kode_guru}
+                              </span>
+                            ) : (
+                              <span className="text-sm text-gray-400">-</span>
+                            )}
+                          </td>
+                          <td className="p-3">
+                            <ToggleSwitch
+                              isActive={user.is_active}
+                              onToggle={() => handleToggleStatus(user.id, user.is_active)}
+                            />
                           </td>
                           <td className="p-3">
                             <div className="flex gap-2">
@@ -644,10 +769,17 @@ const UserManagement = () => {
                 </div>
               ) : (
                 <div className="text-center py-12">
-                  <div className="text-gray-600 mb-4">Belum ada user</div>
-                  <Button onClick={() => setIsAddModalOpen(true)}>
-                    Tambah User Pertama
-                  </Button>
+                  <div className="text-gray-600 mb-4">
+                    {searchTerm || selectedRole !== 'all' 
+                      ? 'Tidak ada user yang sesuai dengan filter' 
+                      : 'Belum ada user'
+                    }
+                  </div>
+                  {!searchTerm && selectedRole === 'all' && (
+                    <Button onClick={() => setIsAddModalOpen(true)}>
+                      Tambah User Pertama
+                    </Button>
+                  )}
                 </div>
               )}
             </CardContent>

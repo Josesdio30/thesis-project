@@ -10,14 +10,17 @@ import Forum from '../_components/forum';
 import Session from '../_components/session';
 import People from '../_components/people';
 import SimpleEditor from '../_components/syllabus';
+import AssignmentTab from '../_components/assignment';
+import ScoreTab from '../_components/score';
 
 const CourseDetail = () => {
   const params = useParams();
   const searchParams = useSearchParams();
   const code = typeof params === 'object' && 'code' in params ? params['code'] : null;
 
-  // Get sessionId from URL search params
+  // Get sessionId and tab from URL search params
   const sessionIdParam = searchParams.get('sessionId');
+  const tabParam = searchParams.get('tab');
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('Session');
@@ -33,7 +36,6 @@ const CourseDetail = () => {
         const courseData = data.data || null;
         setCourse(courseData);
 
-        // Set active session logic - URL parameter takes priority
         if (sessionIdParam) {
           const sessionId = parseInt(sessionIdParam);
           if (!isNaN(sessionId)) {
@@ -44,6 +46,11 @@ const CourseDetail = () => {
           // Default to first session if no URL parameter
           const firstSession = courseData.class_courses[0].sessions[0];
           setActiveSession(firstSession.id);
+        }
+
+        // Set active tab from URL parameter
+        if (tabParam && ['Session', 'Syllabus', 'Assignment', 'Forum', 'Scoring', 'People'].includes(tabParam)) {
+          setActiveTab(tabParam);
         }
       } catch (err) {
         setCourse(null);
@@ -144,6 +151,8 @@ const CourseDetail = () => {
                   className={`px-6 py-3 text-gray-700 font-semibold text-base whitespace-nowrap ${
                     activeTab === tab ? 'border-b-4 border-blue-500 text-blue-500' : 'hover:text-blue-500'
                   }`}
+                  data-testid={`tab-${tab.toLowerCase()}`}
+                  id={`tab-${tab.toLowerCase()}`}
                 >
                   {tab}
                 </button>
@@ -168,8 +177,18 @@ const CourseDetail = () => {
                 <Forum courseCode={code as string} sessions={sessions} />
               </div>
             )}
+            {activeTab === 'Assignment' && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <AssignmentTab courseCode={code as string} sessionId={activeSession} />
+              </div>
+            )}
+            {activeTab === 'Scoring' && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <ScoreTab courseCode={code as string} className={course?.class_courses?.[0]?.classes?.class_name} />
+              </div>
+            )}
             {activeTab === 'People' && <People courseCode={code as string} />}
-            {activeTab !== 'Session' && activeTab !== 'Syllabus' && activeTab !== 'Forum' && activeTab !== 'People' && (
+            {!['Session', 'Syllabus', 'Forum', 'Assignment', 'Scoring', 'People'].includes(activeTab) && (
               <div>
                 <p className="text-gray-700">Content for {activeTab} will be added here.</p>
               </div>

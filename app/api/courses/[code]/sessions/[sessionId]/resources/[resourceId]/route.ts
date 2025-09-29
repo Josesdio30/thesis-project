@@ -3,13 +3,16 @@ import { prisma } from '@/lib/prisma';
 import { unlink } from 'fs/promises';
 import path from 'path';
 
+interface RouteParams {
+  code: string;
+  sessionId: string;
+  resourceId: string;
+}
+
 // GET - Get individual resource
-export async function GET(
-  request: NextRequest,
-  context: any
-) {
+export async function GET(request: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
-    const { resourceId } = context.params;
+    const { resourceId } = await params;
     const resourceIdNum = parseInt(resourceId);
 
     const resource = await prisma.resources.findUnique({
@@ -66,20 +69,11 @@ export async function GET(
 }
 
 // DELETE - Delete resource
-export async function DELETE(
-  request: NextRequest,
-  context: any
-) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
-    const { code, sessionId, resourceId } = context.params;
+    const { code, sessionId, resourceId } = await params;
     const resourceIdNum = parseInt(resourceId);
     const sessionIdNum = parseInt(sessionId);
-
-    console.log('=== RESOURCE DELETE REQUEST ===');
-    console.log('Course Code:', code);
-    console.log('Session ID:', sessionId);
-    console.log('Resource ID:', resourceId);
-    console.log('===============================');
 
     const existingResource = await prisma.resources.findFirst({
       where: {

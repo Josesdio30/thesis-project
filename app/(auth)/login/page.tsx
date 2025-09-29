@@ -59,6 +59,10 @@ export default function LoginPage() {
               value={username}
               onChange={e => setUsername(e.target.value)}
               className="w-full border-gray-300 rounded-md"
+              data-testid="username-input"
+              name="username"
+              id="username-field"
+              autoComplete="username"
               required
             />
           </div>
@@ -69,6 +73,10 @@ export default function LoginPage() {
               value={password}
               onChange={e => setPassword(e.target.value)}
               className="w-full border-gray-300 rounded-md"
+              data-testid="password-input"
+              name="password"
+              id="password-field"
+              autoComplete="current-password"
               required
             />
           </div>
@@ -76,6 +84,8 @@ export default function LoginPage() {
             type="submit"
             disabled={isLoading}
             className="w-full bg-orange-400 hover:bg-orange-600 text-white rounded-full"
+            data-testid="login-button"
+            id="login-submit"
           >
             {isLoading ? 'Signing in...' : 'Login'}
           </Button>

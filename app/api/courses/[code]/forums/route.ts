@@ -10,11 +10,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const { searchParams } = new URL(request.url);
     const sessionId = searchParams.get('sessionId');
 
-    console.log('=== FORUM FETCH REQUEST ===');
-    console.log('Course Code:', code);
-    console.log('Session ID:', sessionId);
-    console.log('===========================');
-
     // Validate session ID if provided
     if (sessionId && isNaN(parseInt(sessionId))) {
       return NextResponse.json(

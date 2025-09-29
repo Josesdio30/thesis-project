@@ -4,15 +4,15 @@ import { checkDatabaseHealth } from '@/lib/db-utils';
 
 export async function GET() {
   try {
-    console.log('🔍 Running comprehensive database test...\n');
+    console.log('Running comprehensive database test...\n');
 
     // Test 1: Health check
     const health = await checkDatabaseHealth();
-    console.log('1. Health check:', health.connected ? '✅' : '❌');
+    console.log('1. Health check:', health.connected ? 'good' : 'bad');
 
     // Test 2: Basic query
     const basicQuery = await query('SELECT NOW() as current_time, current_database(), current_user');
-    console.log('2. Basic query: ✅');
+    console.log('2. Basic query: ');
     console.log('   Current time:', basicQuery.rows[0].current_time);
     console.log('   Database:', basicQuery.rows[0].current_database);
     console.log('   User:', basicQuery.rows[0].current_user);
@@ -62,7 +62,7 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('❌ Database test failed:', error);
+    console.error('Database test failed:', error);
     return NextResponse.json({
       status: 'error',
       message: 'Database test failed',

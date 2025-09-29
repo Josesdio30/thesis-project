@@ -1,12 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/auth';
 
-// GET /api/courses/[code]/people?type=teacher|students
+// GET /api/courses/[code]/people?type=teacher|students&classId=123
 export async function GET(request: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Unauthorized',
+          message: 'Authentication required',
+        },
+        { status: 401 }
+      );
+    }
+
     const { code } = await params;
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type') || 'all';
+    const classId = searchParams.get('classId');
 
     const course = await prisma.courses.findUnique({
       where: {
@@ -30,14 +45,44 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       );
     }
 
+    // Determine which class_course to get people from
+    let classCourseQuery: any = {
+      courses: {
+        course_code: code,
+      },
+    };
+
+    // If classId is provided, use it specifically
+    if (classId) {
+      classCourseQuery.class_id = parseInt(classId);
+    } else {
+      // Otherwise, find the class_course where the current user is involved
+      const userId = parseInt(session.user.id);
+      const userRole = session.user.role;
+
+      if (userRole === 'teacher') {
+        // For teachers, find class_course where they are the teacher
+        classCourseQuery.teacher_id = userId;
+      } else if (userRole === 'student') {
+        // For students, find class_course where they are enrolled
+        classCourseQuery.enrollments = {
+          some: {
+            student_id: userId,
+          },
+        };
+      }
+    }
+
     // Get the class course to find teacher and students
     const classCourse = await prisma.class_courses.findFirst({
-      where: {
-        courses: {
-          course_code: code,
-        },
-      },
+      where: classCourseQuery,
       include: {
+        // Class information
+        classes: {
+          include: {
+            academic_years: true,
+          },
+        },
         // Teacher information
         app_user: {
           include: {
@@ -74,7 +119,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         {
           success: false,
           error: 'Class course not found',
-          message: 'No class course found for this course',
+          message: 'No class course found for this course and user context',
         },
         { status: 404 }
       );
@@ -131,6 +176,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     result.course = {
       course_code: course.course_code,
       course_name: course.course_name,
+    };
+
+    result.class_info = {
+      id: classCourse.id,
+      class_id: classCourse.class_id,
+      class_name: classCourse.classes?.class_name,
+      grade_level: classCourse.classes?.grade_level,
+      academic_year: classCourse.classes?.academic_years?.year_name,
     };
 
     return NextResponse.json({

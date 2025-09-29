@@ -1,5 +1,6 @@
 import { prisma } from './prisma';
-import type { Prisma } from './generated/prisma';
+// import type { Prisma } from './generated/prisma';
+import type { Prisma } from '@prisma/client';
 
 // User operations
 export const userService = {

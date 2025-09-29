@@ -44,12 +44,12 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
       {/* Right side - Notification */}
       <div className="flex items-center space-x-6 relative">
         <div className="relative">
-          <Bell className="w-6 h-6 text-gray-600 cursor-pointer" onClick={() => setShowNotif(!showNotif)} />
+          {/* <Bell className="w-6 h-6 text-gray-600 cursor-pointer" onClick={() => setShowNotif(!showNotif)} />
           {notifications.length > 0 && (
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
               {notifications.length}
             </span>
-          )}
+          )} */}
 
           {/* Notification Popup */}
           {showNotif && (

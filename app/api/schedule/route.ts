@@ -96,11 +96,13 @@ export async function GET(request: NextRequest) {
     const isTeacher =
       userDetails.teacher_details !== null ||
       userDetails.app_user_role?.some(role => role.enumeration?.name === 'TEACHER' && role.is_active);
+    const isAdmin = userDetails.app_user_role?.some(role => role.enumeration?.name === 'ADMIN' && role.is_active);
 
     console.log('Role Determination:', {
       isStudent,
       isTeacher,
-      finalRole: isStudent ? 'student' : isTeacher ? 'teacher' : 'admin',
+      isAdmin,
+      finalRole: isStudent ? 'student' : isTeacher ? 'teacher' : isAdmin ? 'ADMIN' : 'admin',
     });
 
     if (isStudent) {
@@ -163,6 +165,30 @@ export async function GET(request: NextRequest) {
       });
 
       sessions = teacherCourses.flatMap(course => course.sessions || []);
+    } else if (isAdmin) {
+      // Admin can see all sessions
+      const allSessions = await prisma.sessions.findMany({
+        where: whereClause,
+        include: {
+          class_courses: {
+            include: {
+              courses: true,
+              classes: true,
+              app_user: {
+                include: {
+                  user_profile: true,
+                  teacher_details: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          start_time: 'asc',
+        },
+      });
+
+      sessions = allSessions;
     }
     const scheduleData = sessions.map(session => ({
       id: session.id,
@@ -262,6 +288,28 @@ export async function GET(request: NextRequest) {
         },
       });
       allSessions = allTeacherCourses.flatMap(course => course.sessions || []);
+    } else if (isAdmin) {
+      // Admin can see all sessions for calendar dots
+      allSessions = await prisma.sessions.findMany({
+        where: monthWhereClause,
+        include: {
+          class_courses: {
+            include: {
+              courses: true,
+              classes: true,
+              app_user: {
+                include: {
+                  user_profile: true,
+                  teacher_details: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          start_time: 'asc',
+        },
+      });
     }
     const uniqueDates = new Set(allSessions.map(session => format(new Date(session.start_time), 'yyyy-MM-dd')));
     allDatesWithSchedule = Array.from(uniqueDates);
@@ -293,7 +341,7 @@ export async function GET(request: NextRequest) {
         data: {
           schedule: groupedSchedule,
           dates_with_schedule: allDatesWithSchedule,
-          user_role: isStudent ? 'student' : isTeacher ? 'teacher' : 'admin',
+          user_role: isStudent ? 'student' : isTeacher ? 'teacher' : 'ADMIN',
         },
       });
     }
@@ -304,7 +352,7 @@ export async function GET(request: NextRequest) {
         schedule: scheduleData,
         date: dateParam,
         dates_with_schedule: allDatesWithSchedule,
-        user_role: isStudent ? 'student' : isTeacher ? 'teacher' : 'admin',
+        user_role: isStudent ? 'student' : isTeacher ? 'teacher' : 'ADMIN',
       },
     });
   } catch (error) {

@@ -59,7 +59,7 @@ export async function checkDatabaseHealth(): Promise<{
   timestamp: string;
 }> {
   try {
-    const result = await withDatabase(async (client) => {
+    const result = await withDatabase(async client => {
       const res = await client.query('SELECT NOW() as current_time, version() as pg_version');
       return res.rows[0];
     });

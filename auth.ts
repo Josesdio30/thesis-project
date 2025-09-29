@@ -50,7 +50,6 @@ export const authOptions: NextAuthOptions = {
                 SET last_login = CURRENT_TIMESTAMP, updated_date = CURRENT_TIMESTAMP 
                 WHERE id = ${user.id}
             `;
-
             return {
               id: user.id.toString(),
               name: user.nama_lengkap,

@@ -151,6 +151,8 @@ const CourseDetail = () => {
                   className={`px-6 py-3 text-gray-700 font-semibold text-base whitespace-nowrap ${
                     activeTab === tab ? 'border-b-4 border-blue-500 text-blue-500' : 'hover:text-blue-500'
                   }`}
+                  data-testid={`tab-${tab.toLowerCase()}`}
+                  id={`tab-${tab.toLowerCase()}`}
                 >
                   {tab}
                 </button>

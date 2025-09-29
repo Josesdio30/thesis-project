@@ -185,6 +185,8 @@ const SessionSelector = ({
           <button
             key={session.id}
             onClick={() => setActiveSession(session.id)}
+            data-testid={`session-btn-${session.session_number}`}
+            id={`session-btn-${session.session_number}`}
             className={cn(
               'px-4 py-2 rounded-lg border transition-all duration-200 whitespace-nowrap flex-shrink-0',
               activeSession === session.id
@@ -203,6 +205,8 @@ const SessionSelector = ({
             <button
               ref={dropdownButtonRef}
               onClick={() => setDropdownOpen(!dropdownOpen)}
+              data-testid="session-dropdown-btn"
+              id="session-dropdown-btn"
               className={cn(
                 'px-3 py-2 rounded-lg border transition-all duration-200 flex items-center gap-2',
                 dropdownOpen
@@ -229,6 +233,8 @@ const SessionSelector = ({
                       setActiveSession(session.id);
                       setDropdownOpen(false);
                     }}
+                    data-testid={`session-dropdown-item-${session.session_number}`}
+                    id={`session-dropdown-item-${session.session_number}`}
                     className={cn(
                       'w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0',
                       activeSession === session.id && 'bg-blue-50 text-blue-700'
@@ -331,7 +337,9 @@ const SessionContent = ({
     </CardHeader>
     <CardContent>
       {/* Materials Section - Now using dedicated Materials component */}
-      <Materials sessionId={session.id} courseCode={courseCode} className="mb-6" />
+      <div data-testid="materials-section" id="session-materials">
+        <Materials sessionId={session.id} courseCode={courseCode} className="mb-6" />
+      </div>
 
       {/* Session Time */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -451,6 +459,8 @@ const ActionsSidebar = ({
               sessionResources.map((resource, index) => (
                 <div
                   key={resource.id || index}
+                  data-testid={`resource-item-${resource.id || index}`}
+                  id={`resource-item-${resource.id || index}`}
                   className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors group"
                 >
                   <span className="text-lg">{getResourceIcon(resource.file_type)}</span>
@@ -460,6 +470,8 @@ const ActionsSidebar = ({
                       href={resource.file_url}
                       target="_blank"
                       rel="noopener noreferrer"
+                      data-testid={`resource-link-${resource.id || index}`}
+                      id={`resource-link-${resource.id || index}`}
                       className="text-sm text-gray-700 truncate block font-medium hover:text-blue-600 transition-colors"
                     >
                       {resource.file_tittle}
@@ -488,6 +500,8 @@ const ActionsSidebar = ({
                       href={resource.file_url}
                       target="_blank"
                       rel="noopener noreferrer"
+                      data-testid={`resource-open-btn-${resource.id || index}`}
+                      id={`resource-open-btn-${resource.id || index}`}
                       className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
                       title="Open resource"
                     >
@@ -501,6 +515,8 @@ const ActionsSidebar = ({
                           onClick={() =>
                             setResourceMenuOpen(resourceMenuOpen === resource.id ? null : resource.id || null)
                           }
+                          data-testid={`resource-menu-btn-${resource.id || index}`}
+                          id={`resource-menu-btn-${resource.id || index}`}
                           className="p-1 text-gray-400 hover:text-gray-600 transition-colors opacity-0 group-hover:opacity-100"
                           title="Resource actions"
                         >
@@ -510,6 +526,8 @@ const ActionsSidebar = ({
                           <div className="absolute right-0 top-6 z-10 bg-white border border-gray-200 rounded-md shadow-lg py-1 min-w-[120px]">
                             <button
                               onClick={() => handleDeleteClick(resource)}
+                              data-testid={`resource-delete-btn-${resource.id || index}`}
+                              id={`resource-delete-btn-${resource.id || index}`}
                               className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 w-full text-left transition-colors"
                             >
                               <FaTrash className="text-xs" />
@@ -536,6 +554,8 @@ const ActionsSidebar = ({
             <div className="relative flex justify-center">
               <button
                 onClick={() => setIsFabOpen(!isFabOpen)}
+                data-testid="add-resource-fab"
+                id="add-resource-fab"
                 className={cn(
                   'w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-blue-600 transition-all duration-300',
                   isFabOpen && 'rotate-45'
@@ -548,6 +568,8 @@ const ActionsSidebar = ({
               <div className="absolute top-16 flex flex-col items-center space-y-3">
                 <button
                   onClick={onAddFile}
+                  data-testid="add-file-btn"
+                  id="add-file-btn"
                   className={cn(
                     'flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-full shadow-md hover:bg-gray-100 transition-all duration-300',
                     isFabOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
@@ -560,6 +582,8 @@ const ActionsSidebar = ({
 
                 <button
                   onClick={onAddVideo}
+                  data-testid="add-video-btn"
+                  id="add-video-btn"
                   className={cn(
                     'flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-full shadow-md hover:bg-gray-100 transition-all duration-300',
                     isFabOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
@@ -572,6 +596,8 @@ const ActionsSidebar = ({
 
                 <button
                   onClick={onAddLink}
+                  data-testid="add-link-btn"
+                  id="add-link-btn"
                   className={cn(
                     'flex items-center gap-2 px-4 py-2 bg-white text-gray-800 rounded-full shadow-md hover:bg-gray-100 transition-all duration-300',
                     isFabOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4 pointer-events-none'
@@ -671,10 +697,10 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode }: Sess
 
     setIsDeleting(true);
     try {
-      console.log('=== RESOURCE DELETE STARTED ===');
-      console.log('Course Code:', courseCode);
-      console.log('Session ID:', activeSession);
-      console.log('Resource ID:', selectedResource.id);
+      // console.log('=== RESOURCE DELETE STARTED ===');
+      // console.log('Course Code:', courseCode);
+      // console.log('Session ID:', activeSession);
+      // console.log('Resource ID:', selectedResource.id);
 
       const response = await fetch(
         `/api/courses/${courseCode}/sessions/${activeSession}/resources/${selectedResource.id}`,
@@ -684,10 +710,10 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode }: Sess
       );
 
       const result = await response.json();
-      console.log('Delete response:', result);
+      // console.log('Delete response:', result);
 
       if (response.ok && result.success) {
-        console.log('✅ Resource deleted successfully');
+        // console.log('Resource deleted successfully');
         success(
           'Resource deleted',
           `${selectedResource.file_tittle || selectedResource.file_name} has been successfully deleted`
@@ -696,7 +722,7 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode }: Sess
         setSelectedResource(null);
         fetchResources(); // Refresh the resources list
       } else {
-        console.error('❌ Failed to delete resource:', result);
+        // console.error('Failed to delete resource:', result);
         error('Delete failed', result.error || result.message || 'Unknown error occurred');
       }
     } catch (err) {

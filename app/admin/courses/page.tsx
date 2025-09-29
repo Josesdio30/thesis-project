@@ -239,7 +239,7 @@ const CourseManagement = () => {
           )}
         </div>
       </div>
-    )}
+    )
 
     {/* Add Course Modal */}
     {showAddModal && (

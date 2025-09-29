@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../lib/generated/prisma"
+  // output   = "../lib/generated/prisma" // commented because causing build issues on Vercel or windows os
 }
 
 datasource db {

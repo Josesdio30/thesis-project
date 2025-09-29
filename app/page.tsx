@@ -4,7 +4,8 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
-export function useAuthGuard() {
+// export function useAuthGuard() {
+function useAuthGuard() {
   const { status } = useSession();
   const router = useRouter();
 

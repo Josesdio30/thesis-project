@@ -10,9 +10,9 @@ interface RouteParams {
 }
 
 // GET - Get individual resource
-export async function GET(request: NextRequest, { params }: { params: RouteParams }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
-    const { resourceId } = params;
+    const { resourceId } = await params;
     const resourceIdNum = parseInt(resourceId);
 
     const resource = await prisma.resources.findUnique({
@@ -69,17 +69,11 @@ export async function GET(request: NextRequest, { params }: { params: RouteParam
 }
 
 // DELETE - Delete resource
-export async function DELETE(request: NextRequest, { params }: { params: RouteParams }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<RouteParams> }) {
   try {
-    const { code, sessionId, resourceId } = params;
+    const { code, sessionId, resourceId } = await params;
     const resourceIdNum = parseInt(resourceId);
     const sessionIdNum = parseInt(sessionId);
-
-    console.log('=== RESOURCE DELETE REQUEST ===');
-    console.log('Course Code:', code);
-    console.log('Session ID:', sessionId);
-    console.log('Resource ID:', resourceId);
-    console.log('===============================');
 
     const existingResource = await prisma.resources.findFirst({
       where: {

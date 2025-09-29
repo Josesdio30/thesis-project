@@ -472,8 +472,8 @@ const UserManagement = () => {
   }, []);
 
   const handleEditClick = (user: any) => {
-    console.log('handleEditClick called with user:', user);
-    console.log('classCourses:', classCourses);
+    // console.log('handleEditClick called with user:', user);
+    // console.log('classCourses:', classCourses);
 
     let classId = '';
     if (user.class_info && user.class_info.class_id) {
@@ -487,7 +487,7 @@ const UserManagement = () => {
       class_id: classId,
     };
 
-    console.log('Setting editUserData:', updatedUserData);
+    // console.log('Setting editUserData:', updatedUserData);
     setEditUserData(updatedUserData);
     setIsEditModalOpen(true);
   };

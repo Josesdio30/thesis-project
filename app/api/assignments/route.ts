@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       role => role.enumeration?.name === 'ADMIN' && role.is_active
     );
 
-    let assignments;
+    let assignments: any[] = [];
 
     if (isStudent) {
       // For students, get assignments from their enrolled courses

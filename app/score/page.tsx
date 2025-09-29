@@ -100,7 +100,7 @@ export default function ScorePage() {
       }
 
       const data = await response.json();
-      console.log('Fetched scores data:', data);
+      // console.log('Fetched scores data:', data);
       const fetchedSubmissions = data.data || [];
 
       setSubmissions(fetchedSubmissions);
@@ -380,7 +380,7 @@ export default function ScorePage() {
                   </Card>
                   <Card>
                     <CardContent className="p-4 text-center">
-                      <p className="text-2xl font-bold text-purple-600">{stats.overallPercentage}%</p>
+                      <p className="text-2xl font-bold text-purple-600">{stats.overallPercentage}</p>
                       <p className="text-xs text-gray-500">Overall</p>
                     </CardContent>
                   </Card>
@@ -547,8 +547,14 @@ export default function ScorePage() {
                   <CardHeader className="pb-3">
                     <div className="flex justify-between items-start">
                       <div>
-                        <CardTitle className="text-lg font-semibold text-gray-800">{courseScore.course_code}</CardTitle>
-                        <p className="text-sm text-gray-600 mt-1">{courseScore.course_name}</p>
+                        <CardTitle className="text-lg font-semibold text-gray-800">
+                          {courseScore.course_name}
+                          {/* {courseScore.course_code} */}
+                        </CardTitle>
+                        <p className="text-sm text-gray-600 mt-1">
+                          {/* {courseScore.course_name} */}
+                          {courseScore.course_code}
+                        </p>
                         <Badge variant="outline" className="mt-2">
                           {courseScore.class_name}
                         </Badge>
@@ -571,7 +577,7 @@ export default function ScorePage() {
                         </p>
                         <p className="text-xs text-gray-500">Avg Score</p>
                       </div>
-                      {!isTeacher && (
+                      {/* {!isTeacher && (
                         <div className="text-center col-span-2">
                           <p className="text-2xl font-bold text-purple-600">
                             {courseScore.totalPossiblePoints > 0
@@ -581,7 +587,7 @@ export default function ScorePage() {
                           </p>
                           <p className="text-xs text-gray-500">Overall Percentage</p>
                         </div>
-                      )}
+                      )} */}
                     </div>
 
                     {/* Recent Submissions */}

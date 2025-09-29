@@ -147,19 +147,11 @@ const ForumSessionSelector = ({
   return (
     <div className="mb-4" ref={containerRef}>
       <div className="flex items-center gap-3 flex-wrap" style={{ minHeight: '48px' }}>
-        {/* <span className="text-sm text-gray-600 font-medium">Session:</span> */}
-        {/* Visible session buttons */}
         {visibleSessions.map(session => (
           <button
             key={session.id}
             onClick={() => {
-              // console.log('=== FORUM SESSION CLICK ===');
-              // console.log('Clicked session ID:', session.id);
-              // console.log('Clicked session number:', session.session_number);
-              // console.log('Current session before click:', activeSession);
               setActiveSession(session.id);
-              // console.log('setActiveSession called with:', session.id);
-              // console.log('===========================');
             }}
             className={cn(
               'px-4 py-2 rounded-lg border transition-all duration-200 whitespace-nowrap flex-shrink-0',
@@ -197,14 +189,8 @@ const ForumSessionSelector = ({
                   <button
                     key={session.id}
                     onClick={() => {
-                      console.log('=== FORUM DROPDOWN SESSION CLICK ===');
-                      console.log('Clicked dropdown session ID:', session.id);
-                      console.log('Clicked dropdown session number:', session.session_number);
-                      console.log('Current session before click:', activeSession);
                       setActiveSession(session.id);
                       setDropdownOpen(false);
-                      console.log('setActiveSession called with:', session.id);
-                      console.log('===================================');
                     }}
                     className={cn(
                       'w-full px-4 py-3 text-left hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-b-0',
@@ -230,9 +216,8 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
   const [replies, setReplies] = useState<ForumReply[]>([]);
   const [forum, setForum] = useState<{ id: number; title: string; description?: string } | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null); // Internal session management - simplified initialization
+  const [error, setError] = useState<string | null>(null);
   const [currentSessionId, setCurrentSessionId] = useState<number | null>(() => {
-    // Use first available session
     if (sessions && sessions.length > 0) {
       console.log('Forum initializing with first session:', sessions[0].id);
       return sessions[0].id;
@@ -240,28 +225,12 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
     console.log('Forum initializing with null session');
     return null;
   });
-  // Wrap setCurrentSessionId to add debugging
   const setCurrentSessionIdWithDebug = useCallback(
     (newSessionId: number) => {
-      // console.log('=== FORUM SESSION CHANGE ===');
-      // console.log('Previous session ID:', currentSessionId);
-      // console.log('New session ID:', newSessionId);
-      // console.log('============================');
       setCurrentSessionId(newSessionId);
     },
     [currentSessionId]
   );
-
-  // Debug session changes
-  // useEffect(() => {
-  //   console.log('=== FORUM SESSION DEBUG ===');
-  //   console.log('Current Session ID:', currentSessionId);
-  //   console.log(
-  //     'Available Sessions:',
-  //     sessions?.map(s => ({ id: s.id, number: s.session_number }))
-  //   );
-  //   console.log('===========================');
-  // }, [currentSessionId, sessions]);
 
   // Form states
   const [showNewPostForm, setShowNewPostForm] = useState(false);
@@ -351,11 +320,6 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
       return;
     }
 
-    // console.log('=== FETCHING FORUM ===');
-    // console.log('Course Code:', courseCode);
-    // console.log('Current Session ID:', currentSessionId);
-    // console.log('======================');
-
     try {
       setLoading(true);
       setError(null);
@@ -364,16 +328,12 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
       const forumResponse = await fetch(`/api/courses/${courseCode}/forums?sessionId=${currentSessionId}`);
       const forumResult = await forumResponse.json();
 
-      // console.log('Forum API Response:', forumResult);
-
       if (forumResult.success) {
         setForum(forumResult.data.forum);
 
         // Get posts for this forum
         const postsResponse = await fetch(`/api/courses/${courseCode}/forums/${forumResult.data.forum.id}/posts`);
         const postsResult = await postsResponse.json();
-
-        // console.log('Posts API Response:', postsResult);
 
         if (postsResult.success) {
           setPosts(postsResult.data.posts || []);
@@ -579,6 +539,8 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
             <button
               onClick={() => setShowNewPostForm(!showNewPostForm)}
               className="flex items-center gap-2 px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+              data-testid="new-post-button"
+              id="new-post-btn"
             >
               <Plus size={16} />
               New Post
@@ -603,7 +565,11 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
         )}
         {/* New Post Form */}
         {showNewPostForm && (
-          <div className="m-4 p-4 bg-white border border-gray-300 rounded-lg">
+          <div 
+            className="m-4 p-4 bg-white border border-gray-300 rounded-lg"
+            data-testid="forum-new-post-form"
+            id="forum-new-post-form"
+          >
             <h3 className="text-md font-semibold text-gray-800 mb-3">Create New Post</h3>
             <div className="space-y-3">
               <input
@@ -612,6 +578,9 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
                 onChange={e => setNewPostTitle(e.target.value)}
                 placeholder="Post title..."
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                data-testid="forum-post-title-input"
+                id="forum-post-title"
+                name="postTitle"
               />{' '}
               <textarea
                 value={newPostContent}
@@ -619,6 +588,9 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
                 placeholder="Write your post content..."
                 rows={4}
                 className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                data-testid="forum-post-content-textarea"
+                id="forum-post-content"
+                name="postContent"
               />
               {/* File attachments preview */}
               {postAttachments.length > 0 && (
@@ -666,6 +638,8 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
                   <button
                     onClick={() => setShowNewPostForm(false)}
                     className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
+                    data-testid="forum-cancel-button"
+                    id="forum-cancel-btn"
                   >
                     Cancel
                   </button>{' '}
@@ -673,6 +647,8 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
                     onClick={handleCreatePost}
                     disabled={loading || !newPostTitle.trim() || !newPostContent.trim() || !user?.id}
                     className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    data-testid="forum-post-button"
+                    id="forum-post-btn"
                   >
                     <Send size={16} />
                     Post
@@ -709,6 +685,8 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
                     className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${
                       selectedPost?.id === post.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
                     }`}
+                    data-testid={`forum-post-${post.id}`}
+                    id={`forum-post-item-${post.id}`}
                   >
                     <h4 className="font-medium text-gray-800 mb-1">{post.title}</h4>
                     <p className="text-sm text-gray-600 mb-2 line-clamp-2">{post.content}</p>
@@ -869,11 +847,16 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
                       placeholder="Write a reply..."
                       rows={2}
                       className="flex-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                      data-testid="forum-reply-textarea"
+                      id="forum-reply-input"
+                      name="replyContent"
                     />
                     <button
                       onClick={() => handleCreateReply(selectedPost.id)}
                       disabled={loading || !newReplyContent.trim() || !user?.id || uploading}
                       className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                      data-testid="forum-reply-submit-button"
+                      id="forum-reply-submit-btn"
                     >
                       <Send size={16} />
                     </button>

@@ -484,10 +484,10 @@ const Schedule = () => {
                       selected={selectedDate}
                       month={currentMonth}
                       onSelect={date => {
-                        console.log('Calendar date selected:', {
-                          selected: date?.toDateString(),
-                          formatted: formatDate(date),
-                        });
+                        // console.log('Calendar date selected:', {
+                        //   selected: date?.toDateString(),
+                        //   formatted: formatDate(date),
+                        // });
                         handleDateSelect(date);
                       }}
                       onMonthChange={handleMonthChange}

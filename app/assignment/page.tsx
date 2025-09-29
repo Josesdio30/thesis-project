@@ -125,7 +125,7 @@ export default function AssignmentPage() {
 
       // Get courses for the user based on their role
       const queryParam = isTeacher ? `teacherId=${currentUserId}` : `studentId=${currentUserId}`;
-      console.log('Fetching courses with:', queryParam, { isTeacher, currentUserId });
+      // console.log('Fetching courses with:', queryParam, { isTeacher, currentUserId });
 
       const coursesResponse = await fetch(`/api/courses?${queryParam}`);
       if (!coursesResponse.ok) {
@@ -133,7 +133,7 @@ export default function AssignmentPage() {
       }
 
       const coursesData = await coursesResponse.json();
-      console.log('Courses response:', coursesData);
+      // console.log('Courses response:', coursesData);
       const courses = coursesData.data || [];
 
       const allAssignments: Assignment[] = [];
@@ -141,7 +141,7 @@ export default function AssignmentPage() {
 
       // Fetch assignments for each course using the new efficient endpoint
       for (const course of courses) {
-        console.log('Processing course:', course);
+        // console.log('Processing course:', course);
 
         // Handle different data structures for teachers vs students
         let courseCode, courseName, className, courseDescription;
@@ -164,12 +164,12 @@ export default function AssignmentPage() {
 
         try {
           // Use the new single API call for all assignments in a course
-          console.log('Fetching assignments for course:', courseCode);
+          // console.log('Fetching assignments for course:', courseCode);
           const assignmentsResponse = await fetch(`/api/courses/${courseCode}/assignments`);
 
           if (assignmentsResponse.ok) {
             const assignmentsData = await assignmentsResponse.json();
-            console.log('Assignments response for', courseCode, ':', assignmentsData);
+            // console.log('Assignments response for', courseCode, ':', assignmentsData);
             const courseAssignments = (assignmentsData.data || []).map((assignment: any) => ({
               ...assignment,
               course_name: courseName,
@@ -206,8 +206,8 @@ export default function AssignmentPage() {
         }
       }
 
-      console.log('Final assignments:', allAssignments);
-      console.log('Final course assignment groups:', courseAssignmentGroups);
+      // console.log('Final assignments:', allAssignments);
+      // console.log('Final course assignment groups:', courseAssignmentGroups);
 
       setAssignments(allAssignments);
       setCourseAssignments(courseAssignmentGroups);

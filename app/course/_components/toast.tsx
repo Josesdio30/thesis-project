@@ -52,6 +52,8 @@ const ToastComponent = ({ toast, onRemove }: ToastProps) => {
   return (
     <div
       className={`flex items-start gap-3 p-4 rounded-lg border ${getBgColor()} shadow-lg transition-all duration-300 mb-2`}
+      data-testid={`toast-${toast.type}`}
+      id={`toast-${toast.id}`}
     >
       <div className="flex-shrink-0 mt-0.5">{getIcon()}</div>
       <div className="flex-1 min-w-0">
@@ -61,6 +63,9 @@ const ToastComponent = ({ toast, onRemove }: ToastProps) => {
       <button
         onClick={() => onRemove(toast.id)}
         className="flex-shrink-0 text-gray-400 hover:text-gray-600 transition-colors"
+        data-testid={`toast-close-${toast.id}`}
+        id={`toast-close-${toast.id}`}
+        aria-label="Close notification"
       >
         <FaTimes className="text-sm" />
       </button>
@@ -77,7 +82,11 @@ const ToastContainer = ({ toasts, onRemove }: ToastContainerProps) => {
   if (toasts.length === 0) return null;
 
   return (
-    <div className="fixed top-4 right-4 z-50 w-96 max-w-sm">
+    <div 
+      className="fixed top-4 right-4 z-50 w-96 max-w-sm"
+      data-testid="toast-container"
+      id="toast-notifications"
+    >
       {toasts.map(toast => (
         <ToastComponent key={toast.id} toast={toast} onRemove={onRemove} />
       ))}

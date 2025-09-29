@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@/lib/generated/prisma';
+// import { PrismaClient } from '@/lib/generated/prisma';
+import { PrismaClient } from '@prisma/client';
 import { SubmissionStatus } from '@/lib/enumeration-service';
 import { calculateAssignmentScore } from '@/lib/scoringUtils';
 
@@ -8,10 +9,10 @@ const prisma = new PrismaClient();
 // POST /api/courses/[code]/sessions/[sessionId]/assignments/[assignmentId]/submit
 export async function POST(
   request: NextRequest,
-  { params }: { params: { code: string; sessionId: string; assignmentId: string } }
+  { params }: { params: Promise<{ code: string; sessionId: string; assignmentId: string }> }
 ) {
   try {
-    const assignmentId = parseInt(params.assignmentId);
+    const assignmentId = parseInt((await params).assignmentId);
     if (isNaN(assignmentId)) {
       return NextResponse.json({ error: 'Invalid assignment ID' }, { status: 400 });
     }

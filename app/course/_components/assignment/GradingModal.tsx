@@ -82,11 +82,11 @@ export const GradingModal = ({ assignment, courseCode, sessionId, isOpen, onClos
       }
 
       const data = await response.json();
-      console.log('Grading API response:', data); // Debug log
+      // console.log('Grading API response:', data); // Debug log
 
       if (data.success) {
         const submissionData = data.data || [];
-        console.log('Submissions data:', submissionData); // Debug log
+        // console.log('Submissions data:', submissionData); // Debug log
 
         setSubmissions(submissionData);
         if (submissionData.length > 0) {

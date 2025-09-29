@@ -189,7 +189,12 @@ const MaterialForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white border border-gray-300 rounded-lg p-4">
+    <form 
+      onSubmit={handleSubmit} 
+      className="bg-white border border-gray-300 rounded-lg p-4"
+      data-testid="material-form"
+      id="material-form"
+    >
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Material Title *</label>
@@ -199,23 +204,41 @@ const MaterialForm = ({
             placeholder="Enter material title..."
             disabled={isLoading}
             required
+            data-testid="material-title-input"
+            id="material-title-field"
+            name="materialTitle"
           />
         </div>{' '}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
-          <TextEditor
-            content={formData.content}
-            onChange={content => setFormData({ ...formData, content })}
-            placeholder="Enter material content or description..."
-            disabled={isLoading}
-          />
+          <div data-testid="material-content-editor" id="material-content-editor">
+            <TextEditor
+              content={formData.content}
+              onChange={content => setFormData({ ...formData, content })}
+              placeholder="Enter material content or description..."
+              disabled={isLoading}
+            />
+          </div>
         </div>
         <div className="flex items-center gap-2">
-          <Button type="submit" disabled={!formData.title.trim() || isLoading} className="flex items-center gap-2">
+          <Button 
+            type="submit" 
+            disabled={!formData.title.trim() || isLoading} 
+            className="flex items-center gap-2"
+            data-testid="save-material-button"
+            id="save-material-btn"
+          >
             {isLoading ? <FaSpinner className="animate-spin" /> : <FaSave />}
             {material ? 'Update' : 'Add'} Material
           </Button>
-          <Button type="button" variant="outline" onClick={onCancel} disabled={isLoading}>
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={onCancel} 
+            disabled={isLoading}
+            data-testid="cancel-material-button"
+            id="cancel-material-btn"
+          >
             <FaTimes className="mr-2" />
             Cancel
           </Button>
@@ -376,7 +399,13 @@ const Materials = ({ sessionId, courseCode, className }: MaterialsProps) => {
         </h4>
 
         {canEdit && !isFormOpen && (
-          <Button onClick={addMaterial} size="sm" className="flex items-center gap-2">
+          <Button 
+            onClick={addMaterial} 
+            size="sm" 
+            className="flex items-center gap-2"
+            data-testid="add-material-button"
+            id="add-material-btn"
+          >
             <FaPlus className="text-xs" />
             Add Material
           </Button>

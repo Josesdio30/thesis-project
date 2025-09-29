@@ -39,6 +39,8 @@ const CourseCard = ({ course }: { course: Course }) => (
       query: { code: course.course_code },
     }}
     className="block group"
+    data-testid={`course-card-${course.course_code}`}
+    id={`course-${course.course_code}`}
   >
     <Card className="h-full transition-all duration-300 hover:shadow-lg hover:scale-100">
       <CardHeader className="pb-3">
@@ -174,11 +176,11 @@ const Course = () => {
           apiUrl += `?${params.toString()}`;
         }
 
-        console.log('Fetching courses for user:', {
-          role: session.user.role,
-          userId: session.user.id,
-          apiUrl,
-        });
+        // console.log('Fetching courses for user:', {
+        //   role: session.user.role,
+        //   userId: session.user.id,
+        //   apiUrl,
+        // });
 
         const res = await fetch(apiUrl);
 

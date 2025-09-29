@@ -37,10 +37,10 @@ const UploadModal = ({ type, courseCode, sessionId, isOpen, onClose, onSuccess }
 
     try {
       if (type === 'link') {
-        console.log('=== LINK UPLOAD STARTED ===');
-        console.log('Course Code:', courseCode);
-        console.log('Session ID:', sessionId);
-        console.log('Data:', { title, url });
+        // console.log('=== LINK UPLOAD STARTED ===');
+        // console.log('Course Code:', courseCode);
+        // console.log('Session ID:', sessionId);
+        // console.log('Data:', { title, url });
 
         // Handle link addition
         const response = await fetch(`/api/courses/${courseCode}/sessions/${sessionId}/resources`, {
@@ -55,22 +55,22 @@ const UploadModal = ({ type, courseCode, sessionId, isOpen, onClose, onSuccess }
           }),
         });
 
-        console.log('Response status:', response.status);
-        console.log('Response ok:', response.ok);
+        // console.log('Response status:', response.status);
+        // console.log('Response ok:', response.ok);
 
         const responseData = await response.json();
-        console.log('Response data:', responseData);
+        // console.log('Response data:', responseData);
 
         if (response.ok) {
-          console.log('✅ Link saved successfully');
+          // console.log('Link saved successfully');
           onSuccess();
           handleClose();
         } else {
-          console.error('❌ Failed to save link:', responseData);
+          // console.error('Failed to save link:', responseData);
           throw new Error(responseData.error || responseData.details || 'Failed to save link');
         }
       } else {
-        console.log('=== FILE UPLOAD STARTED ===');
+        // console.log('=== FILE UPLOAD STARTED ===');
         // Handle file/video upload
         if (!file) {
           alert('Please select a file');
@@ -82,23 +82,23 @@ const UploadModal = ({ type, courseCode, sessionId, isOpen, onClose, onSuccess }
         formData.append('courseCode', courseCode || '');
         formData.append('sessionId', sessionId.toString());
 
-        console.log('Uploading file:', file.name);
-        console.log('Course Code:', courseCode);
-        console.log('Session ID:', sessionId);
+        // console.log('Uploading file:', file.name);
+        // console.log('Course Code:', courseCode);
+        // console.log('Session ID:', sessionId);
 
         const uploadResponse = await fetch('/api/upload', {
           method: 'POST',
           body: formData,
         });
 
-        console.log('Upload response status:', uploadResponse.status);
+        // console.log('Upload response status:', uploadResponse.status);
         const uploadResult = await uploadResponse.json();
-        console.log('Upload result:', uploadResult);
+        // console.log('Upload result:', uploadResult);
         if (uploadResponse.ok) {
           // Save to database
-          console.log('File uploaded, now saving to database...');
-          console.log('Upload result file_extension:', uploadResult.data.file_extension);
-          console.log('Upload result content_type:', uploadResult.data.content_type);
+          // console.log('File uploaded, now saving to database...');
+          // console.log('Upload result file_extension:', uploadResult.data.file_extension);
+          // console.log('Upload result content_type:', uploadResult.data.content_type);
 
           const saveResponse = await fetch(`/api/courses/${courseCode}/sessions/${sessionId}/resources`, {
             method: 'POST',
@@ -114,20 +114,20 @@ const UploadModal = ({ type, courseCode, sessionId, isOpen, onClose, onSuccess }
             }),
           });
 
-          console.log('Save response status:', saveResponse.status);
+          // console.log('Save response status:', saveResponse.status);
           const saveResult = await saveResponse.json();
-          console.log('Save result:', saveResult);
+          // console.log('Save result:', saveResult);
 
           if (saveResponse.ok) {
-            console.log('✅ File saved successfully');
+            console.log('File saved successfully');
             onSuccess();
             handleClose();
           } else {
-            console.error('❌ Failed to save file:', saveResult);
+            console.error('Failed to save file:', saveResult);
             throw new Error(saveResult.error || saveResult.details || 'Failed to save file');
           }
         } else {
-          console.error('❌ Upload failed:', uploadResult);
+          console.error('Upload failed:', uploadResult);
           throw new Error(uploadResult.error || uploadResult.details || 'Upload failed');
         }
       }

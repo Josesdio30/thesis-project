@@ -419,11 +419,11 @@ const AssignmentDetailModal = ({
                             return '';
                           })()}
                           onValueChange={value => {
-                            console.log('Select onValueChange:', {
-                              questionIndex: index,
-                              value,
-                              questionId: question.id,
-                            });
+                            // console.log('Select onValueChange:', {
+                            //   questionIndex: index,
+                            //   value,
+                            //   questionId: question.id,
+                            // });
                             handleAnswerChange(index, value);
                           }}
                         >
@@ -436,7 +436,7 @@ const AssignmentDetailModal = ({
                                 key={option.id}
                                 value={option.id.toString()}
                                 onClick={e => {
-                                  console.log('SelectItem clicked:', { option: option.option_text, optIndex });
+                                  // console.log('SelectItem clicked:', { option: option.option_text, optIndex });
                                   e.stopPropagation();
                                 }}
                               >

@@ -7,10 +7,11 @@ const prisma = new PrismaClient();
 // GET /api/courses/[code]/sessions/[sessionId]/assignments/[assignmentId]
 export async function GET(
   request: NextRequest,
-  { params }: { params: { code: string; sessionId: string; assignmentId: string } }
+  { params }: { params: Promise<{ code: string; sessionId: string; assignmentId: string }> }
 ) {
   try {
-    const assignmentId = parseInt(params.assignmentId);
+    const { assignmentId: assignmentIdParam } = await params;
+    const assignmentId = parseInt(assignmentIdParam);
     if (isNaN(assignmentId)) {
       return NextResponse.json({ error: 'Invalid assignment ID' }, { status: 400 });
     }
@@ -118,10 +119,11 @@ export async function GET(
 // POST /api/courses/[code]/sessions/[sessionId]/assignments/[assignmentId]/submit
 export async function POST(
   request: NextRequest,
-  { params }: { params: { code: string; sessionId: string; assignmentId: string } }
+  { params }: { params: Promise<{ code: string; sessionId: string; assignmentId: string }> }
 ) {
   try {
-    const assignmentId = parseInt(params.assignmentId);
+    const { assignmentId: assignmentIdParam } = await params;
+    const assignmentId = parseInt(assignmentIdParam);
     if (isNaN(assignmentId)) {
       return NextResponse.json({ error: 'Invalid assignment ID' }, { status: 400 });
     }

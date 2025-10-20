@@ -8,10 +8,11 @@ const prisma = new PrismaClient();
 // POST /api/courses/[code]/sessions/[sessionId]/assignments/[assignmentId]/submit
 export async function POST(
   request: NextRequest,
-  { params }: { params: { code: string; sessionId: string; assignmentId: string } }
+  { params }: { params: Promise<{ code: string; sessionId: string; assignmentId: string }> }
 ) {
   try {
-    const assignmentId = parseInt(params.assignmentId);
+    const { assignmentId: assignmentIdParam } = await params;
+    const assignmentId = parseInt(assignmentIdParam);
     if (isNaN(assignmentId)) {
       return NextResponse.json({ error: 'Invalid assignment ID' }, { status: 400 });
     }

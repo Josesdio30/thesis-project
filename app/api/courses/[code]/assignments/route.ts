@@ -6,7 +6,10 @@ import { PrismaClient } from '@/lib/generated/prisma';
 const prisma = new PrismaClient();
 
 // GET /api/courses/[code]/assignments - Get all assignments for a course
-export async function GET(request: NextRequest, { params }: { params: { code: string } }) {
+export async function GET(
+  request: NextRequest, 
+  { params }: { params: Promise<{ code: string }> }
+) {
   try {
     const session = await getServerSession(authOptions);
 
@@ -14,6 +17,7 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Await params since it's now a Promise
     const { code } = await params;
     const courseCode = code;
     const isTeacher = session.user.role === 'TEACHER' || session.user.role === 'ADMIN';

@@ -3,6 +3,27 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 import { prisma } from '@/lib/prisma';
 
+// Define the type by inferring from the actual query
+const getAssignments = async () => {
+  return await prisma.assignments.findMany({
+    include: {
+      sessions: {
+        include: {
+          class_courses: {
+            include: {
+              courses: true,
+              classes: true,
+            },
+          },
+        },
+      },
+      enumeration: true,
+    },
+  });
+};
+
+type AssignmentWithRelations = Awaited<ReturnType<typeof getAssignments>>[number];
+
 export async function GET(request: NextRequest) {
   try {
     // Get session for authentication
@@ -40,7 +61,7 @@ export async function GET(request: NextRequest) {
       role => role.enumeration?.name === 'ADMIN' && role.is_active
     );
 
-    let assignments;
+    let assignments: AssignmentWithRelations[];
 
     if (isStudent) {
       // For students, get assignments from their enrolled courses
@@ -119,4 +140,4 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

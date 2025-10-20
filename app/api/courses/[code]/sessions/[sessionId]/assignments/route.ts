@@ -4,9 +4,13 @@ import { PrismaClient } from '@/lib/generated/prisma';
 const prisma = new PrismaClient();
 
 // GET /api/courses/[code]/sessions/[sessionId]/assignments
-export async function GET(request: NextRequest, { params }: { params: { code: string; sessionId: string } }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ code: string; sessionId: string }> }
+) {
   try {
-    const sessionId = parseInt(params.sessionId);
+    const { sessionId: sessionIdParam } = await params;
+    const sessionId = parseInt(sessionIdParam);
     if (isNaN(sessionId)) {
       return NextResponse.json({ error: 'Invalid session ID' }, { status: 400 });
     }
@@ -110,9 +114,13 @@ export async function GET(request: NextRequest, { params }: { params: { code: st
 }
 
 // POST /api/courses/[code]/sessions/[sessionId]/assignments
-export async function POST(request: NextRequest, { params }: { params: { code: string; sessionId: string } }) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ code: string; sessionId: string }> }
+) {
   try {
-    const sessionId = parseInt(params.sessionId);
+    const { sessionId: sessionIdParam } = await params;
+    const sessionId = parseInt(sessionIdParam);
     if (isNaN(sessionId)) {
       return NextResponse.json({ error: 'Invalid session ID' }, { status: 400 });
     }

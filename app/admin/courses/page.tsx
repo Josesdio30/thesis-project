@@ -239,10 +239,9 @@ const CourseManagement = () => {
           )}
         </div>
       </div>
-    )}
 
-    {/* Add Course Modal */}
-    {showAddModal && (
+      {/* Add Course Modal */}
+      {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h3 className="text-lg font-semibold mb-4">Add New Course</h3>
@@ -371,4 +370,4 @@ const CourseManagement = () => {
   );
 };
 
-export default CourseManagement; 
+export default CourseManagement;

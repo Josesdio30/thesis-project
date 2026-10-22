@@ -1,0 +1,70 @@
+{
+  "grading": [
+    {
+      "label": "short",
+      "studentAnswerChars": 92,
+      "studentAnswerWords": 17,
+      "model": "gpt-4o-mini",
+      "input_tokens": 759,
+      "output_tokens": 223,
+      "total_tokens": 982,
+      "latency_ms": 7608,
+      "status": "completed"
+    },
+    {
+      "label": "medium",
+      "studentAnswerChars": 846,
+      "studentAnswerWords": 125,
+      "model": "gpt-4o-mini",
+      "input_tokens": 897,
+      "output_tokens": 344,
+      "total_tokens": 1241,
+      "latency_ms": 7546,
+      "status": "completed"
+    },
+    {
+      "label": "long",
+      "studentAnswerChars": 2441,
+      "studentAnswerWords": 355,
+      "model": "gpt-4o-mini",
+      "input_tokens": 1196,
+      "output_tokens": 355,
+      "total_tokens": 1551,
+      "latency_ms": 10197,
+      "status": "completed"
+    }
+  ],
+  "embeddings": [
+    {
+      "label": "batch_5",
+      "batchSize": 5,
+      "approxTokensPerChunk": 250,
+      "model": "text-embedding-3-small",
+      "total_tokens": 845,
+      "tokens_per_chunk_avg": 169,
+      "latency_ms": 2708,
+      "dimensions": 384
+    },
+    {
+      "label": "batch_20",
+      "batchSize": 20,
+      "approxTokensPerChunk": 250,
+      "model": "text-embedding-3-small",
+      "total_tokens": 3360,
+      "tokens_per_chunk_avg": 168,
+      "latency_ms": 344,
+      "dimensions": 384
+    },
+    {
+      "label": "batch_50",
+      "batchSize": 50,
+      "approxTokensPerChunk": 250,
+      "model": "text-embedding-3-small",
+      "total_tokens": 8370,
+      "tokens_per_chunk_avg": 167.4,
+      "latency_ms": 1291,
+      "dimensions": 384
+    }
+  ],
+  "timestamp": "2026-05-24T09:49:12.757Z"
+}

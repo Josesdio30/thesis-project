@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+<<<<<<< HEAD
+=======
+import { requireCourseManager, teacherIdsForSession } from '@/lib/auth/course-access';
+>>>>>>> test-plagiarism-correction-feature
 import { prisma } from '@/lib/prisma';
 import { unlink } from 'fs/promises';
 import path from 'path';
@@ -62,7 +66,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ro
       {
         success: false,
         error: 'Database error',
+<<<<<<< HEAD
         details: error instanceof Error ? error.message : 'Failed to fetch resource',
+=======
+>>>>>>> test-plagiarism-correction-feature
       },
       { status: 500 }
     );
@@ -76,6 +83,11 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const { code, sessionId, resourceId } = resolvedParams;
     const resourceIdNum = parseInt(resourceId);
     const sessionIdNum = parseInt(sessionId);
+<<<<<<< HEAD
+=======
+    const access = await requireCourseManager(() => teacherIdsForSession(sessionId));
+    if (!access.ok) return access.response;
+>>>>>>> test-plagiarism-correction-feature
 
     console.log('=== RESOURCE DELETE REQUEST ===');
     console.log('Course Code:', code);
@@ -141,7 +153,10 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       {
         success: false,
         error: 'Database error',
+<<<<<<< HEAD
         details: error instanceof Error ? error.message : 'Failed to delete resource',
+=======
+>>>>>>> test-plagiarism-correction-feature
       },
       { status: 500 }
     );

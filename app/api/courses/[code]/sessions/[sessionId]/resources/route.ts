@@ -1,11 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+<<<<<<< HEAD
 import { prisma } from '@/lib/prisma';
 import { notifyNewResource } from '@/lib/notification-service';
+=======
+import { requireCourseManager, teacherIdsForSession } from '@/lib/auth/course-access';
+import { prisma } from '@/lib/prisma';
+>>>>>>> test-plagiarism-correction-feature
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ code: string; sessionId: string }> }) {
   try {
+<<<<<<< HEAD
     const { code, sessionId } = await params;
     const sessionIdNum = parseInt(sessionId);
     const body = await request.json();
@@ -13,6 +19,26 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     // Get current user session
     const session = await getServerSession(authOptions);
     const uploaderName = session?.user?.name || 'Guru';
+=======
+    const session = await getServerSession(authOptions);
+    if (!session || !session.user || !session.user.id) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Unauthorized',
+          message: 'You must be logged in to upload resources',
+        },
+        { status: 401 }
+      );
+    }
+
+    const { code, sessionId } = await params;
+    const sessionIdNum = parseInt(sessionId);
+    const access = await requireCourseManager(() => teacherIdsForSession(sessionId));
+    if (!access.ok) return access.response;
+
+    const body = await request.json();
+>>>>>>> test-plagiarism-correction-feature
 
     console.log('=== RESOURCE SAVE REQUEST ===');
     console.log('Course Code:', code);
@@ -33,7 +59,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     }
 
     // Verify session exists
+<<<<<<< HEAD
     const sessionData = await prisma.sessions.findFirst({
+=======
+    const dbSession = await prisma.sessions.findFirst({
+>>>>>>> test-plagiarism-correction-feature
       where: {
         id: sessionIdNum,
         class_courses: {
@@ -44,7 +74,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       },
     });
 
+<<<<<<< HEAD
     if (!sessionData) {
+=======
+    if (!dbSession) {
+>>>>>>> test-plagiarism-correction-feature
       return NextResponse.json(
         {
           success: false,
@@ -53,6 +87,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         },
         { status: 404 }
       );
+<<<<<<< HEAD
     }
 
     // Create new resource in database using Prisma
@@ -60,6 +95,13 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       data: {
         session_id: sessionIdNum,
         uploader_id: session?.user?.id ? parseInt(session.user.id) : 1,
+=======
+    } // Create new resource in database using Prisma
+    const newResource = await prisma.resources.create({
+      data: {
+        session_id: sessionIdNum,
+        uploader_id: parseInt(session.user.id),
+>>>>>>> test-plagiarism-correction-feature
         file_url: body.file_url,
         file_name: body.file_name,
         file_tittle: body.file_tittle,
@@ -79,6 +121,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       },
     });
 
+<<<<<<< HEAD
     // 🔔 Send notification to enrolled students
     try {
       const resourceTitle = body.file_tittle || body.file_name || 'File Baru';
@@ -89,6 +132,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       // Don't fail the request if notification fails
     }
 
+=======
+>>>>>>> test-plagiarism-correction-feature
     return NextResponse.json({
       success: true,
       message: 'Resource saved successfully',
@@ -112,7 +157,10 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       {
         success: false,
         error: 'Database error',
+<<<<<<< HEAD
         details: error instanceof Error ? error.message : 'Failed to save resource',
+=======
+>>>>>>> test-plagiarism-correction-feature
       },
       { status: 500 }
     );
@@ -226,7 +274,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       {
         success: false,
         error: 'Database error',
+<<<<<<< HEAD
         details: error instanceof Error ? error.message : 'Failed to fetch resources',
+=======
+>>>>>>> test-plagiarism-correction-feature
       },
       { status: 500 }
     );

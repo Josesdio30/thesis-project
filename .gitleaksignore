@@ -1,0 +1,6 @@
+# Reviewed false positives: fixed ciphertext fixtures and a dummy sk-test key.
+# Exceptions are limited to the original commit, file, rule, and line.
+c0346e572fd0439eead3195f40b89868b18a3ac2:tests/lib/crypto.test.ts:generic-api-key:8
+c0346e572fd0439eead3195f40b89868b18a3ac2:tests/lib/crypto.test.ts:generic-api-key:9
+c0346e572fd0439eead3195f40b89868b18a3ac2:tests/lib/crypto.test.ts:generic-api-key:10
+c0346e572fd0439eead3195f40b89868b18a3ac2:tests/lib/crypto.test.ts:generic-api-key:31

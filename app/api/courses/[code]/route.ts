@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+<<<<<<< HEAD
+=======
+import { requireCourseManager, teacherIdsForCourseCode } from '@/lib/auth/course-access';
+>>>>>>> test-plagiarism-correction-feature
 import { courseService } from '@/lib/prisma-services';
 import { ApiResponse } from '@/types';
 
@@ -150,6 +154,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 export async function PUT(request: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   try {
     const { code } = await params;
+<<<<<<< HEAD
+=======
+    const access = await requireCourseManager(() => teacherIdsForCourseCode(code));
+    if (!access.ok) return access.response;
+>>>>>>> test-plagiarism-correction-feature
     const body = await request.json();
 
     // Find course first
@@ -193,6 +202,11 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ code: string }> }) {
   try {
     const { code } = await params;
+<<<<<<< HEAD
+=======
+    const access = await requireCourseManager(() => teacherIdsForCourseCode(code));
+    if (!access.ok) return access.response;
+>>>>>>> test-plagiarism-correction-feature
 
     // Find course first
     const existingCourse = await courseService.findByCode(code);

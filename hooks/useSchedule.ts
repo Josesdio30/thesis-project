@@ -7,10 +7,15 @@ export interface ScheduleItem {
   id: number;
   subject: string;
   teacher: string;
+<<<<<<< HEAD
   teacher_id?: number | null;
   session_title: string;
   class_name: string;
   class_id?: number | null;
+=======
+  session_title: string;
+  class_name: string;
+>>>>>>> test-plagiarism-correction-feature
   description?: string;
   start_time: string;
   end_time: string;

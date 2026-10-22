@@ -3,7 +3,11 @@ import { Assignment } from '../../../../hooks/useAssignmentData';
 import { formatDateTime, getScoreDisplay, getSubmissionStatusColor } from '../../../../lib/assignmentUtils';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+<<<<<<< HEAD
 import { FaSave, FaEye, FaUser, FaClock, FaTimes } from 'react-icons/fa';
+=======
+import { FaSave, FaEye, FaUser, FaClock, FaTimes, FaRobot, FaChevronDown, FaChevronUp } from 'react-icons/fa';
+>>>>>>> test-plagiarism-correction-feature
 import { useSession } from 'next-auth/react';
 
 interface GradingModalProps {
@@ -55,6 +59,27 @@ interface GradeInput {
   feedback: string;
 }
 
+<<<<<<< HEAD
+=======
+interface AiGradingResult {
+  question_id: string;
+  score: number | null;
+  max_score: number;
+  qualitative_grade: string | null;
+  feedback: string;
+  citations: unknown;
+  confidence: string;
+}
+
+function aiConfidenceStyle(conf: string) {
+  const c = (conf || '').toLowerCase();
+  if (c === 'high') return { label: 'High confidence', bg: 'bg-green-100', text: 'text-green-700' };
+  if (c === 'medium') return { label: 'Medium confidence', bg: 'bg-yellow-100', text: 'text-yellow-700' };
+  if (c === 'low') return { label: 'Low confidence', bg: 'bg-red-100', text: 'text-red-700' };
+  return { label: conf || 'Unknown', bg: 'bg-gray-100', text: 'text-gray-700' };
+}
+
+>>>>>>> test-plagiarism-correction-feature
 export const GradingModal = ({ assignment, courseCode, sessionId, isOpen, onClose }: GradingModalProps) => {
   const { data: session } = useSession();
   const [submissions, setSubmissions] = useState<SubmissionForGrading[]>([]);
@@ -63,6 +88,22 @@ export const GradingModal = ({ assignment, courseCode, sessionId, isOpen, onClos
   const [overallFeedback, setOverallFeedback] = useState('');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+<<<<<<< HEAD
+=======
+  const [aiResults, setAiResults] = useState<Record<number, AiGradingResult>>({});
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiHasJob, setAiHasJob] = useState(false);
+  const [aiExpandedQuestions, setAiExpandedQuestions] = useState<Set<number>>(new Set());
+
+  const toggleAiPanel = (questionId: number) => {
+    setAiExpandedQuestions(prev => {
+      const next = new Set(prev);
+      if (next.has(questionId)) next.delete(questionId);
+      else next.add(questionId);
+      return next;
+    });
+  };
+>>>>>>> test-plagiarism-correction-feature
 
   useEffect(() => {
     if (isOpen && assignment) {
@@ -113,6 +154,46 @@ export const GradingModal = ({ assignment, courseCode, sessionId, isOpen, onClos
     }));
     setGrades(initialGrades);
     setOverallFeedback('');
+<<<<<<< HEAD
+=======
+
+    // Fetch AI grading suggestions for the selected student (read-only reference)
+    const studentId =
+      submission.app_user_assignment_submissions_student_idToapp_user?.id ??
+      submission.student?.id;
+    if (studentId !== undefined) {
+      fetchAiResults(studentId);
+    } else {
+      setAiResults({});
+      setAiHasJob(false);
+    }
+  };
+
+  const fetchAiResults = async (studentId: number) => {
+    setAiLoading(true);
+    setAiResults({});
+    setAiHasJob(false);
+    setAiExpandedQuestions(new Set());
+    try {
+      const res = await fetch(
+        `/api/ai-grading/results/${assignment.id}?studentId=${studentId}`
+      );
+      const data = await res.json();
+      if (data?.success) {
+        setAiHasJob(Boolean(data.data?.job));
+        const byQuestion: Record<number, AiGradingResult> = {};
+        for (const r of (data.data?.results ?? []) as AiGradingResult[]) {
+          const qid = Number(r.question_id);
+          if (!Number.isNaN(qid)) byQuestion[qid] = r;
+        }
+        setAiResults(byQuestion);
+      }
+    } catch {
+      // silent — AI suggestions are best-effort
+    } finally {
+      setAiLoading(false);
+    }
+>>>>>>> test-plagiarism-correction-feature
   };
 
   const updateGrade = (questionId: number, pointsEarned: number, feedback: string) => {
@@ -345,6 +426,108 @@ export const GradingModal = ({ assignment, courseCode, sessionId, isOpen, onClos
                             />
                           </div>
                         </div>
+<<<<<<< HEAD
+=======
+
+                        {/* AI Grade Suggestion — collapsible bar, read-only reference */}
+                        {isManualGradable && (() => {
+                          const aiR = aiResults[answer.question_id];
+                          const isExpanded = aiExpandedQuestions.has(answer.question_id);
+
+                          if (aiLoading) {
+                            return (
+                              <div className="mt-3 border border-indigo-100 bg-indigo-50/40 rounded-lg px-3 py-2 text-xs text-indigo-600 flex items-center gap-2">
+                                <FaRobot size={11} />
+                                Loading AI suggestion…
+                              </div>
+                            );
+                          }
+                          if (!aiHasJob) {
+                            return (
+                              <div className="mt-3 border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs text-gray-500 flex items-center gap-2">
+                                <FaRobot size={11} />
+                                No AI grading run yet for this assignment.
+                              </div>
+                            );
+                          }
+                          if (!aiR) {
+                            return (
+                              <div className="mt-3 border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 text-xs text-gray-500 flex items-center gap-2">
+                                <FaRobot size={11} />
+                                AI did not grade this question for this student.
+                              </div>
+                            );
+                          }
+
+                          const conf = aiConfidenceStyle(aiR.confidence);
+                          const citations = Array.isArray(aiR.citations)
+                            ? (aiR.citations as unknown[]).map(c => String(c))
+                            : [];
+                          const scoreLabel =
+                            aiR.score !== null && aiR.score !== undefined ? aiR.score : '—';
+
+                          return (
+                            <div className="mt-3 border border-green-200 bg-green-50/50 rounded-lg overflow-hidden">
+                              <button
+                                type="button"
+                                onClick={() => toggleAiPanel(answer.question_id)}
+                                aria-expanded={isExpanded}
+                                className="w-full px-3 py-2 flex items-center justify-between gap-2 hover:bg-green-100/50 transition-colors text-left"
+                              >
+                                <div className="flex items-center gap-2 min-w-0">
+                                  <FaRobot className="text-green-600 shrink-0" size={12} />
+                                  <span className="text-xs font-semibold text-green-800 truncate">
+                                    AI Grade (reference only)
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2 shrink-0">
+                                  <span className="text-xs font-bold text-green-800">
+                                    {scoreLabel} / {aiR.max_score}
+                                  </span>
+                                  {aiR.qualitative_grade && (
+                                    <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-green-100 text-green-700 font-medium">
+                                      {aiR.qualitative_grade}
+                                    </span>
+                                  )}
+                                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${conf.bg} ${conf.text}`}>
+                                    {conf.label}
+                                  </span>
+                                  {isExpanded ? (
+                                    <FaChevronUp className="text-green-600" size={10} />
+                                  ) : (
+                                    <FaChevronDown className="text-green-600" size={10} />
+                                  )}
+                                </div>
+                              </button>
+
+                              {isExpanded && (
+                                <div className="px-3 pb-3 pt-1 border-t border-green-200/70 space-y-2">
+                                  <p className="text-[11px] text-green-700/80 italic">
+                                    AI-generated suggestion. Teacher grade remains authoritative.
+                                  </p>
+                                  {aiR.feedback && (
+                                    <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                                      {aiR.feedback}
+                                    </p>
+                                  )}
+                                  {citations.length > 0 && (
+                                    <div className="flex flex-wrap gap-1.5 pt-1">
+                                      {citations.map((c, i) => (
+                                        <span
+                                          key={i}
+                                          className="text-xs bg-white border border-green-200 text-green-700 px-2 py-0.5 rounded-full"
+                                        >
+                                          📄 {c}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          );
+                        })()}
+>>>>>>> test-plagiarism-correction-feature
                       </div>
                     );
                   })}

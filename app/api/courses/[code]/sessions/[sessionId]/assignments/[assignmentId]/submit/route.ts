@@ -1,4 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+<<<<<<< HEAD
+=======
+import { Prisma } from '@prisma/client';
+import { getSessionUser, unauthorizedResponse } from '@/lib/auth/course-access';
+>>>>>>> test-plagiarism-correction-feature
 import { prisma } from '@/lib/prisma';
 import { SubmissionStatus } from '@/lib/enumeration-service';
 import { calculateAssignmentScore } from '@/lib/scoringUtils';
@@ -9,6 +14,14 @@ export async function POST(
   { params }: { params: Promise<{ code: string; sessionId: string; assignmentId: string }> }
 ) {
   try {
+<<<<<<< HEAD
+=======
+    // Q-12: the submitter is always the signed-in student; a body student_id is ignored.
+    const user = await getSessionUser();
+    if (!user) return unauthorizedResponse();
+    const studentId = user.id;
+
+>>>>>>> test-plagiarism-correction-feature
     const resolvedParams = await params;
     const assignmentId = parseInt(resolvedParams.assignmentId);
     if (isNaN(assignmentId)) {
@@ -16,10 +29,17 @@ export async function POST(
     }
 
     const body = await request.json();
+<<<<<<< HEAD
     const { student_id, answers } = body;
 
     if (!student_id || !answers || !Array.isArray(answers)) {
       return NextResponse.json({ error: 'Missing required fields: student_id, answers' }, { status: 400 });
+=======
+    const { answers } = body;
+
+    if (!answers || !Array.isArray(answers)) {
+      return NextResponse.json({ error: 'Missing required field: answers' }, { status: 400 });
+>>>>>>> test-plagiarism-correction-feature
     }
 
     // Check if assignment exists and is published
@@ -39,6 +59,18 @@ export async function POST(
       return NextResponse.json({ error: 'Assignment not found' }, { status: 404 });
     }
 
+<<<<<<< HEAD
+=======
+    // Q-12: only students enrolled in the assignment's class_course may submit.
+    const enrollment = await prisma.enrollments.findFirst({
+      where: { student_id: studentId, class_courses: { sessions: { some: { id: assignment.session_id } } } },
+      select: { id: true },
+    });
+    if (!enrollment) {
+      return NextResponse.json({ error: 'You are not enrolled in this course' }, { status: 403 });
+    }
+
+>>>>>>> test-plagiarism-correction-feature
     if (!assignment.is_published) {
       return NextResponse.json({ error: 'Assignment is not published' }, { status: 400 });
     }
@@ -52,7 +84,11 @@ export async function POST(
     const existingSubmissions = await prisma.assignment_submissions.count({
       where: {
         assignment_id: assignmentId,
+<<<<<<< HEAD
         student_id: parseInt(student_id),
+=======
+        student_id: studentId,
+>>>>>>> test-plagiarism-correction-feature
       },
     });
 
@@ -73,7 +109,11 @@ export async function POST(
       const submission = await tx.assignment_submissions.create({
         data: {
           assignment_id: assignmentId,
+<<<<<<< HEAD
           student_id: parseInt(student_id),
+=======
+          student_id: studentId,
+>>>>>>> test-plagiarism-correction-feature
           attempt_number: existingSubmissions + 1,
           status_id: submittedStatusId,
           submitted_at: new Date(),
@@ -172,9 +212,20 @@ export async function POST(
       message: 'Assignment submitted successfully',
     });
   } catch (error) {
+<<<<<<< HEAD
     console.error('Error submitting assignment:', error);
     return NextResponse.json(
       { error: 'Failed to submit assignment', details: error instanceof Error ? error.message : 'Unknown error' },
+=======
+    // FR-SUB-1 / O-18: a concurrent submit can pass the attempt count above; the
+    // unique (assignment_id, student_id, attempt_number) index rejects the loser.
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return NextResponse.json({ error: 'Maximum attempts reached' }, { status: 409 });
+    }
+    console.error('Error submitting assignment:', error);
+    return NextResponse.json(
+      { error: 'Failed to submit assignment' },
+>>>>>>> test-plagiarism-correction-feature
       { status: 500 }
     );
   }

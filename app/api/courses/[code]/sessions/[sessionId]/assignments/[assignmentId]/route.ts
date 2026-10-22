@@ -1,4 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+<<<<<<< HEAD
+=======
+import { Prisma } from '@prisma/client';
+import {
+  canManageCourse,
+  getSessionUser,
+  requireSessionMember,
+  teacherIdsForAssignment,
+  unauthorizedResponse,
+} from '@/lib/auth/course-access';
+>>>>>>> test-plagiarism-correction-feature
 import { prisma } from '@/lib/prisma';
 import { SubmissionStatus } from '@/lib/enumeration-service';
 
@@ -8,6 +19,12 @@ export async function GET(
   { params }: { params: Promise<{ code: string; sessionId: string; assignmentId: string }> }
 ) {
   try {
+<<<<<<< HEAD
+=======
+    const user = await getSessionUser();
+    if (!user) return unauthorizedResponse();
+
+>>>>>>> test-plagiarism-correction-feature
     const resolvedParams = await params;
     const assignmentId = parseInt(resolvedParams.assignmentId);
     if (isNaN(assignmentId)) {
@@ -50,6 +67,20 @@ export async function GET(
       return NextResponse.json({ error: 'Assignment not found' }, { status: 404 });
     }
 
+<<<<<<< HEAD
+=======
+    // FR-ASG-5: the course teacher and admins see answer keys and every
+    // submission; an enrolled student sees only their own work, without keys.
+    const isManager = canManageCourse(user, await teacherIdsForAssignment(assignmentId));
+    if (!isManager) {
+      const member = await requireSessionMember(assignment.session_id);
+      if (!member.ok) return member.response;
+    }
+    const visibleSubmissions = isManager
+      ? assignment.assignment_submissions
+      : assignment.assignment_submissions.filter(submission => submission.student_id === user.id);
+
+>>>>>>> test-plagiarism-correction-feature
     // Transform the data
     const transformedAssignment = {
       id: assignment.id,
@@ -76,11 +107,19 @@ export async function GET(
         options: question.assignment_question_options.map(option => ({
           id: option.id,
           option_text: option.option_text,
+<<<<<<< HEAD
           is_correct: option.is_correct,
           order_number: option.order_number,
         })),
       })),
       submissions: assignment.assignment_submissions.map(submission => ({
+=======
+          ...(isManager ? { is_correct: option.is_correct } : {}),
+          order_number: option.order_number,
+        })),
+      })),
+      submissions: visibleSubmissions.map(submission => ({
+>>>>>>> test-plagiarism-correction-feature
         id: submission.id,
         student: {
           id: submission.app_user_assignment_submissions_student_idToapp_user.id,
@@ -108,7 +147,11 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching assignment:', error);
     return NextResponse.json(
+<<<<<<< HEAD
       { error: 'Failed to fetch assignment', details: error instanceof Error ? error.message : 'Unknown error' },
+=======
+      { error: 'Failed to fetch assignment' },
+>>>>>>> test-plagiarism-correction-feature
       { status: 500 }
     );
   }
@@ -120,6 +163,14 @@ export async function POST(
   { params }: { params: Promise<{ code: string; sessionId: string; assignmentId: string }> }
 ) {
   try {
+<<<<<<< HEAD
+=======
+    // Q-12: same identity and enrollment rules as .../submit.
+    const user = await getSessionUser();
+    if (!user) return unauthorizedResponse();
+    const studentId = user.id;
+
+>>>>>>> test-plagiarism-correction-feature
     const resolvedParams = await params;
     const assignmentId = parseInt(resolvedParams.assignmentId);
     if (isNaN(assignmentId)) {
@@ -127,10 +178,17 @@ export async function POST(
     }
 
     const body = await request.json();
+<<<<<<< HEAD
     const { student_id, answers } = body;
 
     if (!student_id || !answers || !Array.isArray(answers)) {
       return NextResponse.json({ error: 'Missing required fields: student_id, answers' }, { status: 400 });
+=======
+    const { answers } = body;
+
+    if (!answers || !Array.isArray(answers)) {
+      return NextResponse.json({ error: 'Missing required field: answers' }, { status: 400 });
+>>>>>>> test-plagiarism-correction-feature
     }
 
     // Check if assignment exists and is published
@@ -149,6 +207,12 @@ export async function POST(
       return NextResponse.json({ error: 'Assignment not found' }, { status: 404 });
     }
 
+<<<<<<< HEAD
+=======
+    const member = await requireSessionMember(assignment.session_id);
+    if (!member.ok) return member.response;
+
+>>>>>>> test-plagiarism-correction-feature
     if (!assignment.is_published) {
       return NextResponse.json({ error: 'Assignment is not published' }, { status: 400 });
     }
@@ -162,7 +226,11 @@ export async function POST(
     const existingSubmissions = await prisma.assignment_submissions.count({
       where: {
         assignment_id: assignmentId,
+<<<<<<< HEAD
         student_id: parseInt(student_id),
+=======
+        student_id: studentId,
+>>>>>>> test-plagiarism-correction-feature
       },
     });
 
@@ -183,7 +251,11 @@ export async function POST(
       const submission = await tx.assignment_submissions.create({
         data: {
           assignment_id: assignmentId,
+<<<<<<< HEAD
           student_id: parseInt(student_id),
+=======
+          student_id: studentId,
+>>>>>>> test-plagiarism-correction-feature
           attempt_number: existingSubmissions + 1,
           status_id: submittedStatusId,
           submitted_at: new Date(),
@@ -215,9 +287,20 @@ export async function POST(
       message: 'Assignment submitted successfully',
     });
   } catch (error) {
+<<<<<<< HEAD
     console.error('Error submitting assignment:', error);
     return NextResponse.json(
       { error: 'Failed to submit assignment', details: error instanceof Error ? error.message : 'Unknown error' },
+=======
+    // FR-SUB-1 / O-18: a concurrent submit can pass the attempt count above; the
+    // unique (assignment_id, student_id, attempt_number) index rejects the loser.
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return NextResponse.json({ error: 'Maximum attempts reached' }, { status: 409 });
+    }
+    console.error('Error submitting assignment:', error);
+    return NextResponse.json(
+      { error: 'Failed to submit assignment' },
+>>>>>>> test-plagiarism-correction-feature
       { status: 500 }
     );
   }

@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
+<<<<<<< HEAD
+=======
+import { getSessionUser, requireSessionMember, unauthorizedResponse } from '@/lib/auth/course-access';
+>>>>>>> test-plagiarism-correction-feature
 
 // Content type mapping for common file extensions
 const CONTENT_TYPE_MAP: Record<string, string> = {
@@ -52,9 +56,12 @@ const CONTENT_TYPE_MAP: Record<string, string> = {
   html: 'text/html',
   json: 'application/json',
   xml: 'application/xml',
+<<<<<<< HEAD
 
   // Default fallback
   default: 'application/octet-stream',
+=======
+>>>>>>> test-plagiarism-correction-feature
 };
 
 function getFileExtension(filename: string): string {
@@ -63,6 +70,7 @@ function getFileExtension(filename: string): string {
   return filename.substring(lastDot + 1).toLowerCase();
 }
 
+<<<<<<< HEAD
 function getContentType(filename: string): string {
   const extension = getFileExtension(filename);
   return CONTENT_TYPE_MAP[extension] || CONTENT_TYPE_MAP['default'];
@@ -70,22 +78,97 @@ function getContentType(filename: string): string {
 
 export async function POST(request: NextRequest) {
   try {
+=======
+// Q-08 (2026-10-17): PDF, Word and images only.
+const ALLOWED_EXTENSIONS = new Set(['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'gif']);
+
+// The extension and the browser-reported type are both client-controlled, so the
+// file's leading bytes must match the extension too (A6). DOCX is a ZIP container.
+const OLE2 = [0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1];
+const JPEG = [0xff, 0xd8, 0xff];
+const SIGNATURES: Record<string, number[][]> = {
+  pdf: [[0x25, 0x50, 0x44, 0x46, 0x2d]], // %PDF-
+  doc: [OLE2],
+  docx: [[0x50, 0x4b, 0x03, 0x04]],
+  jpg: [JPEG],
+  jpeg: [JPEG],
+  png: [[0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]],
+  gif: [
+    [0x47, 0x49, 0x46, 0x38, 0x37, 0x61], // GIF87a
+    [0x47, 0x49, 0x46, 0x38, 0x39, 0x61], // GIF89a
+  ],
+};
+
+function contentMatchesExtension(buffer: Buffer, extension: string): boolean {
+  return SIGNATURES[extension].some(
+    signature => buffer.length >= signature.length && signature.every((byte, i) => buffer[i] === byte)
+  );
+}
+
+// A declared type other than these generic ones must be the extension's own type.
+const GENERIC_TYPES = new Set(['', 'application/octet-stream']);
+
+function declaredTypeMatchesExtension(declared: string, extension: string): boolean {
+  return GENERIC_TYPES.has(declared) || declared === CONTENT_TYPE_MAP[extension];
+}
+
+function unsupportedTypeResponse(): NextResponse {
+  return NextResponse.json(
+    { error: 'Unsupported file type', message: 'Only PDF, Word (DOC/DOCX) and image (JPG/PNG/GIF) files are allowed.' },
+    { status: 415 }
+  );
+}
+// Path parts become folder names, so they may not contain separators or dots.
+const SAFE_SEGMENT = /^[A-Za-z0-9_-]+$/;
+
+export async function POST(request: NextRequest) {
+  try {
+    const user = await getSessionUser();
+    if (!user) return unauthorizedResponse();
+
+>>>>>>> test-plagiarism-correction-feature
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const courseCode = formData.get('courseCode') as string;
     const sessionId = formData.get('sessionId') as string;
     const context = formData.get('context') as string;
 
+<<<<<<< HEAD
     console.log('=== FILE UPLOAD REQUEST ===');
     console.log('Course Code:', courseCode);
     console.log('Session ID:', sessionId);
     console.log('Context:', context);
     console.log('File Name:', file?.name);
     console.log('==========================');
+=======
+>>>>>>> test-plagiarism-correction-feature
     if (!file) {
       return NextResponse.json({ error: 'No file received' }, { status: 400 });
     }
 
+<<<<<<< HEAD
+=======
+    if (
+      !SAFE_SEGMENT.test(courseCode ?? '') ||
+      !/^\d+$/.test(sessionId ?? '') ||
+      (context && !SAFE_SEGMENT.test(context))
+    ) {
+      return NextResponse.json(
+        { error: 'Invalid upload location', message: 'courseCode, sessionId and context must be plain names' },
+        { status: 400 }
+      );
+    }
+
+    const fileExtension = getFileExtension(file.name);
+    if (!ALLOWED_EXTENSIONS.has(fileExtension) || !declaredTypeMatchesExtension(file.type, fileExtension)) {
+      return unsupportedTypeResponse();
+    }
+
+    // Q-09: only members of the course session may upload to it.
+    const access = await requireSessionMember(sessionId, { courseCode });
+    if (!access.ok) return access.response;
+
+>>>>>>> test-plagiarism-correction-feature
     // Check file size (10MB limit)
     const maxSize = 10 * 1024 * 1024; // 10MB in bytes
     if (file.size > maxSize) {
@@ -97,6 +180,15 @@ export async function POST(request: NextRequest) {
         { status: 413 }
       );
     }
+<<<<<<< HEAD
+=======
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+    if (!contentMatchesExtension(buffer, fileExtension)) {
+      return unsupportedTypeResponse();
+    }
+
+>>>>>>> test-plagiarism-correction-feature
     const uploadDir = context
       ? path.join(process.cwd(), 'public', 'uploads', 'courses', courseCode, 'sessions', sessionId, context)
       : path.join(process.cwd(), 'public', 'uploads', 'courses', courseCode, 'sessions', sessionId);
@@ -113,17 +205,25 @@ export async function POST(request: NextRequest) {
     const filename = `${timestamp}_${sanitizedName}`;
     const filepath = path.join(uploadDir, filename);
 
+<<<<<<< HEAD
     // Get file extension and content type
     const fileExtension = getFileExtension(file.name);
     const detectedContentType = getContentType(file.name);
+=======
+    // Only allowed extensions reach this point, and each has a known type.
+    const detectedContentType = CONTENT_TYPE_MAP[fileExtension];
+>>>>>>> test-plagiarism-correction-feature
 
     console.log('File extension:', fileExtension);
     console.log('Detected content type:', detectedContentType);
     console.log('Browser reported type:', file.type);
 
     // Save file
+<<<<<<< HEAD
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
+=======
+>>>>>>> test-plagiarism-correction-feature
     await writeFile(filepath, buffer);
 
     console.log('File saved to:', filepath); // Return file URL (public path) with context support
@@ -148,7 +248,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'Upload failed',
+<<<<<<< HEAD
         details: error instanceof Error ? error.message : 'Unknown error',
+=======
+>>>>>>> test-plagiarism-correction-feature
       },
       { status: 500 }
     );

@@ -1,6 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
+<<<<<<< HEAD
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
+=======
+import {
+  canManageCourse,
+  forbiddenResponse,
+  getSessionUser,
+  isAdminRole,
+  isStudentRole,
+  isTeacherRole,
+  unauthorizedResponse,
+} from '@/lib/auth/course-access';
+>>>>>>> test-plagiarism-correction-feature
 import { prisma } from '@/lib/prisma';
 
 export async function GET(
@@ -8,6 +20,7 @@ export async function GET(
   { params }: { params: Promise<{ code: string }> }
 ) {
   try {
+<<<<<<< HEAD
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
@@ -17,6 +30,21 @@ export async function GET(
     const { code } = await params;
     const courseCode = code;
     const isTeacher = session.user.role === 'TEACHER' || session.user.role === 'ADMIN';
+=======
+    const user = await getSessionUser();
+    if (!user) return unauthorizedResponse();
+    if (!isAdminRole(user.role) && !isTeacherRole(user.role) && !isStudentRole(user.role)) return forbiddenResponse();
+
+    const { code } = await params;
+    const courseCode = code;
+    // A course code can be offered to several classes. Scope the database read
+    // to the caller's offerings, rather than granting access to the entire code.
+    const offeringScope = isAdminRole(user.role)
+      ? {}
+      : isTeacherRole(user.role)
+        ? { teacher_id: user.id }
+        : { enrollments: { some: { student_id: user.id } } };
+>>>>>>> test-plagiarism-correction-feature
 
     const courseData = await prisma.courses.findUnique({
       where: {
@@ -24,7 +52,13 @@ export async function GET(
       },
       include: {
         class_courses: {
+<<<<<<< HEAD
           include: {
+=======
+          where: offeringScope,
+          include: {
+            enrollments: { where: { student_id: user.id }, select: { id: true } },
+>>>>>>> test-plagiarism-correction-feature
             sessions: {
               include: {
                 assignments: {
@@ -32,12 +66,20 @@ export async function GET(
                     assignment_questions: {
                       orderBy: { order_number: 'asc' },
                       include: {
+<<<<<<< HEAD
+=======
+                        enumeration: true,
+>>>>>>> test-plagiarism-correction-feature
                         assignment_question_options: {
                           orderBy: { order_number: 'asc' },
                         },
                       },
                     },
                     assignment_submissions: {
+<<<<<<< HEAD
+=======
+                      where: isStudentRole(user.role) ? { student_id: user.id } : {},
+>>>>>>> test-plagiarism-correction-feature
                       include: {
                         app_user_assignment_submissions_student_idToapp_user: {
                           select: {
@@ -63,8 +105,20 @@ export async function GET(
       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
+<<<<<<< HEAD
     const allAssignments = [];
     for (const classCourse of courseData.class_courses) {
+=======
+    const allowedOfferings = courseData.class_courses.filter(classCourse =>
+      canManageCourse(user, [classCourse.teacher_id]) ||
+      (isStudentRole(user.role) && classCourse.enrollments.length > 0)
+    );
+    if (!isAdminRole(user.role) && allowedOfferings.length === 0) return forbiddenResponse();
+
+    const allAssignments = [];
+    for (const classCourse of allowedOfferings) {
+      const isManager = canManageCourse(user, [classCourse.teacher_id]);
+>>>>>>> test-plagiarism-correction-feature
       for (const session of classCourse.sessions) {
         for (const assignment of session.assignments) {
           const transformedAssignment = {
@@ -91,16 +145,30 @@ export async function GET(
               question_text: question.question_text,
               points: question.points,
               question_type_id: question.question_type_id,
+<<<<<<< HEAD
+=======
+              question_type: question.enumeration.name,
+>>>>>>> test-plagiarism-correction-feature
               order_number: question.order_number,
               required: question.required,
               options: question.assignment_question_options.map(option => ({
                 id: option.id,
                 option_text: option.option_text,
+<<<<<<< HEAD
                 ...(isTeacher && { is_correct: option.is_correct }),
                 order_number: option.order_number,
               })),
             })),
             submissions: assignment.assignment_submissions.map(submission => ({
+=======
+                ...(isManager && { is_correct: option.is_correct }),
+                order_number: option.order_number,
+              })),
+            })),
+            submissions: assignment.assignment_submissions
+              .filter(submission => isManager || submission.student_id === user.id)
+              .map(submission => ({
+>>>>>>> test-plagiarism-correction-feature
               id: submission.id,
               student: {
                 id: submission.app_user_assignment_submissions_student_idToapp_user.id,
@@ -132,8 +200,16 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching course assignments:', error);
     return NextResponse.json(
+<<<<<<< HEAD
       { error: 'Failed to fetch assignments', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
 }
+=======
+      { error: 'Failed to fetch assignments' },
+      { status: 500 }
+    );
+  }
+}
+>>>>>>> test-plagiarism-correction-feature

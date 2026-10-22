@@ -1,0 +1,2 @@
+# Managed migration provider. Do not edit after applying migrations.
+provider = "postgresql"

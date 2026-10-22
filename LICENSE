@@ -1,0 +1,52 @@
+MIT License
+
+Copyright (c) 2026 Galeno Areliano (original additions and modifications only)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of the original additions and modifications made in this repository (the
+"Software"; see "Scope of this license" below), to deal in the Software
+without restriction, including without limitation the rights to use, copy,
+modify, merge, publish, distribute, sublicense, and/or sell copies of the
+Software, and to permit persons to whom the Software is furnished to do so,
+subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+--------------------------------------------------------------------------------
+
+Upstream attribution and scope of this license
+
+This project is a derivative work. Its base Learning Management System
+(authentication, roles, courses, classes, enrollments, sessions, materials,
+assignments, forums, the admin panel and the core Prisma schema) comes from
+the repository LMS_StLouis2 by Josesdio30 and its contributors:
+
+    https://github.com/Josesdio30/LMS_StLouis2
+
+That repository did not include a license file when this derivative was
+prepared (checked 2026-10-22). Copyright in the upstream code therefore
+remains with its original author(s), and the MIT License above is NOT granted
+by them. Nothing in this file licenses, or claims ownership of, the upstream
+code or any part of it that remains in this repository.
+
+Scope of this license: the MIT License above covers only the original work
+added in this repository by Galeno Areliano, namely the AI-assisted grading
+pipeline, the retrieval-augmented generation (RAG) and embedding backend, the
+plagiarism detection module, the AUX database and its migration runner, the
+setup tooling, tests, CI configuration and operational documentation, and the
+modifications made to upstream files.
+
+Anyone who wants to reuse or redistribute this repository beyond the original
+additions should first obtain permission from the upstream author(s), or wait
+for them to publish a license for LMS_StLouis2.
+
+Third-party dependencies are distributed under their own licenses.

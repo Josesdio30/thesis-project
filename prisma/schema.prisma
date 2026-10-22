@@ -99,9 +99,13 @@ model student_details {
   created_by     Int?
   updated_date   DateTime?
   updated_by     Int?
+<<<<<<< HEAD
   class_id       Int?
   app_user       app_user  @relation(fields: [user_id], references: [id], onDelete: Cascade)
   classes        classes?  @relation(fields: [class_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
+=======
+  app_user       app_user  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+>>>>>>> test-plagiarism-correction-feature
 }
 
 model teacher_details {
@@ -227,7 +231,10 @@ model classes {
   class_courses  class_courses[]
   app_user       app_user?       @relation(fields: [wali_kelas], references: [id], onUpdate: NoAction)
   academic_years academic_years? @relation(fields: [year_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+<<<<<<< HEAD
   student_details student_details[]
+=======
+>>>>>>> test-plagiarism-correction-feature
 
   @@unique([class_name, year_id])
   @@index([grade_level, year_id], map: "idx_classes_grade")

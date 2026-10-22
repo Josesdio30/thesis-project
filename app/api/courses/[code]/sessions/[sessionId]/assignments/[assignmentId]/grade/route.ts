@@ -1,4 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+<<<<<<< HEAD
+=======
+import { requireCourseManager, teacherIdsForAssignment } from '@/lib/auth/course-access';
+>>>>>>> test-plagiarism-correction-feature
 import { prisma } from '@/lib/prisma';
 import { SubmissionStatus } from '@/lib/enumeration-service';
 
@@ -13,6 +17,7 @@ export async function POST(
     if (isNaN(assignmentId)) {
       return NextResponse.json({ error: 'Invalid assignment ID' }, { status: 400 });
     }
+<<<<<<< HEAD
 
     const body = await request.json();
     const { submission_id, grader_id, grades, feedback } = body;
@@ -21,6 +26,19 @@ export async function POST(
       return NextResponse.json(
         {
           error: 'Missing required fields: submission_id, grader_id, grades',
+=======
+    const access = await requireCourseManager(() => teacherIdsForAssignment(assignmentId));
+    if (!access.ok) return access.response;
+
+    const body = await request.json();
+    // graded_by is always the signed-in teacher (Q-12); a body grader_id is ignored.
+    const { submission_id, grades, feedback } = body;
+
+    if (!submission_id || !grades || !Array.isArray(grades)) {
+      return NextResponse.json(
+        {
+          error: 'Missing required fields: submission_id, grades',
+>>>>>>> test-plagiarism-correction-feature
         },
         { status: 400 }
       );
@@ -86,7 +104,11 @@ export async function POST(
         data: {
           total_score: totalScore,
           feedback: feedback,
+<<<<<<< HEAD
           graded_by: grader_id,
+=======
+          graded_by: access.user.id,
+>>>>>>> test-plagiarism-correction-feature
           graded_at: new Date(),
           status_id: gradedStatusId,
         },
@@ -110,7 +132,10 @@ export async function POST(
     return NextResponse.json(
       {
         error: 'Failed to grade assignment',
+<<<<<<< HEAD
         details: error instanceof Error ? error.message : 'Unknown error',
+=======
+>>>>>>> test-plagiarism-correction-feature
       },
       { status: 500 }
     );
@@ -128,14 +153,29 @@ export async function GET(
     if (isNaN(assignmentId)) {
       return NextResponse.json({ error: 'Invalid assignment ID' }, { status: 400 });
     }
+<<<<<<< HEAD
+=======
+    const access = await requireCourseManager(() => teacherIdsForAssignment(assignmentId));
+    if (!access.ok) return access.response;
+>>>>>>> test-plagiarism-correction-feature
 
     const url = new URL(request.url);
     const submissionId = url.searchParams.get('submission_id');
 
     if (submissionId) {
+<<<<<<< HEAD
       // Get specific submission for grading
       const submission = await prisma.assignment_submissions.findUnique({
         where: { id: parseInt(submissionId) },
+=======
+      const id = parseInt(submissionId);
+      if (isNaN(id)) {
+        return NextResponse.json({ error: 'Invalid submission ID' }, { status: 400 });
+      }
+      // Get specific submission for grading
+      const submission = await prisma.assignment_submissions.findUnique({
+        where: { id },
+>>>>>>> test-plagiarism-correction-feature
         include: {
           assignment_answers: {
             include: {
@@ -157,7 +197,13 @@ export async function GET(
         },
       });
 
+<<<<<<< HEAD
       if (!submission) {
+=======
+      // Q-07 / Q-10: access was checked for the URL's assignment, so a submission
+      // of any other assignment is treated as missing (no existence leak).
+      if (!submission || submission.assignment_id !== assignmentId) {
+>>>>>>> test-plagiarism-correction-feature
         return NextResponse.json({ error: 'Submission not found' }, { status: 404 });
       }
 
@@ -218,7 +264,10 @@ export async function GET(
     return NextResponse.json(
       {
         error: 'Failed to fetch grading data',
+<<<<<<< HEAD
         details: error instanceof Error ? error.message : 'Unknown error',
+=======
+>>>>>>> test-plagiarism-correction-feature
       },
       { status: 500 }
     );

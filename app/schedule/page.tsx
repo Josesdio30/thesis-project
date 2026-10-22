@@ -62,7 +62,10 @@ const AddSessionModal = ({
   const [classes, setClasses] = useState<any[]>([]);
   const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+<<<<<<< HEAD
   const [teacherSearch, setTeacherSearch] = useState('');
+=======
+>>>>>>> test-plagiarism-correction-feature
 
   useEffect(() => {
     if (isOpen) {
@@ -238,6 +241,7 @@ const AddSessionModal = ({
                     <SelectValue placeholder="Pilih guru" />
                   </SelectTrigger>
                   <SelectContent>
+<<<<<<< HEAD
                     <div className="p-2">
                       <Input
                         placeholder="Cari guru..."
@@ -258,6 +262,13 @@ const AddSessionModal = ({
                           {teacher.name} ({teacher.kode_guru})
                         </SelectItem>
                       ))}
+=======
+                    {teachers.map(teacher => (
+                      <SelectItem key={teacher.id} value={teacher.id.toString()}>
+                        {teacher.name} ({teacher.kode_guru})
+                      </SelectItem>
+                    ))}
+>>>>>>> test-plagiarism-correction-feature
                   </SelectContent>
                 </Select>
               </div>
@@ -294,6 +305,7 @@ const AddSessionModal = ({
   );
 };
 
+<<<<<<< HEAD
 // Edit Session Modal Component
 const EditSessionModal = ({
   isOpen,
@@ -505,6 +517,8 @@ const EditSessionModal = ({
 };
 
 
+=======
+>>>>>>> test-plagiarism-correction-feature
 const Schedule = () => {
   const router = useRouter();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
@@ -512,9 +526,12 @@ const Schedule = () => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [userRole, setUserRole] = useState<string>('');
+<<<<<<< HEAD
   const [deletingSessionId, setDeletingSessionId] = useState<number | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingSession, setEditingSession] = useState<ScheduleItem | null>(null);
+=======
+>>>>>>> test-plagiarism-correction-feature
 
   const { scheduleData, loading, error, fetchDateSchedule, fetchMonthSchedule, refetch } = useSchedule(
     selectedDate,
@@ -593,6 +610,7 @@ const Schedule = () => {
     }
   };
 
+<<<<<<< HEAD
   const handleDeleteSession = async (sessionId: number, sessionTitle: string) => {
     const confirmed = window.confirm(`Apakah Anda yakin ingin menghapus session "${sessionTitle}"?\n\nSemua materi dan tugas yang terkait juga akan dihapus.`);
 
@@ -656,6 +674,8 @@ const Schedule = () => {
     setIsEditModalOpen(true);
   };
 
+=======
+>>>>>>> test-plagiarism-correction-feature
   const datesWithSchedule = scheduleData?.dates_with_schedule?.map(dateStr => new Date(dateStr)) || [];
 
   return (
@@ -706,10 +726,18 @@ const Schedule = () => {
                       dailySchedule.map((item, index) => (
                         <Card
                           key={index}
+<<<<<<< HEAD
                           className={`mb-2 border border-gray-300 shadow-sm transition-all duration-200 ${item.course_code
                             ? 'hover:shadow-lg hover:border-blue-300 cursor-pointer hover:bg-blue-50'
                             : 'hover:shadow-md'
                             }`}
+=======
+                          className={`mb-2 border border-gray-300 shadow-sm transition-all duration-200 ${
+                            item.course_code
+                              ? 'hover:shadow-lg hover:border-blue-300 cursor-pointer hover:bg-blue-50'
+                              : 'hover:shadow-md'
+                          }`}
+>>>>>>> test-plagiarism-correction-feature
                           onClick={() => {
                             if (item.course_code && item.id) {
                               router.push(`/course/${item.course_code}?sessionId=${item.id}`);
@@ -741,6 +769,7 @@ const Schedule = () => {
 
                             {userRole === 'ADMIN' && (
                               <div className="flex gap-2 mt-3">
+<<<<<<< HEAD
                                 <Button
                                   size="sm"
                                   variant="outline"
@@ -750,6 +779,9 @@ const Schedule = () => {
                                     openEditModal(item);
                                   }}
                                 >
+=======
+                                <Button size="sm" variant="outline" className="flex items-center gap-1">
+>>>>>>> test-plagiarism-correction-feature
                                   <FaEdit className="text-xs" />
                                   Edit
                                 </Button>
@@ -757,6 +789,7 @@ const Schedule = () => {
                                   size="sm"
                                   variant="outline"
                                   className="flex items-center gap-1 text-red-600 hover:text-red-700"
+<<<<<<< HEAD
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleDeleteSession(item.id, item.session_title || item.subject);
@@ -769,6 +802,11 @@ const Schedule = () => {
                                     <FaTrash className="text-xs" />
                                   )}
                                   {deletingSessionId === item.id ? 'Menghapus...' : 'Hapus'}
+=======
+                                >
+                                  <FaTrash className="text-xs" />
+                                  Hapus
+>>>>>>> test-plagiarism-correction-feature
                                 </Button>
                               </div>
                             )}
@@ -783,8 +821,14 @@ const Schedule = () => {
                         <div className="text-gray-600">
                           {userRole === 'ADMIN'
                             ? 'Belum ada session yang dijadwalkan untuk tanggal ini'
+<<<<<<< HEAD
                             : `You don't have any scheduled activities for ${selectedDate ? format(selectedDate, 'MMM dd, yyyy') : 'this date'
                             }`}
+=======
+                            : `You don't have any scheduled activities for ${
+                                selectedDate ? format(selectedDate, 'MMM dd, yyyy') : 'this date'
+                              }`}
+>>>>>>> test-plagiarism-correction-feature
                         </div>
                       </div>
                     )}
@@ -804,8 +848,11 @@ const Schedule = () => {
                       onMonthChange={handleMonthChange}
                       className="rounded-md border shadow-sm bg-white"
                       captionLayout="dropdown"
+<<<<<<< HEAD
                       startMonth={new Date(1900, 0)}
                       endMonth={new Date(2100, 11)}
+=======
+>>>>>>> test-plagiarism-correction-feature
                       modifiers={{
                         hasSchedule: datesWithSchedule,
                       }}
@@ -822,6 +869,7 @@ const Schedule = () => {
       </div>
 
       <AddSessionModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} onSave={handleAddSession} />
+<<<<<<< HEAD
       <EditSessionModal
         isOpen={isEditModalOpen}
         onClose={() => {
@@ -831,6 +879,8 @@ const Schedule = () => {
         onSave={handleEditSession}
         session={editingSession}
       />
+=======
+>>>>>>> test-plagiarism-correction-feature
     </div>
   );
 };

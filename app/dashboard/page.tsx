@@ -4,6 +4,7 @@ import Sidebar from '../_components/sidebar';
 import Topbar from '../_components/topbar';
 import Footer from '../../components/common/footer';
 import { useState, useEffect } from 'react';
+<<<<<<< HEAD
 import { FaClock, FaUser, FaUserFriends, FaClipboard, FaBook, FaFile, FaExternalLinkAlt } from 'react-icons/fa';
 import { Card, CardContent } from '@/components/ui/card';
 import { useSchedule, getUpcomingClass } from '@/hooks';
@@ -52,14 +53,24 @@ const formatFileSize = (bytes: number): string => {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
+=======
+import { FaClock, FaUser, FaUserFriends, FaClipboard } from 'react-icons/fa';
+import { Card, CardContent } from '@/components/ui/card';
+import { useSchedule, getUpcomingClass } from '@/hooks';
+import { useRouter } from 'next/navigation';
+import { format } from 'date-fns';
+>>>>>>> test-plagiarism-correction-feature
 
 export default function Home() {
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userRole, setUserRole] = useState<string>('');
+<<<<<<< HEAD
   const [materials, setMaterials] = useState<MaterialItem[]>([]);
   const [resources, setResources] = useState<ResourceItem[]>([]);
   const [loadingMaterials, setLoadingMaterials] = useState(true);
+=======
+>>>>>>> test-plagiarism-correction-feature
 
   // Check user role and redirect admin to schedule
   useEffect(() => {
@@ -82,6 +93,7 @@ export default function Home() {
     checkUserRole();
   }, [router]);
 
+<<<<<<< HEAD
   // Fetch materials and resources
   useEffect(() => {
     const fetchMaterials = async () => {
@@ -106,16 +118,37 @@ export default function Home() {
     }
   }, [userRole]);
 
+=======
+>>>>>>> test-plagiarism-correction-feature
   // Get schedule data for upcoming class
   const { scheduleData, loading } = useSchedule();
   const upcomingClass = getUpcomingClass(scheduleData);
 
+<<<<<<< HEAD
   // Combine materials and resources, sort by date
   const allItems: DashboardItem[] = [...materials, ...resources].sort((a, b) => {
     const dateA = 'created_at' in a ? new Date(a.created_at).getTime() : 0;
     const dateB = 'created_at' in b ? new Date(b.created_at).getTime() : 0;
     return dateB - dateA;
   }).slice(0, 5);
+=======
+  const latestForumPosts = [
+    {
+      id: 1,
+      author: 'Benedictus Dhaniar Ardra',
+      date: '18 Feb 2025, 08:00 GMT+7',
+      title: 'Pembahasan Future Past',
+      subject: 'IX - 1 Bahasa Inggris Lanjut (A) (Peminatan) XI MIPA',
+    },
+    {
+      id: 2,
+      author: 'Samuel Prakoso',
+      date: '18 Feb 2025, 08:00 GMT+7',
+      title: 'Pembahasan Future Past',
+      subject: 'IX - 1 Bahasa Inggris Lanjut (A) (Peminatan) XI MIPA',
+    },
+  ];
+>>>>>>> test-plagiarism-correction-feature
 
   // Show loading while checking role
   if (userRole === '') {
@@ -141,6 +174,7 @@ export default function Home() {
       <div className="flex flex-col flex-1">
         <Topbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
         <div className="flex-1 p-6">
+<<<<<<< HEAD
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Materials Section */}
             <div className="md:col-span-2 bg-white p-4 rounded-md shadow">
@@ -221,6 +255,28 @@ export default function Home() {
             {/* Upcoming Class Section */}
             <div className="bg-white p-4 rounded-md shadow">
               <h2 className="text-xl font-semibold mb-4 text-gray-600">Kelas Berikutnya</h2>
+=======
+          {/* <div className="bg-gray-800 text-white p-2 rounded-md mb-6">
+            <h1 className="text-2xl font-bold">Dashboard</h1>
+          </div> */}
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="md:col-span-2 bg-white p-4 rounded-md shadow">
+              <h2 className="text-xl font-semibold mb-4 text-gray-600">Latest Forum Post</h2>
+              <div className="space-y-4">
+                {latestForumPosts.map(post => (
+                  <div key={post.id} className="p-4 border rounded-md shadow-sm">
+                    <p className="font-medium text-gray-600">{post.author}</p>
+                    <p className="text-xs text-gray-600">{post.date}</p>
+                    <p className="font-semibold mt-2 text-gray-600">{post.title}</p>
+                    <p className="text-sm text-gray-600">{post.subject}</p>
+                  </div>
+                ))}
+              </div>
+            </div>{' '}
+            <div className="bg-white p-4 rounded-md shadow">
+              <h2 className="text-xl font-semibold mb-4 text-gray-600">Upcoming Class</h2>
+>>>>>>> test-plagiarism-correction-feature
               {loading ? (
                 <div className="p-4 border rounded-md shadow-sm">
                   <p className="text-gray-500">Loading...</p>
@@ -264,7 +320,11 @@ export default function Home() {
                 </Card>
               ) : (
                 <div className="p-4 border rounded-md shadow-sm">
+<<<<<<< HEAD
                   <p className="text-gray-500">Tidak ada kelas mendatang</p>
+=======
+                  <p className="text-gray-500">No upcoming classes</p>
+>>>>>>> test-plagiarism-correction-feature
                 </div>
               )}
             </div>

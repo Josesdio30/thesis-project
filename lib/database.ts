@@ -1,5 +1,6 @@
 import { Pool, PoolConfig } from 'pg';
 
+<<<<<<< HEAD
 // Database configuration
 const dbConfig: PoolConfig = {
   host: process.env.DB_HOST || '31.97.50.49',
@@ -12,6 +13,37 @@ const dbConfig: PoolConfig = {
   connectionTimeoutMillis: 2000,
   ssl: false,
 };
+=======
+// All connection details must come from explicit deployment configuration.
+// Never let missing settings fall through to pg's ambient defaults.
+function databaseConfig(): PoolConfig {
+  const connectionString = process.env.LMS_POSTGRES_URL || process.env.DATABASE_URL;
+  const limits = { max: 20, idleTimeoutMillis: 30000, connectionTimeoutMillis: 2000, ssl: false as const };
+  if (connectionString) return { ...limits, connectionString };
+
+  const required = ['DB_HOST', 'DB_PORT', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'] as const;
+  const missing = required.filter(key =>
+    process.env[key] === undefined || (key !== 'DB_PASSWORD' && !process.env[key]?.trim())
+  );
+  if (missing.length) {
+    throw new Error(`Missing database configuration: set LMS_POSTGRES_URL, DATABASE_URL, or all DB_* settings (missing: ${missing.join(', ')})`);
+  }
+  const port = Number(process.env.DB_PORT);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error('Invalid DB_PORT: expected an integer between 1 and 65535');
+  }
+  return {
+    ...limits,
+    host: process.env.DB_HOST,
+    port,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+  };
+}
+
+const dbConfig = databaseConfig();
+>>>>>>> test-plagiarism-correction-feature
 
 // Create connection pool
 const pool = new Pool(dbConfig);

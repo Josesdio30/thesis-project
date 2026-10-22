@@ -47,11 +47,15 @@ export async function GET(request: NextRequest) {
             enumeration: true,
           },
         },
+<<<<<<< HEAD
         student_details: {
           include: {
             classes: true,
           },
         },
+=======
+        student_details: true,
+>>>>>>> test-plagiarism-correction-feature
         teacher_details: true,
         admin_details: true,
       },
@@ -64,6 +68,7 @@ export async function GET(request: NextRequest) {
       // Get class information for students
       let classInfo = null;
       if (user.student_details) {
+<<<<<<< HEAD
         if (user.student_details.classes) {
           classInfo = {
             class_id: user.student_details.classes.id,
@@ -83,10 +88,24 @@ export async function GET(request: NextRequest) {
                     include: {
                       academic_years: true,
                     },
+=======
+        // Find enrollments for this student
+        const studentEnrollments = await prisma.enrollments.findMany({
+          where: {
+            student_id: user.id,
+          },
+          include: {
+            class_courses: {
+              include: {
+                classes: {
+                  include: {
+                    academic_years: true,
+>>>>>>> test-plagiarism-correction-feature
                   },
                 },
               },
             },
+<<<<<<< HEAD
           });
 
           // Get the first active enrollment with active class_course
@@ -101,6 +120,22 @@ export async function GET(request: NextRequest) {
               grade_level: activeEnrollment.class_courses.classes.grade_level,
             };
           }
+=======
+          },
+        });
+
+        // Get the first active enrollment with active class_course
+        const activeEnrollment = studentEnrollments.find(enrollment => 
+          enrollment.class_courses?.is_active && enrollment.class_courses?.classes
+        );
+
+        if (activeEnrollment?.class_courses?.classes) {
+          classInfo = {
+            class_id: activeEnrollment.class_courses.classes.id,
+            class_name: activeEnrollment.class_courses.classes.class_name,
+            grade_level: activeEnrollment.class_courses.classes.grade_level,
+          };
+>>>>>>> test-plagiarism-correction-feature
         }
       }
 
@@ -262,6 +297,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Create student details if STUDENT role is selected
+<<<<<<< HEAD
     if (role === '1') {
       await prisma.student_details.create({
         data: {
@@ -270,6 +306,26 @@ export async function POST(request: NextRequest) {
           nisn: nisn || '',
           parent_contact: parent_contact || '',
           class_id: class_id ? parseInt(class_id) : null,
+=======
+    // nis is required (non-nullable, unique) in student_details
+    if (role === '1' && nis) {
+      // Check for duplicate NIS before inserting
+      const existingNis = await prisma.student_details.findUnique({ where: { nis } });
+      if (existingNis) {
+        await prisma.app_user.delete({ where: { id: newUser.id } });
+        return NextResponse.json(
+          { success: false, error: 'NIS already exists' },
+          { status: 400 }
+        );
+      }
+
+      await prisma.student_details.create({
+        data: {
+          user_id: newUser.id,
+          nis,
+          nisn: nisn || '',
+          parent_contact: parent_contact || '',
+>>>>>>> test-plagiarism-correction-feature
         },
       });
     }

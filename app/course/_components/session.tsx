@@ -78,6 +78,7 @@ const getResourceIcon = (fileType: string) => {
   }
 };
 
+<<<<<<< HEAD
 // Convert file URL to view URL for inline display
 const getViewUrl = (fileUrl: string, fileType: string) => {
   // If it's a link, return as-is
@@ -104,6 +105,8 @@ const getViewUrl = (fileUrl: string, fileType: string) => {
   return fileUrl;
 };
 
+=======
+>>>>>>> test-plagiarism-correction-feature
 const SessionSelector = ({
   sessions,
   activeSession,
@@ -204,15 +207,24 @@ const SessionSelector = ({
   }, [dropdownOpen]);
 
   return (
+<<<<<<< HEAD
     <div className="mb-4" ref={containerRef}>
       <div className="flex items-center gap-2 sm:gap-3 flex-wrap" style={{ minHeight: '48px' }}>
+=======
+    <div className="mb-6" ref={containerRef}>
+      <div className="flex items-center gap-3 scrollbar-hide" style={{ minHeight: '48px' }}>
+>>>>>>> test-plagiarism-correction-feature
         {/* Visible session buttons */}
         {visibleSessions.map(session => (
           <button
             key={session.id}
             onClick={() => setActiveSession(session.id)}
             className={cn(
+<<<<<<< HEAD
               'px-3 sm:px-4 py-2 rounded-lg border transition-all duration-200 whitespace-nowrap flex-shrink-0 text-sm sm:text-base',
+=======
+              'px-4 py-2 rounded-lg border transition-all duration-200 whitespace-nowrap flex-shrink-0',
+>>>>>>> test-plagiarism-correction-feature
               activeSession === session.id
                 ? 'bg-blue-500 text-white border-blue-500 shadow-md'
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-300'
@@ -323,11 +335,19 @@ const SessionContent = ({
   loadingResources?: boolean;
   courseCode?: string;
 }) => (
+<<<<<<< HEAD
   <Card className="mb-4 sm:mb-6">
     <CardHeader className="p-4 sm:p-6">
       <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
         <FaBookOpen className="text-blue-600" />
         <span className="break-words">{session.title}</span>
+=======
+  <Card className="mb-6">
+    <CardHeader>
+      <CardTitle className="flex items-center gap-2 text-xl">
+        <FaBookOpen className="text-blue-600" />
+        {session.title}
+>>>>>>> test-plagiarism-correction-feature
       </CardTitle>
       {session.description && <p className="text-gray-600 mt-2">{session.description}</p>}
     </CardHeader>
@@ -336,7 +356,11 @@ const SessionContent = ({
       <Materials sessionId={session.id} courseCode={courseCode} className="mb-6" />
 
       {/* Session Time */}
+<<<<<<< HEAD
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
+=======
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+>>>>>>> test-plagiarism-correction-feature
         <div className="bg-green-50 rounded-lg p-4">
           <div className="flex items-center gap-2 text-green-700 font-semibold mb-2">
             <FaClock className="text-sm" />
@@ -433,11 +457,19 @@ const ActionsSidebar = ({
     }
   }, [resourceMenuOpen]);
   return (
+<<<<<<< HEAD
     <Card className="lg:w-80 w-full h-fit">
       <CardHeader className="p-4 sm:p-6">
         <CardTitle className="text-base sm:text-lg">Resources</CardTitle>
       </CardHeader>
       <CardContent className="p-4 sm:p-6 pt-0 sm:pt-0">
+=======
+    <Card className="lg:w-80 h-fit">
+      <CardHeader>
+        <CardTitle className="text-lg">Resources</CardTitle>
+      </CardHeader>
+      <CardContent>
+>>>>>>> test-plagiarism-correction-feature
         <div className="mb-6">
           {/* <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
             <FaDownload className="text-sm text-blue-600" />
@@ -459,7 +491,11 @@ const ActionsSidebar = ({
                   <div className="flex-1 min-w-0">
                     {' '}
                     <a
+<<<<<<< HEAD
                       href={getViewUrl(resource.file_url, resource.file_type)}
+=======
+                      href={resource.file_url}
+>>>>>>> test-plagiarism-correction-feature
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-sm text-gray-700 truncate block font-medium hover:text-blue-600 transition-colors"
@@ -487,11 +523,19 @@ const ActionsSidebar = ({
                   {/* Resource Actions */}
                   <div className="flex items-center gap-1">
                     <a
+<<<<<<< HEAD
                       href={getViewUrl(resource.file_url, resource.file_type)}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
                       title="View resource"
+=======
+                      href={resource.file_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1 text-gray-400 hover:text-blue-600 transition-colors"
+                      title="Open resource"
+>>>>>>> test-plagiarism-correction-feature
                     >
                       <FaExternalLinkAlt className="text-xs" />
                     </a>
@@ -731,9 +775,15 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode }: Sess
   return (
     <div className="space-y-6">
       <SessionSelector sessions={sessions} activeSession={activeSession} setActiveSession={setActiveSession} />{' '}
+<<<<<<< HEAD
       <div className="flex flex-col lg:flex-row gap-4 lg:gap-6">
         {' '}
         <div className="flex-1 min-w-0">
+=======
+      <div className="flex flex-col lg:flex-row gap-6">
+        {' '}
+        <div className="flex-1">
+>>>>>>> test-plagiarism-correction-feature
           <SessionContent
             session={{
               ...currentSession,
@@ -742,8 +792,13 @@ const Session = ({ sessions, activeSession, setActiveSession, courseCode }: Sess
             loadingResources={loadingResources}
             courseCode={courseCode}
           />
+<<<<<<< HEAD
         </div>
         <div className="w-full lg:w-80 flex-shrink-0">
+=======
+        </div>{' '}
+        <div className="lg:w-80">
+>>>>>>> test-plagiarism-correction-feature
           {' '}
           <ActionsSidebar
             session={{

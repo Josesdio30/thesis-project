@@ -12,6 +12,10 @@
 
 # testing
 /coverage
+<<<<<<< HEAD
+=======
+/public/uploads/courses
+>>>>>>> test-plagiarism-correction-feature
 
 # next.js
 /.next/
@@ -43,9 +47,54 @@ next-env.d.ts
 /lib/generated/prisma
 
 DATABASE-SETUP-SUMMARY.md
+<<<<<<< HEAD
 
 # docs
 /docs
 
 # scripts
 /scripts
+=======
+/supabase
+
+# Local documentation, including AI-generated plans and QA reports
+/docs/
+
+/.env
+/.env.local
+/.env.production
+# python bytecode
+__pycache__/
+*.pyc
+
+# local db snapshots
+/backups
+
+
+.env*
+!.env.example
+
+# never commit: literal password test script, runtime uploads
+temp_hash.js
+/public/uploads/
+
+# Playwright
+/test-results/
+/playwright-report/
+/test-reports/
+
+# AI assistant instructions, tooling, and generated artifacts (kept locally)
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+/.agents/
+/.claude/
+/.codex/
+/.gemini/
+/.cursor/
+/.beads/
+/.metaswarm/
+/.mcp.json
+/specs/
+skills-lock.json
+>>>>>>> test-plagiarism-correction-feature

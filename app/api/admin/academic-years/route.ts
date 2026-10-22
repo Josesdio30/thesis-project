@@ -25,7 +25,11 @@ async function checkAdminAccess(session: any) {
   }
 
   const isAdmin = userDetails.app_user_role?.some(
+<<<<<<< HEAD
     (role: any) => role.enumeration?.name === 'ADMIN' && role.is_active
+=======
+    role => role.enumeration?.name?.toLowerCase() === 'admin' && role.is_active
+>>>>>>> test-plagiarism-correction-feature
   );
 
   if (!isAdmin) {
@@ -69,6 +73,7 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+<<<<<<< HEAD
 }
 
 export async function POST(request: NextRequest) {
@@ -143,3 +148,6 @@ export async function POST(request: NextRequest) {
     );
   }
 }
+=======
+} 
+>>>>>>> test-plagiarism-correction-feature

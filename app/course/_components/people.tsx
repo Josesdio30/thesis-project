@@ -2,6 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { RefreshCw, User, Users } from 'lucide-react';
+<<<<<<< HEAD
+=======
+import { buildPeopleQuery } from '@/lib/course-class-selection';
+>>>>>>> test-plagiarism-correction-feature
 
 interface Teacher {
   id: number;
@@ -38,7 +42,11 @@ interface Student {
 
 interface PeopleProps {
   courseCode?: string;
+<<<<<<< HEAD
   classId?: number;
+=======
+  classId?: number | null;
+>>>>>>> test-plagiarism-correction-feature
 }
 
 const People = ({ courseCode, classId }: PeopleProps) => {
@@ -56,7 +64,11 @@ const People = ({ courseCode, classId }: PeopleProps) => {
       setLoading(true);
       setError(null);
 
+<<<<<<< HEAD
       const response = await fetch(`/api/courses/${courseCode}/people?type=teacher${classId ? `&classId=${classId}` : ''}`);
+=======
+      const response = await fetch(`/api/courses/${courseCode}/people?${buildPeopleQuery('teacher', classId)}`);
+>>>>>>> test-plagiarism-correction-feature
       const result = await response.json();
 
       if (result.success) {
@@ -82,7 +94,11 @@ const People = ({ courseCode, classId }: PeopleProps) => {
       setLoading(true);
       setError(null);
 
+<<<<<<< HEAD
       const response = await fetch(`/api/courses/${courseCode}/people?type=students${classId ? `&classId=${classId}` : ''}`);
+=======
+      const response = await fetch(`/api/courses/${courseCode}/people?${buildPeopleQuery('students', classId)}`);
+>>>>>>> test-plagiarism-correction-feature
       const result = await response.json();
 
       if (result.success) {
@@ -108,7 +124,11 @@ const People = ({ courseCode, classId }: PeopleProps) => {
       setLoading(true);
       setError(null);
 
+<<<<<<< HEAD
       const response = await fetch(`/api/courses/${courseCode}/people?type=all${classId ? `&classId=${classId}` : ''}`);
+=======
+      const response = await fetch(`/api/courses/${courseCode}/people?${buildPeopleQuery('all', classId)}`);
+>>>>>>> test-plagiarism-correction-feature
       const result = await response.json();
 
       if (result.success) {
@@ -129,12 +149,20 @@ const People = ({ courseCode, classId }: PeopleProps) => {
     }
   }, [courseCode, classId]);
 
+<<<<<<< HEAD
   // Load data when component mounts or courseCode/classId changes
+=======
+  // Load data when component mounts or courseCode changes
+>>>>>>> test-plagiarism-correction-feature
   useEffect(() => {
     if (courseCode) {
       fetchAllPeople();
     }
+<<<<<<< HEAD
   }, [courseCode, classId, fetchAllPeople]);
+=======
+  }, [courseCode, fetchAllPeople]);
+>>>>>>> test-plagiarism-correction-feature
 
   // Load specific data when tab changes
   useEffect(() => {
@@ -143,19 +171,44 @@ const People = ({ courseCode, classId }: PeopleProps) => {
     } else if (courseCode && activePeopleTab === 'Students' && students.length === 0) {
       fetchStudents();
     }
+<<<<<<< HEAD
   }, [activePeopleTab, courseCode, classId, teacher, students.length, fetchTeacher, fetchStudents]);
 
   return (
     <div className="flex-1">
       <div className="border border-gray-300 rounded-lg p-6 shadow-sm">
+=======
+  }, [activePeopleTab, courseCode, teacher, students.length, fetchTeacher, fetchStudents]);
+  return (
+    <div className="flex-1">
+      <div className="border border-gray-300 rounded-lg p-6 shadow-sm">
+        {/* Header with refresh button */}
+        {/* <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold text-gray-800">Course People</h2>
+          <button
+            onClick={fetchAllPeople}
+            disabled={loading}
+            className="flex items-center gap-2 px-3 py-1 rounded text-gray-600 hover:bg-gray-200 transition-colors disabled:opacity-50"
+          >
+            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+            Refresh
+          </button>
+        </div> */}
+>>>>>>> test-plagiarism-correction-feature
         {/* Tab Navigation */}
         <div className="flex border-b border-gray-300 mb-6">
           {['Teacher', 'Students'].map(tab => (
             <button
               key={tab}
               onClick={() => setActivePeopleTab(tab)}
+<<<<<<< HEAD
               className={`px-4 py-2 text-gray-700 font-semibold text-base ${activePeopleTab === tab ? 'border-b-2 border-blue-500 text-blue-500' : 'hover:text-blue-500'
                 }`}
+=======
+              className={`px-4 py-2 text-gray-700 font-semibold text-base ${
+                activePeopleTab === tab ? 'border-b-2 border-blue-500 text-blue-500' : 'hover:text-blue-500'
+              }`}
+>>>>>>> test-plagiarism-correction-feature
             >
               {tab}{' '}
               {tab === 'Teacher' ? (

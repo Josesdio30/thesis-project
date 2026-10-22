@@ -1,12 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { courseService } from '@/lib/prisma-services';
 import { ApiResponse } from '@/types';
+<<<<<<< HEAD
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const teacherId = searchParams.get('teacherId');
     const studentId = searchParams.get('studentId');
+=======
+import { getSessionUser, isAdminRole, isTeacherRole, unauthorizedResponse } from '@/lib/auth/course-access';
+
+export async function GET(request: NextRequest) {
+  try {
+    const user = await getSessionUser();
+    if (!user) return unauthorizedResponse();
+
+    const { searchParams } = new URL(request.url);
+    let teacherId = searchParams.get('teacherId');
+    let studentId = searchParams.get('studentId');
+
+    // Q-06: only admins may list another user's courses (or all courses).
+    // Everyone else gets their own, whatever IDs the query string carries.
+    if (!isAdminRole(user.role)) {
+      teacherId = isTeacherRole(user.role) ? String(user.id) : null;
+      studentId = isTeacherRole(user.role) ? null : String(user.id);
+    }
+>>>>>>> test-plagiarism-correction-feature
 
     let courses;
 

@@ -1,7 +1,11 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
+<<<<<<< HEAD
 import { MessageSquare, Reply, Plus, Paperclip, Send, RefreshCw, User, Trash2 } from 'lucide-react';
+=======
+import { MessageSquare, Reply, Plus, Paperclip, Send, RefreshCw, User } from 'lucide-react';
+>>>>>>> test-plagiarism-correction-feature
 import { FaChevronDown } from 'react-icons/fa';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { cn } from '@/lib/utils';
@@ -517,6 +521,7 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
   // Format timestamp
   const formatTimestamp = (timestamp: string) => {
     return new Date(timestamp).toLocaleString();
+<<<<<<< HEAD
   };
 
   // Delete post
@@ -551,6 +556,8 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
     } finally {
       setLoading(false);
     }
+=======
+>>>>>>> test-plagiarism-correction-feature
   }; // Load forum on mount and when session changes
   useEffect(() => {
     fetchForum();
@@ -595,8 +602,13 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
       )}
 
       <div className="flex flex-col h-[calc(100vh-200px)] bg-gray-50 rounded-lg shadow-sm border border-gray-300">
+<<<<<<< HEAD
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border-b border-gray-300 bg-white rounded-t-lg gap-2 sm:gap-0">
+=======
+        {/* Header */}{' '}
+        <div className="flex items-center justify-between p-4 border-b border-gray-300 bg-white rounded-t-lg">
+>>>>>>> test-plagiarism-correction-feature
           <div>
             <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
               <MessageSquare size={20} />
@@ -716,11 +728,19 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
             </div>
           </div>
         )}
+<<<<<<< HEAD
         <div className="flex flex-1 overflow-hidden flex-col md:flex-row">
           {/* Posts List */}
           <div className={`w-full md:w-1/2 border-b md:border-b-0 md:border-r border-gray-300 flex flex-col ${selectedPost ? 'hidden md:flex' : 'flex'}`}>
             <div className="p-3 bg-gray-100 border-b border-gray-300">
               <h3 className="font-medium text-gray-700 text-sm sm:text-base">Posts ({posts.length})</h3>
+=======
+        <div className="flex flex-1 overflow-hidden">
+          {/* Posts List */}
+          <div className="w-1/2 border-r border-gray-300 flex flex-col">
+            <div className="p-3 bg-gray-100 border-b border-gray-300">
+              <h3 className="font-medium text-gray-700">Posts ({posts.length})</h3>
+>>>>>>> test-plagiarism-correction-feature
             </div>
             <div className="flex-1 overflow-y-auto">
               {loading && posts.length === 0 ? (
@@ -740,8 +760,14 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
                   <div
                     key={post.id}
                     onClick={() => setSelectedPost(post)}
+<<<<<<< HEAD
                     className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${selectedPost?.id === post.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
                       }`}
+=======
+                    className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${
+                      selectedPost?.id === post.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                    }`}
+>>>>>>> test-plagiarism-correction-feature
                   >
                     <h4 className="font-medium text-gray-800 mb-1">{post.title}</h4>
                     <p className="text-sm text-gray-600 mb-2 line-clamp-2">{post.content}</p>
@@ -765,6 +791,7 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
           </div>
 
           {/* Post Detail & Replies */}
+<<<<<<< HEAD
           <div className={`w-full md:w-1/2 flex flex-col ${selectedPost ? 'flex' : 'hidden md:flex'}`}>
             {selectedPost ? (
               <>
@@ -793,6 +820,14 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
                       </button>
                     )}
                   </div>
+=======
+          <div className="w-1/2 flex flex-col">
+            {selectedPost ? (
+              <>
+                {/* Post Detail */}
+                <div className="p-4 border-b border-gray-300 bg-white">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">{selectedPost.title}</h3>
+>>>>>>> test-plagiarism-correction-feature
                   <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
                     <User size={14} />
                     <span>{selectedPost.author.nama_lengkap}</span>

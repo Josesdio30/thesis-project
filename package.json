@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@headlessui/react": "^2.2.0",
-=======
     "db:generate": "node scripts/env-run.mjs node_modules/prisma/build/index.js generate",
     "db:pull": "node scripts/env-run.mjs node_modules/prisma/build/index.js db pull",
     "db:push": "node scripts/env-run.mjs node_modules/prisma/build/index.js db push",
@@ -88,7 +87,7 @@
     "@types/react-dom": "^19",
     "dotenv": "^16.5.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
     "eslint": "^9.39.4",
     "eslint-config-next": "^15.5.28",
     "jest": "^30.2.0",

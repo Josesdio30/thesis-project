@@ -102,7 +102,6 @@ model student_details {
   class_id       Int?
   app_user       app_user  @relation(fields: [user_id], references: [id], onDelete: Cascade)
   classes        classes?  @relation(fields: [class_id], references: [id], onDelete: SetNull, onUpdate: NoAction)
-  app_user       app_user  @relation(fields: [user_id], references: [id], onDelete: Cascade)
 }
 
 model teacher_details {

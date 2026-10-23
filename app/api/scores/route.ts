@@ -80,10 +80,8 @@ export async function GET(request: NextRequest) {
                   session_number: true,
                   class_courses: {
                     select: {
-<<<<<<< HEAD
-=======
                       class_id: true,
->>>>>>> test-plagiarism-correction-feature
+
                       courses: {
                         select: {
                           course_code: true,
@@ -140,13 +138,10 @@ export async function GET(request: NextRequest) {
           assignment_type: submission.assignments.enumeration.name,
           course_code: course?.course_code || 'N/A',
           course_name: course?.course_name || 'Unknown Course',
-<<<<<<< HEAD
           class_name: classInfo?.class_name || 'Unknown Class',
-=======
           class_id: classCourse?.class_id ?? null,
           class_name: classInfo?.class_name || 'Unknown Class',
           session_id: submission.assignments.session_id,
->>>>>>> test-plagiarism-correction-feature
           session_title: submission.assignments.sessions.title,
           session_number: submission.assignments.sessions.session_number,
           student: {
@@ -216,10 +211,7 @@ export async function GET(request: NextRequest) {
                   session_number: true,
                   class_courses: {
                     select: {
-<<<<<<< HEAD
-=======
                       class_id: true,
->>>>>>> test-plagiarism-correction-feature
                       courses: {
                         select: {
                           course_code: true,
@@ -269,13 +261,10 @@ export async function GET(request: NextRequest) {
           assignment_type: submission.assignments.enumeration.name,
           course_code: course?.course_code || 'N/A',
           course_name: course?.course_name || 'Unknown Course',
-<<<<<<< HEAD
           class_name: classInfo?.class_name || 'Unknown Class',
-=======
           class_id: classCourse?.class_id ?? null,
           class_name: classInfo?.class_name || 'Unknown Class',
           session_id: submission.assignments.session_id,
->>>>>>> test-plagiarism-correction-feature
           session_title: submission.assignments.sessions.title,
           session_number: submission.assignments.sessions.session_number,
           attempt_number: submission.attempt_number,
@@ -298,11 +287,8 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching scores:', error);
     return NextResponse.json(
-<<<<<<< HEAD
       { error: 'Failed to fetch scores', details: error instanceof Error ? error.message : 'Unknown error' },
-=======
       { error: 'Failed to fetch scores' },
->>>>>>> test-plagiarism-correction-feature
       { status: 500 }
     );
   }

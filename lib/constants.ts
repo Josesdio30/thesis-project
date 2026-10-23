@@ -11,10 +11,7 @@ export const NAVIGATION_ITEMS = [
   { icon: 'FaBook', text: 'Assignment', path: '/assignment' },
   // { icon: 'FaClipboardCheck', text: 'Exam', path: '/exam' },
   { icon: 'FaChartBar', text: 'Score', path: '/score' },
-<<<<<<< HEAD
-=======
   { icon: 'FaRobot', text: 'AI Dashboard', path: '/ai-dashboard' },
->>>>>>> test-plagiarism-correction-feature
   // { icon: 'FaBullhorn', text: 'Announcement', path: '/announcement' },
 ] as const;
 
@@ -23,13 +20,10 @@ export const ADMIN_NAVIGATION_ITEMS = [
   { icon: 'FaCalendarAlt', text: 'Session Management', path: '/schedule' },
   { icon: 'FaBook', text: 'Course Management', path: '/admin/courses' },
   { icon: 'FaUniversity', text: 'Class Management', path: '/admin/classes' },
-<<<<<<< HEAD
   { icon: 'FaCalendarAlt', text: 'Academic Year', path: '/admin/academic-years' },
   { icon: 'FaUsers', text: 'User Management', path: '/user' },
-=======
   { icon: 'FaUsers', text: 'User Management', path: '/user' },
   { icon: 'FaRobot', text: 'AI Management', path: '/admin/ai' },
->>>>>>> test-plagiarism-correction-feature
 ] as const;
 
 // User roles

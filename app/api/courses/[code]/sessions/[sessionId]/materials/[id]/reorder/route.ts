@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-<<<<<<< HEAD
-=======
 import { requireCourseManager, teacherIdsForSession } from '@/lib/auth/course-access';
->>>>>>> test-plagiarism-correction-feature
 import { prisma } from '@/lib/prisma';
 
 // PATCH /api/courses/[code]/sessions/[sessionId]/materials/[id]/reorder
@@ -12,11 +9,8 @@ export async function PATCH(
 ) {
   try {
     const { code, sessionId, id } = await params;
-<<<<<<< HEAD
-=======
     const access = await requireCourseManager(() => teacherIdsForSession(sessionId));
     if (!access.ok) return access.response;
->>>>>>> test-plagiarism-correction-feature
     const body = await request.json();
     const { direction } = body;
 

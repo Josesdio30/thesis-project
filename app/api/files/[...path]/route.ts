@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 // import { NextRequest, NextResponse } from 'next/server';
 // import { readFile } from 'fs/promises';
 // import path from 'path';
@@ -60,27 +60,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readFile } from 'fs/promises';
 import path from 'path';
-=======
 import { NextRequest, NextResponse } from 'next/server';
 import { readFile } from 'fs/promises';
 import path from 'path';
 import { getSessionUser, requireSessionMember, unauthorizedResponse } from '@/lib/auth/course-access';
 
 const UPLOADS_ROOT = path.join(process.cwd(), 'public', 'uploads');
->>>>>>> test-plagiarism-correction-feature
+
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   try {
     const { path: pathArray } = await params;
     const filePath = pathArray.join('/');
-<<<<<<< HEAD
     const fullPath = path.join(process.cwd(), 'public', 'uploads', filePath);
-
     console.log('=== FILE READ REQUEST ===');
     console.log('Requested path:', filePath);
     console.log('Full path:', fullPath);
     console.log('========================');
-=======
     const fullPath = path.join(UPLOADS_ROOT, filePath);
 
     // Q-09: only course files, only inside the uploads folder, only for
@@ -99,7 +95,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
     const access = await requireSessionMember(sessionId, { courseCode });
     if (!access.ok) return access.response;
->>>>>>> test-plagiarism-correction-feature
 
     const fileBuffer = await readFile(fullPath);
 
@@ -138,11 +133,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       headers: {
         'Content-Type': contentType,
         'Content-Disposition': `inline; filename="${fileName}"`,
-<<<<<<< HEAD
         'Cache-Control': 'public, max-age=31536000',
-=======
         'Cache-Control': 'private, max-age=0, must-revalidate',
->>>>>>> test-plagiarism-correction-feature
       },
     });
   } catch (error) {

@@ -3,17 +3,12 @@ import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 export async function middleware(request: NextRequest) {
-<<<<<<< HEAD
-=======
-  const { pathname } = request.nextUrl;
-
->>>>>>> test-plagiarism-correction-feature
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
   });
 
-<<<<<<< HEAD
+
   const { pathname } = request.nextUrl;
 
   // Skip middleware untuk routes yang tidak memerlukan auth
@@ -24,7 +19,6 @@ export async function middleware(request: NextRequest) {
     pathname.startsWith('/images/') ||
     pathname.startsWith('/icons/') ||
     pathname.includes('.') // File extensions (css, js, png, etc.)
-=======
   if (
     pathname.startsWith('/api/auth') || 
     pathname.startsWith('/_next') || 
@@ -34,12 +28,11 @@ export async function middleware(request: NextRequest) {
     // Dotted paths are static assets, except API routes and uploaded course
     // files, which always need a session (Q-09).
     (pathname.includes('.') && !pathname.startsWith('/api/') && !pathname.startsWith('/uploads/'))
->>>>>>> test-plagiarism-correction-feature
   ) {
     return NextResponse.next();
   }
 
-<<<<<<< HEAD
+
   // Define public routes yang bisa diakses tanpa authentication
   const publicRoutes = ['/login', '/(auth)/login'];
   const isPublicRoute = publicRoutes.includes(pathname);
@@ -58,7 +51,6 @@ export async function middleware(request: NextRequest) {
       const response = NextResponse.redirect(new URL('/login', request.url));
 
       // Clear all NextAuth cookies
-=======
   const publicRoutes = ['/login', '/auth'];
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
 
@@ -72,12 +64,10 @@ export async function middleware(request: NextRequest) {
       
       const cookieOptions = { path: '/', secure: process.env.NODE_ENV === 'production' };
       
->>>>>>> test-plagiarism-correction-feature
       response.cookies.delete('next-auth.session-token');
       response.cookies.delete('__Secure-next-auth.session-token');
       response.cookies.delete('next-auth.csrf-token');
       response.cookies.delete('__Secure-next-auth.csrf-token');
-<<<<<<< HEAD
       response.cookies.delete('next-auth.callback-url');
       response.cookies.delete('__Secure-next-auth.callback-url');
 
@@ -103,8 +93,6 @@ export async function middleware(request: NextRequest) {
   }
 
   // Unauthenticated user on public route, allow access
-=======
-      
       return response;
     }
 
@@ -129,13 +117,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
->>>>>>> test-plagiarism-correction-feature
   return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-<<<<<<< HEAD
     /*
      * Match all request paths except for the ones starting with:
      * - api/auth (NextAuth API routes)
@@ -147,8 +133,3 @@ export const config = {
     '/((?!api/auth|_next/static|_next/image|favicon.ico|images|icons).*)',
   ],
 };
-=======
-    '/((?!api/auth|_next/static|_next/image|favicon.ico|images|icons).*)',
-  ],
-};
->>>>>>> test-plagiarism-correction-feature

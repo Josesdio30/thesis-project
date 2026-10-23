@@ -1,12 +1,10 @@
 'use client';
 
-<<<<<<< HEAD
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { FaUsers, FaPlus, FaEdit, FaTrash, FaSpinner, FaEye, FaEyeSlash, FaChevronLeft, FaChevronRight, FaSearch, FaFilter } from 'react-icons/fa';
-=======
 import React, { useState, useEffect } from 'react';
 import { FaUsers, FaPlus, FaEdit, FaTrash, FaSpinner, FaEye, FaEyeSlash } from 'react-icons/fa';
->>>>>>> test-plagiarism-correction-feature
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Sidebar from '../_components/sidebar';
@@ -96,7 +94,7 @@ const AddUserModal = ({ isOpen, onClose, onSave, initialData = null, isEditMode 
       } else if (initialData.class_info && initialData.class_info.class_id) {
         classId = initialData.class_info.class_id.toString();
       }
-<<<<<<< HEAD
+
 
       // Generate password dari tanggal lahir untuk ditampilkan
       let generatedPassword = '';
@@ -108,21 +106,15 @@ const AddUserModal = ({ isOpen, onClose, onSave, initialData = null, isEditMode 
         generatedPassword = `s!nLui2+${day}${month}${year}`;
       }
 
-=======
       // Don't set default class if no class found - let user select
-      
->>>>>>> test-plagiarism-correction-feature
       setFormData({
         nama_lengkap: initialData.nama_lengkap || '',
         email: initialData.email || '',
         user_name: initialData.user_name || '',
-<<<<<<< HEAD
         password: generatedPassword, // ✅ TAMPILKAN password yang di-generate
         confirmPassword: generatedPassword,
-=======
         password: '',
         confirmPassword: '',
->>>>>>> test-plagiarism-correction-feature
         role: initialData.roles ? (initialData.roles[0] === 'ADMIN' ? '3' : initialData.roles[0] === 'TEACHER' ? '2' : '1') : '',
         tanggal_lahir: tanggalLahir,
         nis: initialData.nis || '',
@@ -198,13 +190,10 @@ const AddUserModal = ({ isOpen, onClose, onSave, initialData = null, isEditMode 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-<<<<<<< HEAD
     if (!formData.nama_lengkap || !formData.email || !formData.user_name ||
       !formData.role || !formData.tanggal_lahir) {
-=======
     if (!formData.nama_lengkap || !formData.email || !formData.user_name || 
         !formData.role || !formData.tanggal_lahir) {
->>>>>>> test-plagiarism-correction-feature
       alert('Mohon lengkapi semua field yang diperlukan');
       return;
     }
@@ -327,7 +316,6 @@ const AddUserModal = ({ isOpen, onClose, onSave, initialData = null, isEditMode 
                 id="tanggal_lahir"
                 type="date"
                 value={formData.tanggal_lahir}
-<<<<<<< HEAD
                 onChange={(e) => {
                   const newDate = e.target.value;
                   // Auto-generate password dari tanggal lahir baru
@@ -346,9 +334,8 @@ const AddUserModal = ({ isOpen, onClose, onSave, initialData = null, isEditMode 
                     confirmPassword: newPassword
                   });
                 }}
-=======
+
                 onChange={(e) => setFormData({ ...formData, tanggal_lahir: e.target.value })}
->>>>>>> test-plagiarism-correction-feature
                 required
               />
             </div>
@@ -373,7 +360,6 @@ const AddUserModal = ({ isOpen, onClose, onSave, initialData = null, isEditMode 
             </Select>
           </div>
 
-<<<<<<< HEAD
           {/* Password Fields - Auto-generated from birth date */}
           <div className="grid grid-cols-2 gap-4">
             <div>
@@ -421,8 +407,6 @@ const AddUserModal = ({ isOpen, onClose, onSave, initialData = null, isEditMode 
             </div>
           </div>
 
-=======
->>>>>>> test-plagiarism-correction-feature
           {/* Student Details */}
           {formData.role === '1' && (
             <div className="border-t pt-4">
@@ -566,7 +550,7 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [classCourses, setClassCourses] = useState<any[]>([]);
 
-<<<<<<< HEAD
+
   // Search and Filter state
   const [searchQuery, setSearchQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('all');
@@ -610,8 +594,6 @@ const UserManagement = () => {
     setCurrentPage(1);
   }, [searchQuery, roleFilter, statusFilter]);
 
-=======
->>>>>>> test-plagiarism-correction-feature
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -706,7 +688,6 @@ const UserManagement = () => {
     }
   };
 
-<<<<<<< HEAD
   const handleDeleteUser = async (userId: number) => {
     if (!confirm('Apakah Anda yakin ingin menghapus user ini?')) {
       return;
@@ -734,8 +715,6 @@ const UserManagement = () => {
     }
   };
 
-=======
->>>>>>> test-plagiarism-correction-feature
   const handleMenuClick = () => {
     setIsMobileOpen(true);
   };
@@ -755,11 +734,8 @@ const UserManagement = () => {
                   <FaUsers className="text-blue-600" />
                   User Management
                 </CardTitle>
-<<<<<<< HEAD
                 <Button
-=======
                 <Button 
->>>>>>> test-plagiarism-correction-feature
                   onClick={() => setIsAddModalOpen(true)}
                   className="flex items-center gap-2"
                 >
@@ -769,7 +745,6 @@ const UserManagement = () => {
               </div>
             </CardHeader>
             <CardContent>
-<<<<<<< HEAD
               {/* Search and Filter Controls */}
               <div className="flex flex-col md:flex-row gap-4 mb-6">
                 {/* Search Input */}
@@ -828,18 +803,13 @@ const UserManagement = () => {
                 )}
               </div>
 
-=======
->>>>>>> test-plagiarism-correction-feature
               {loading ? (
                 <div className="flex items-center justify-center py-12">
                   <FaSpinner className="animate-spin text-blue-500 mr-2" />
                   <span className="text-gray-600">Loading users...</span>
                 </div>
-<<<<<<< HEAD
               ) : filteredUsers.length > 0 ? (
-=======
               ) : users.length > 0 ? (
->>>>>>> test-plagiarism-correction-feature
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
                     <thead>
@@ -854,11 +824,8 @@ const UserManagement = () => {
                       </tr>
                     </thead>
                     <tbody>
-<<<<<<< HEAD
                       {paginatedUsers.map((user) => (
-=======
                       {users.map((user) => (
->>>>>>> test-plagiarism-correction-feature
                         <tr key={user.id} className="border-b hover:bg-gray-50">
                           <td className="p-3">{user.nama_lengkap}</td>
                           <td className="p-3">{user.email}</td>
@@ -886,52 +853,43 @@ const UserManagement = () => {
                           </td>
                           <td className="p-3">
                             <span
-<<<<<<< HEAD
                               className={`text-xs px-2 py-1 rounded-full ${user.is_active
                                 ? 'bg-green-100 text-green-800'
                                 : 'bg-red-100 text-red-800'
                                 }`}
-=======
                               className={`text-xs px-2 py-1 rounded-full ${
                                 user.is_active
                                   ? 'bg-green-100 text-green-800'
                                   : 'bg-red-100 text-red-800'
                               }`}
->>>>>>> test-plagiarism-correction-feature
                             >
                               {user.is_active ? 'Active' : 'Inactive'}
                             </span>
                           </td>
                           <td className="p-3">
                             <div className="flex gap-2">
-<<<<<<< HEAD
                               <Button
                                 size="sm"
                                 variant="outline"
                                 className="flex items-center gap-1"
-=======
                               <Button 
                                 size="sm" 
                                 variant="outline" 
                                 className="flex items-center gap-1" 
->>>>>>> test-plagiarism-correction-feature
                                 onClick={() => handleEditClick(user)}
                               >
                                 <FaEdit className="text-xs" />
                                 Edit
                               </Button>
-<<<<<<< HEAD
                               <Button
                                 size="sm"
                                 variant="outline"
                                 className="flex items-center gap-1 text-red-600 hover:text-red-700"
                                 onClick={() => handleDeleteUser(user.id)}
-=======
                               <Button 
                                 size="sm" 
                                 variant="outline" 
                                 className="flex items-center gap-1 text-red-600 hover:text-red-700"
->>>>>>> test-plagiarism-correction-feature
                               >
                                 <FaTrash className="text-xs" />
                                 Hapus
@@ -942,7 +900,6 @@ const UserManagement = () => {
                       ))}
                     </tbody>
                   </table>
-<<<<<<< HEAD
 
                   {/* Pagination Controls */}
                   {totalPages > 1 && (
@@ -1001,8 +958,6 @@ const UserManagement = () => {
                       </div>
                     </div>
                   )}
-=======
->>>>>>> test-plagiarism-correction-feature
                 </div>
               ) : (
                 <div className="text-center py-12">

@@ -12,10 +12,7 @@ import People from '../_components/people';
 import SimpleEditor from '../_components/syllabus';
 import AssignmentTab from '../_components/assignment';
 import ScoreTab from '../_components/score';
-<<<<<<< HEAD
-=======
 import { selectClassCourse, selectInitialSessionId } from '@/lib/course-class-selection';
->>>>>>> test-plagiarism-correction-feature
 
 const CourseDetail = () => {
   const params = useParams();
@@ -26,10 +23,7 @@ const CourseDetail = () => {
   const sessionIdParam = searchParams.get('sessionId');
   const tabParam = searchParams.get('tab');
   const classIdParam = searchParams.get('classId');
-<<<<<<< HEAD
-=======
   const assignmentIdParam = searchParams.get('assignmentId');
->>>>>>> test-plagiarism-correction-feature
   const [course, setCourse] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('Session');
@@ -45,7 +39,6 @@ const CourseDetail = () => {
         const courseData = data.data || null;
         setCourse(courseData);
 
-<<<<<<< HEAD
         if (sessionIdParam) {
           const sessionId = parseInt(sessionIdParam);
           if (!isNaN(sessionId)) {
@@ -56,7 +49,7 @@ const CourseDetail = () => {
           // Default to first session if no URL parameter
           const firstSession = courseData.class_courses[0].sessions[0];
           setActiveSession(firstSession.id);
-=======
+
         const initialSessionId = selectInitialSessionId(courseData?.class_courses, classIdParam, sessionIdParam);
 
         if (initialSessionId !== null) {
@@ -64,7 +57,6 @@ const CourseDetail = () => {
           if (sessionIdParam) {
             setActiveTab('Session');
           }
->>>>>>> test-plagiarism-correction-feature
         }
 
         // Set active tab from URL parameter
@@ -78,11 +70,8 @@ const CourseDetail = () => {
       }
     };
     fetchCourse();
-<<<<<<< HEAD
   }, [code, sessionIdParam]);
-=======
   }, [code, classIdParam, sessionIdParam, tabParam]);
->>>>>>> test-plagiarism-correction-feature
   if (loading) {
     return (
       <div className="flex min-h-screen w-full overflow-hidden">
@@ -109,11 +98,8 @@ const CourseDetail = () => {
           <div className="flex items-center justify-center h-96">
             <div className="text-center">
               <h2 className="text-xl font-semibold text-gray-900 mb-2">Course Not Found</h2>
-<<<<<<< HEAD
               <p className="text-gray-600 mb-4">The course you're looking for doesn't exist.</p>
-=======
               <p className="text-gray-600 mb-4">The course you&apos;re looking for doesn&apos;t exist.</p>
->>>>>>> test-plagiarism-correction-feature
               <Link
                 href="/course"
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
@@ -127,7 +113,6 @@ const CourseDetail = () => {
     );
   }
 
-<<<<<<< HEAD
   // ✅ FIX: Find the class_course based on classId from URL, or fallback to finding by active session
   const activeClassCourse = classIdParam
     ? course.class_courses?.find((cc: any) => cc.class_id === parseInt(classIdParam))
@@ -139,11 +124,9 @@ const CourseDetail = () => {
   const students = activeClassCourse?.students || [];
 
   // ✅ FIX: Only get sessions from the active class_course, not all class_courses
-=======
   const activeClassCourse = selectClassCourse<any>(course.class_courses, classIdParam, activeSession);
   const teacher = activeClassCourse?.teacher || {};
   const students = activeClassCourse?.students || [];
->>>>>>> test-plagiarism-correction-feature
   const sessions = activeClassCourse?.sessions || [];
 
   return (
@@ -189,14 +172,11 @@ const CourseDetail = () => {
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
-<<<<<<< HEAD
                   className={`px-6 py-3 text-gray-700 font-semibold text-base whitespace-nowrap ${activeTab === tab ? 'border-b-4 border-blue-500 text-blue-500' : 'hover:text-blue-500'
                     }`}
-=======
                   className={`px-6 py-3 text-gray-700 font-semibold text-base whitespace-nowrap ${
                     activeTab === tab ? 'border-b-4 border-blue-500 text-blue-500' : 'hover:text-blue-500'
                   }`}
->>>>>>> test-plagiarism-correction-feature
                 >
                   {tab}
                 </button>
@@ -223,24 +203,18 @@ const CourseDetail = () => {
             )}
             {activeTab === 'Assignment' && (
               <div className="bg-white rounded-lg shadow-sm p-6">
-<<<<<<< HEAD
                 <AssignmentTab courseCode={code as string} sessionId={activeSession} />
-=======
                 <AssignmentTab
                   courseCode={code as string}
                   sessionId={activeSession}
                   initialAssignmentId={assignmentIdParam ? parseInt(assignmentIdParam) : null}
                 />
->>>>>>> test-plagiarism-correction-feature
               </div>
             )}
             {activeTab === 'Scoring' && (
               <div className="bg-white rounded-lg shadow-sm p-6">
-<<<<<<< HEAD
                 <ScoreTab courseCode={code as string} className={course?.class_courses?.[0]?.classes?.class_name} />
-=======
                 <ScoreTab courseCode={code as string} className={activeClassCourse?.class_name} />
->>>>>>> test-plagiarism-correction-feature
               </div>
             )}
             {activeTab === 'People' && <People courseCode={code as string} classId={activeClassCourse?.class_id} />}

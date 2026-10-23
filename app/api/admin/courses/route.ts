@@ -39,16 +39,10 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     const { isAdmin, error } = await checkAdminAccess(session);
-<<<<<<< HEAD
-
-=======
-    
->>>>>>> test-plagiarism-correction-feature
     if (!isAdmin) {
       return NextResponse.json({ success: false, error }, { status: 401 });
     }
 
-<<<<<<< HEAD
     // Get all teachers (users with teacher_details OR teacher role)
     const teachers = await prisma.app_user.findMany({
       where: {
@@ -72,14 +66,12 @@ export async function GET(request: NextRequest) {
             },
           },
         ],
-=======
     // Get all teachers
     const teachers = await prisma.app_user.findMany({
       where: {
         teacher_details: {
           isNot: null,
         },
->>>>>>> test-plagiarism-correction-feature
         is_active: true,
         is_deleted: false,
       },
@@ -115,11 +107,8 @@ export async function GET(request: NextRequest) {
         teachers: teachers.map(teacher => ({
           id: teacher.id,
           name: teacher.nama_lengkap,
-<<<<<<< HEAD
           kode_guru: teacher.teacher_details?.kode_guru || teacher.user_name || '-',
-=======
           kode_guru: teacher.teacher_details?.kode_guru,
->>>>>>> test-plagiarism-correction-feature
           niy: teacher.teacher_details?.niy,
         })),
         classes: classes.map(classData => ({
@@ -154,11 +143,6 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     const { isAdmin, error } = await checkAdminAccess(session);
-<<<<<<< HEAD
-
-=======
-    
->>>>>>> test-plagiarism-correction-feature
     if (!isAdmin) {
       return NextResponse.json({ success: false, error }, { status: 401 });
     }

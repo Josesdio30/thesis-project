@@ -2,13 +2,11 @@
 
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-<<<<<<< HEAD
 import { Menu } from 'lucide-react';
 import NotificationBell from '@/components/notification-bell';
 
 export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   const pathname = usePathname();
-=======
 import { Bell, Menu } from 'lucide-react';
 import { useState } from 'react';
 
@@ -22,7 +20,6 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
     { id: 2, message: 'Assignment deadline approaching.' },
     { id: 3, message: 'Your course has been updated.' },
   ];
->>>>>>> test-plagiarism-correction-feature
 
   const pathTitleMap: Record<string, string> = {
     '/dashboard': 'MY DASHBOARD',
@@ -31,10 +28,7 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
     '/session': 'MY SESSION',
     '/schedule': 'MY SCHEDULE',
     '/course/[code]': 'MY COURSE DETAIL',
-<<<<<<< HEAD
-=======
     '/admin/ai': 'AI MANAGEMENT',
->>>>>>> test-plagiarism-correction-feature
   };
 
   const pageTitle = pathTitleMap[pathname] || 'MY PAGE';
@@ -54,10 +48,8 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
         </div>
       </div>
       {/* Right side - Notification */}
-<<<<<<< HEAD
       <div className="flex items-center space-x-6">
         <NotificationBell />
-=======
       <div className="flex items-center space-x-6 relative">
         <div className="relative">
           {/* <Bell className="w-6 h-6 text-gray-600 cursor-pointer" onClick={() => setShowNotif(!showNotif)} />
@@ -85,7 +77,6 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
             </div>
           )}
         </div>
->>>>>>> test-plagiarism-correction-feature
       </div>
     </div>
   );

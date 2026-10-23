@@ -68,7 +68,6 @@ export async function POST(request: NextRequest) {
       where: { id: parseInt(teacherId) },
       include: {
         teacher_details: true,
-<<<<<<< HEAD
         app_user_role: {
           include: {
             enumeration: true,
@@ -84,12 +83,10 @@ export async function POST(request: NextRequest) {
       );
 
     if (!teacher || !isTeacher) {
-=======
       },
     });
 
     if (!teacher || !teacher.teacher_details) {
->>>>>>> test-plagiarism-correction-feature
       return NextResponse.json(
         { success: false, error: 'Teacher not found' },
         { status: 404 }
@@ -186,7 +183,6 @@ export async function POST(request: NextRequest) {
     console.log('Total class_courses found:', allClassCoursesInClass.length);
 
     const allStudentIds = new Set<number>();
-<<<<<<< HEAD
     
     // 1. Fetch from direct class assignment in student_details
     const directClassStudents = await prisma.student_details.findMany({
@@ -200,8 +196,6 @@ export async function POST(request: NextRequest) {
     directClassStudents.forEach(s => allStudentIds.add(s.user_id));
 
     // 2. Fetch from existing enrollments in the same class (backward compatibility)
-=======
->>>>>>> test-plagiarism-correction-feature
     for (const cc of allClassCoursesInClass) {
       console.log(`Class course ${cc.id}: ${cc.enrollments.length} enrollments`);
       for (const enrollment of cc.enrollments) {

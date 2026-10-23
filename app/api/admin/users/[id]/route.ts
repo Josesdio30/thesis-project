@@ -82,11 +82,10 @@ export async function PUT(
 
     // Check if email already exists (excluding current user)
     const existingEmail = await prisma.app_user.findFirst({
-<<<<<<< HEAD
       where: {
-=======
+
       where: { 
->>>>>>> test-plagiarism-correction-feature
+        test-plagiarism-correction-feature
         email,
         id: { not: userId }
       },
@@ -101,11 +100,8 @@ export async function PUT(
 
     // Check if username already exists (excluding current user)
     const existingUsername = await prisma.app_user.findFirst({
-<<<<<<< HEAD
       where: {
-=======
       where: { 
->>>>>>> test-plagiarism-correction-feature
         user_name,
         id: { not: userId }
       },
@@ -138,7 +134,6 @@ export async function PUT(
     }
 
     // Hash the password
-<<<<<<< HEAD
     console.log('🔐 Updating password for user:', userId);
     console.log('🔐 Password to hash:', finalPassword);
     updateData.password = await bcrypt.hash(finalPassword, 10);
@@ -150,7 +145,6 @@ export async function PUT(
       data: updateData,
     });
     console.log('✅ User updated, password hash saved:', updatedUser.password?.substring(0, 20) + '...');
-=======
     updateData.password = await bcrypt.hash(finalPassword, 10);
 
     // Update user
@@ -158,7 +152,6 @@ export async function PUT(
       where: { id: userId },
       data: updateData,
     });
->>>>>>> test-plagiarism-correction-feature
 
     // Update user role
     await prisma.app_user_role.deleteMany({
@@ -185,21 +178,15 @@ export async function PUT(
     });
 
     // Create student details if STUDENT role is selected
-<<<<<<< HEAD
     if (role === '1') {
-=======
     if (role === '1' && (nis || nisn || parent_contact)) {
->>>>>>> test-plagiarism-correction-feature
       await prisma.student_details.create({
         data: {
           user_id: userId,
           nis: nis || '',
           nisn: nisn || '',
           parent_contact: parent_contact || '',
-<<<<<<< HEAD
           class_id: class_id ? parseInt(class_id) : null,
-=======
->>>>>>> test-plagiarism-correction-feature
         },
       });
     }

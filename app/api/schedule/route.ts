@@ -11,11 +11,7 @@ export async function GET(request: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
     }
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> test-plagiarism-correction-feature
     const { searchParams } = new URL(request.url);
     const dateParam = searchParams.get('date'); // Format: YYYY-MM-DD
     const monthParam = searchParams.get('month'); // Format: YYYY-MM
@@ -79,11 +75,11 @@ export async function GET(request: NextRequest) {
         },
       },
     });
-<<<<<<< HEAD
 
-=======
+
+
     
->>>>>>> test-plagiarism-correction-feature
+
     if (!userDetails) {
       return NextResponse.json({ success: false, error: 'User not found' }, { status: 404 });
     }
@@ -97,11 +93,11 @@ export async function GET(request: NextRequest) {
         isActive: role.is_active,
       })),
     });
-<<<<<<< HEAD
 
-=======
+
+
     
->>>>>>> test-plagiarism-correction-feature
+
     let sessions: any[] = [];
 
     const isStudent =
@@ -217,22 +213,22 @@ export async function GET(request: NextRequest) {
 
       sessions = allSessions;
     }
-<<<<<<< HEAD
 
-=======
+
+
     
->>>>>>> test-plagiarism-correction-feature
+
     const scheduleData = sessions.map(session => ({
       id: session.id,
       subject: session.class_courses?.courses?.course_name || 'Unknown Course',
       teacher: session.class_courses?.app_user?.nama_lengkap || 'Unknown Teacher',
-<<<<<<< HEAD
+
       teacher_id: session.class_courses?.teacher_id || null,
       class_name: session.class_courses?.classes?.class_name || 'Unknown Class',
       class_id: session.class_courses?.class_id || null,
-=======
+
       class_name: session.class_courses?.classes?.class_name || 'Unknown Class',
->>>>>>> test-plagiarism-correction-feature
+
       session_title: session.title,
       description: session.description,
       start_time: session.start_time,
@@ -364,11 +360,7 @@ export async function GET(request: NextRequest) {
         },
       });
     }
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> test-plagiarism-correction-feature
     const uniqueDates = new Set(allSessions.map(session => format(new Date(session.start_time), 'yyyy-MM-dd')));
     allDatesWithSchedule = Array.from(uniqueDates);
 
@@ -377,24 +369,19 @@ export async function GET(request: NextRequest) {
       monthParam,
       monthWhereClause: monthWhereClause.start_time
         ? {
-<<<<<<< HEAD
           gte: monthWhereClause.start_time.gte.toISOString(),
           lte: monthWhereClause.start_time.lte.toISOString(),
         }
-=======
             gte: monthWhereClause.start_time.gte.toISOString(),
             lte: monthWhereClause.start_time.lte.toISOString(),
           }
->>>>>>> test-plagiarism-correction-feature
+
         : 'none',
       allSessionsCount: allSessions.length,
       allDatesWithSchedule,
     });
-<<<<<<< HEAD
 
-=======
-    
->>>>>>> test-plagiarism-correction-feature
+
     if (!dateParam) {
       const groupedSchedule: Record<string, typeof scheduleData> = {};
 

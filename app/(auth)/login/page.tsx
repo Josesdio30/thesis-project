@@ -3,10 +3,7 @@
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-<<<<<<< HEAD
 import {Eye, EyeOff} from 'lucide-react' ;
-=======
->>>>>>> test-plagiarism-correction-feature
 import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -16,10 +13,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-<<<<<<< HEAD
   const [showPassword, setShowPassword] = useState(false);
-=======
->>>>>>> test-plagiarism-correction-feature
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,7 +64,6 @@ export default function LoginPage() {
               required
             />
           </div>
-<<<<<<< HEAD
           
           <div className="relative">
             <Input
@@ -90,8 +83,6 @@ export default function LoginPage() {
               {showPassword ? <EyeOff size={18} /> : <Eye size={18} /> }
               </Button>  
           </div>
-
-=======
           <div>
             <Input
               type="password"
@@ -102,7 +93,6 @@ export default function LoginPage() {
               required
             />
           </div>
->>>>>>> test-plagiarism-correction-feature
           <Button
             type="submit"
             disabled={isLoading}

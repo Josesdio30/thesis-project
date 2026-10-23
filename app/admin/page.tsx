@@ -10,7 +10,6 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('Session');
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [form, setForm] = useState({
-<<<<<<< HEAD
     title: '',
     kodeMapel: '',
     startTime: '',
@@ -24,14 +23,12 @@ const AdminDashboard = () => {
   const [courses, setCourses] = useState<any[]>([]);
   const [teachers, setTeachers] = useState<any[]>([]);
   const [classes, setClasses] = useState<any[]>([]);
-=======
     kodeMapel: '',
     jam: '',
     tanggal: '',
   });
   const [jadwal, setJadwal] = useState<any[]>([]);
   const [courses, setCourses] = useState<any[]>([]);
->>>>>>> test-plagiarism-correction-feature
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,7 +46,6 @@ const AdminDashboard = () => {
     }
   }, [router]);
 
-<<<<<<< HEAD
   // Fetch courses, teachers, and classes dari database
   useEffect(() => {
     const fetchData = async () => {
@@ -79,7 +75,6 @@ const AdminDashboard = () => {
       }
     };
     fetchData();
-=======
   // Fetch courses dari database
   useEffect(() => {
     const fetchCourses = async () => {
@@ -94,7 +89,6 @@ const AdminDashboard = () => {
       }
     };
     fetchCourses();
->>>>>>> test-plagiarism-correction-feature
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -106,7 +100,6 @@ const AdminDashboard = () => {
     setLoading(true);
     setError(null);
     try {
-<<<<<<< HEAD
       // Format payload sesuai yang dibutuhkan API
       const payload = {
         title: form.title,
@@ -138,7 +131,6 @@ const AdminDashboard = () => {
         teacherId: '',
         sessionNumber: '1',
       });
-=======
       const res = await fetch('/api/admin/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -148,7 +140,6 @@ const AdminDashboard = () => {
       if (!res.ok) throw new Error(data.message || 'Gagal input session');
       setJadwal((prev) => [data.session, ...prev]);
       setForm({ kodeMapel: '', jam: '', tanggal: '' });
->>>>>>> test-plagiarism-correction-feature
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -186,52 +177,43 @@ const AdminDashboard = () => {
       <Sidebar isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
       <div className="flex-1 bg-gray-50 flex flex-col min-w-0">
         <Topbar onMenuClick={() => setIsMobileOpen(!isMobileOpen)} />
-<<<<<<< HEAD
 
         <div className="flex-1 p-6">
           <div className="max-w-6xl mx-auto">
             <h1 className="text-2xl font-bold mb-6">Dashboard Admin</h1>
 
-=======
         
         <div className="flex-1 p-6">
           <div className="max-w-6xl mx-auto">
             <h1 className="text-2xl font-bold mb-6">Dashboard Admin</h1>
             
->>>>>>> test-plagiarism-correction-feature
             {/* Tab Navigation */}
             <div className="flex space-x-1 bg-white rounded-lg p-1 mb-6 shadow-sm">
               <button
                 onClick={() => setActiveTab('Session')}
-<<<<<<< HEAD
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${activeTab === 'Session'
                   ? 'bg-blue-600 text-white shadow-sm'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                   }`}
-=======
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
                   activeTab === 'Session'
                     ? 'bg-blue-600 text-white shadow-sm'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
->>>>>>> test-plagiarism-correction-feature
               >
                 Session
               </button>
               <button
                 onClick={() => setActiveTab('Schedule')}
-<<<<<<< HEAD
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${activeTab === 'Schedule'
                   ? 'bg-blue-600 text-white shadow-sm'
                   : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                   }`}
-=======
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
                   activeTab === 'Schedule'
                     ? 'bg-blue-600 text-white shadow-sm'
                     : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                 }`}
->>>>>>> test-plagiarism-correction-feature
               >
                 Schedule
               </button>
@@ -242,7 +224,6 @@ const AdminDashboard = () => {
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold mb-4">Add Session</h2>
                 <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-<<<<<<< HEAD
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">Judul Session *</label>
@@ -298,7 +279,6 @@ const AdminDashboard = () => {
                         onChange={handleChange}
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         required
-=======
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Mata Pelajaran</label>
@@ -308,7 +288,6 @@ const AdminDashboard = () => {
                         onChange={handleChange} 
                         className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" 
                         required 
->>>>>>> test-plagiarism-correction-feature
                       >
                         <option value="">Pilih mata pelajaran</option>
                         {courses.map((course) => (
@@ -319,7 +298,6 @@ const AdminDashboard = () => {
                       </select>
                     </div>
                     <div>
-<<<<<<< HEAD
                       <label className="block text-sm font-medium text-gray-700 mb-1">Nomor Sesi *</label>
                       <input
                         name="sessionNumber"
@@ -368,7 +346,6 @@ const AdminDashboard = () => {
                   <button
                     type="submit"
                     className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
-=======
                       <label className="block text-sm font-medium text-gray-700 mb-1">Jam</label>
                       <input 
                         name="jam" 
@@ -394,7 +371,6 @@ const AdminDashboard = () => {
                   <button 
                     type="submit" 
                     className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50" 
->>>>>>> test-plagiarism-correction-feature
                     disabled={loading}
                   >
                     {loading ? 'Menyimpan...' : 'Add Session'}
@@ -433,18 +409,15 @@ const AdminDashboard = () => {
                             <td className="border border-gray-300 px-4 py-2">{formatDateTime(s.start_time)}</td>
                             <td className="border border-gray-300 px-4 py-2">{formatDateTime(s.end_time)}</td>
                             <td className="border border-gray-300 px-4 py-2">
-<<<<<<< HEAD
                               <span className={`px-2 py-1 rounded-full text-xs ${s.is_completed
                                 ? 'bg-green-100 text-green-800'
                                 : 'bg-yellow-100 text-yellow-800'
                                 }`}>
-=======
                               <span className={`px-2 py-1 rounded-full text-xs ${
                                 s.is_completed 
                                   ? 'bg-green-100 text-green-800' 
                                   : 'bg-yellow-100 text-yellow-800'
                               }`}>
->>>>>>> test-plagiarism-correction-feature
                                 {s.is_completed ? 'Selesai' : 'Belum Selesai'}
                               </span>
                             </td>

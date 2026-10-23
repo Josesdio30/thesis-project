@@ -1,14 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { courseService } from '@/lib/prisma-services';
 import { ApiResponse } from '@/types';
-<<<<<<< HEAD
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const teacherId = searchParams.get('teacherId');
     const studentId = searchParams.get('studentId');
-=======
 import { getSessionUser, isAdminRole, isTeacherRole, unauthorizedResponse } from '@/lib/auth/course-access';
 
 export async function GET(request: NextRequest) {
@@ -26,7 +24,6 @@ export async function GET(request: NextRequest) {
       teacherId = isTeacherRole(user.role) ? String(user.id) : null;
       studentId = isTeacherRole(user.role) ? null : String(user.id);
     }
->>>>>>> test-plagiarism-correction-feature
 
     let courses;
 

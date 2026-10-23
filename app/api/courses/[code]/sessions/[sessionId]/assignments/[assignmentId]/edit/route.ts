@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-<<<<<<< HEAD
-=======
 import { requireCourseManager, teacherIdsForAssignment } from '@/lib/auth/course-access';
->>>>>>> test-plagiarism-correction-feature
 import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/auth';
@@ -54,15 +51,12 @@ export async function PUT(
       return NextResponse.json({ error: 'Assignment not found' }, { status: 404 });
     }
 
-<<<<<<< HEAD
     if (existingAssignment.created_by !== parseInt(session.user.id)) {
       return NextResponse.json({ error: 'Forbidden: You can only edit assignments you created' }, { status: 403 });
     }
-=======
     // Q-07: the class_course's assigned teacher or an admin may edit, not only the creator.
     const access = await requireCourseManager(() => teacherIdsForAssignment(assignmentId));
     if (!access.ok) return access.response;
->>>>>>> test-plagiarism-correction-feature
 
     const hasSubmissions = existingAssignment.assignment_submissions.length > 0;
 
@@ -158,10 +152,7 @@ export async function PUT(
       {
         success: false,
         error: 'Failed to update assignment',
-<<<<<<< HEAD
         details: error instanceof Error ? error.message : 'Unknown error',
-=======
->>>>>>> test-plagiarism-correction-feature
       },
       { status: 500 }
     );

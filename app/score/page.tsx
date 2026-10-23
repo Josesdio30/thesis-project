@@ -1,10 +1,8 @@
 'use client';
 
-<<<<<<< HEAD
+
 import { useState, useEffect } from 'react';
-=======
 import { useState, useEffect, useMemo } from 'react';
->>>>>>> test-plagiarism-correction-feature
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -12,7 +10,6 @@ import Sidebar from '../_components/sidebar';
 import Topbar from '../_components/topbar';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-<<<<<<< HEAD
 import {
   FaSpinner,
   FaBookOpen,
@@ -66,7 +63,6 @@ interface CourseScore {
   totalPossiblePoints: number;
   earnedPoints: number;
 }
-=======
 import { Input } from '@/components/ui/input';
 import {
   Table,
@@ -102,18 +98,15 @@ import {
 
 type Submission = ScoreSubmission;
 const ASSIGNMENT_PREVIEW_LIMIT = 3;
->>>>>>> test-plagiarism-correction-feature
 
 export default function ScorePage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [submissions, setSubmissions] = useState<Submission[]>([]);
-<<<<<<< HEAD
   const [courseScores, setCourseScores] = useState<CourseScore[]>([]);
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'submissions' | 'courses'>('submissions');
-=======
   const [loading, setLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'submissions' | 'courses'>('submissions');
   const [expandedAssignmentLists, setExpandedAssignmentLists] = useState<Record<string, boolean>>({});
@@ -124,13 +117,11 @@ export default function ScorePage() {
   const [classFilter, setClassFilter] = useState<string>('all');
   const [assignmentFilter, setAssignmentFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<'all' | 'graded' | 'pending'>('all');
->>>>>>> test-plagiarism-correction-feature
 
   // Derived state from session
   const isTeacher = session?.user?.role === 'TEACHER' || session?.user?.role === 'GURU';
 
-<<<<<<< HEAD
-=======
+
   // Build unique filter options from the loaded submissions.
   const courseOptions = useMemo(() => {
     const seen = new Map<string, string>();
@@ -208,7 +199,6 @@ export default function ScorePage() {
     setStatusFilter('all');
   };
 
->>>>>>> test-plagiarism-correction-feature
   useEffect(() => {
     // Wait for session to load
     if (status === 'loading') {
@@ -239,7 +229,6 @@ export default function ScorePage() {
       const fetchedSubmissions = data.data || [];
 
       setSubmissions(fetchedSubmissions);
-<<<<<<< HEAD
 
       // Group submissions by course for course view
       const courseGroups: Record<string, CourseScore> = {};
@@ -284,11 +273,9 @@ export default function ScorePage() {
       console.error('Error fetching scores:', error);
       setSubmissions([]);
       setCourseScores([]);
-=======
     } catch (error) {
       console.error('Error fetching scores:', error);
       setSubmissions([]);
->>>>>>> test-plagiarism-correction-feature
       alert(`Error loading scores: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setLoading(false);
@@ -296,7 +283,6 @@ export default function ScorePage() {
   };
 
   const handleSubmissionClick = (submission: Submission) => {
-<<<<<<< HEAD
     router.push(`/course/${submission.course_code}?sessionId=${submission.assignment_id}&tab=Assignment`);
   };
 
@@ -304,7 +290,6 @@ export default function ScorePage() {
     router.push(`/course/${courseCode}?tab=Scoring`);
   };
 
-=======
     const params = new URLSearchParams({ tab: 'Assignment' });
     if (submission.session_id !== null && submission.session_id !== undefined) {
       params.set('sessionId', String(submission.session_id));
@@ -330,7 +315,6 @@ export default function ScorePage() {
     }));
   };
 
->>>>>>> test-plagiarism-correction-feature
   const formatDateTime = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('id-ID', {
       day: 'numeric',
@@ -592,7 +576,6 @@ export default function ScorePage() {
               </p>
             </div>
           ) : viewMode === 'submissions' ? (
-<<<<<<< HEAD
             // All Submissions View
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {submissions.map(submission => {
@@ -708,7 +691,6 @@ export default function ScorePage() {
                   </div>
                 );
               })}
-=======
             // All Submissions — data table with filters
             <div className="bg-white border border-gray-200 rounded-lg">
               {/* Filter Bar */}
@@ -879,12 +861,10 @@ export default function ScorePage() {
                   </TableBody>
                 </Table>
               )}
->>>>>>> test-plagiarism-correction-feature
             </div>
           ) : (
             // By Course View
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-<<<<<<< HEAD
               {courseScores.map(courseScore => (
                 <Card key={courseScore.course_code} className="hover:shadow-lg transition-shadow">
                   <CardHeader className="pb-3">
@@ -982,7 +962,6 @@ export default function ScorePage() {
                   </CardContent>
                 </Card>
               ))}
-=======
               {courseScores.length === 0 ? (
                 <div className="md:col-span-2 xl:col-span-3 text-center py-12 text-gray-500 text-sm">
                   No courses match the current filters.
@@ -1151,7 +1130,6 @@ export default function ScorePage() {
                   );
                 })
               )}
->>>>>>> test-plagiarism-correction-feature
             </div>
           )}
         </div>

@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-<<<<<<< HEAD
-=======
 import { requireCourseManager, teacherIdsForSession } from '@/lib/auth/course-access';
->>>>>>> test-plagiarism-correction-feature
 import { prisma } from '@/lib/prisma';
 
 // GET /api/courses/[code]/sessions/[sessionId]/materials
@@ -49,11 +46,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ code: string; sessionId: string }> }) {
   try {
     const { code, sessionId } = await params;
-<<<<<<< HEAD
-=======
     const access = await requireCourseManager(() => teacherIdsForSession(sessionId));
     if (!access.ok) return access.response;
->>>>>>> test-plagiarism-correction-feature
     const body = await request.json();
     const { title, content } = body;
 

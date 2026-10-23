@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 import React, { useState } from 'react';
-=======
 import React, { useEffect, useRef, useState } from 'react';
->>>>>>> test-plagiarism-correction-feature
 import { useSession } from 'next-auth/react';
 import { AssignmentProvider } from '@/lib/contexts/AssignmentContext';
 import AssignmentCreateModal from './assignment/assignment-create-modal';
@@ -19,19 +16,15 @@ import { filterAssignments } from '../../../lib/assignmentUtils';
 interface AssignmentTabProps {
   courseCode: string;
   sessionId: number;
-<<<<<<< HEAD
 }
 
 export default function AssignmentTab({ courseCode, sessionId }: AssignmentTabProps) {
   const { data: session } = useSession();
-=======
   initialAssignmentId?: number | null;
 }
 
 export default function AssignmentTab({ courseCode, sessionId, initialAssignmentId }: AssignmentTabProps) {
   const { data: session } = useSession();
-
->>>>>>> test-plagiarism-correction-feature
   const [viewMode, setViewMode] = useState<'all' | 'by-session'>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -43,12 +36,10 @@ export default function AssignmentTab({ courseCode, sessionId, initialAssignment
   const { assignments, loading, refetch } = useAssignmentData(courseCode);
   const { handlePublishToggle, handleBulkPublish, handleSubmitAnswer } = useAssignmentActions(courseCode, refetch);
 
-<<<<<<< HEAD
   const isTeacher = session?.user?.role === 'TEACHER' || session?.user?.role === 'GURU';
   const currentUserId = session?.user?.id ? parseInt(session.user.id) : null;
   const filteredAssignments = filterAssignments(assignments, isTeacher);
 
-=======
   const isTeacher = session?.user?.role?.toUpperCase() === 'TEACHER' || session?.user?.role?.toUpperCase() === 'GURU';
   const currentUserId = session?.user?.id ? parseInt(session.user.id) : null;
   const filteredAssignments = filterAssignments(assignments, isTeacher);
@@ -68,7 +59,6 @@ export default function AssignmentTab({ courseCode, sessionId, initialAssignment
     }
   }, [initialAssignmentId, assignments, loading]);
 
->>>>>>> test-plagiarism-correction-feature
   const handleAssignmentClick = (assignment: Assignment) => {
     setSelectedAssignment(assignment);
     setShowDetailModal(true);

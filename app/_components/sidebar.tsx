@@ -14,10 +14,7 @@ import {
   FaSignOutAlt,
   FaTimes,
   FaUsers,
-<<<<<<< HEAD
-=======
   FaRobot,
->>>>>>> test-plagiarism-correction-feature
 } from 'react-icons/fa';
 import { NAVIGATION_ITEMS, ADMIN_NAVIGATION_ITEMS } from '@/lib/constants';
 import { cn } from '@/lib/utils';
@@ -33,10 +30,7 @@ const iconMap = {
   FaUniversity: FaUniversity,
   FaBullhorn: FaBullhorn,
   FaUsers: FaUsers,
-<<<<<<< HEAD
-=======
   FaRobot: FaRobot,
->>>>>>> test-plagiarism-correction-feature
 } as const;
 
 interface SidebarProps {

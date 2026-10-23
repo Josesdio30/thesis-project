@@ -47,15 +47,12 @@ export async function GET(request: NextRequest) {
             enumeration: true,
           },
         },
-<<<<<<< HEAD
         student_details: {
           include: {
             classes: true,
           },
         },
-=======
         student_details: true,
->>>>>>> test-plagiarism-correction-feature
         teacher_details: true,
         admin_details: true,
       },
@@ -68,7 +65,6 @@ export async function GET(request: NextRequest) {
       // Get class information for students
       let classInfo = null;
       if (user.student_details) {
-<<<<<<< HEAD
         if (user.student_details.classes) {
           classInfo = {
             class_id: user.student_details.classes.id,
@@ -88,7 +84,6 @@ export async function GET(request: NextRequest) {
                     include: {
                       academic_years: true,
                     },
-=======
         // Find enrollments for this student
         const studentEnrollments = await prisma.enrollments.findMany({
           where: {
@@ -100,12 +95,10 @@ export async function GET(request: NextRequest) {
                 classes: {
                   include: {
                     academic_years: true,
->>>>>>> test-plagiarism-correction-feature
                   },
                 },
               },
             },
-<<<<<<< HEAD
           });
 
           // Get the first active enrollment with active class_course
@@ -120,7 +113,6 @@ export async function GET(request: NextRequest) {
               grade_level: activeEnrollment.class_courses.classes.grade_level,
             };
           }
-=======
           },
         });
 
@@ -135,7 +127,6 @@ export async function GET(request: NextRequest) {
             class_name: activeEnrollment.class_courses.classes.class_name,
             grade_level: activeEnrollment.class_courses.classes.grade_level,
           };
->>>>>>> test-plagiarism-correction-feature
         }
       }
 
@@ -297,7 +288,6 @@ export async function POST(request: NextRequest) {
     });
 
     // Create student details if STUDENT role is selected
-<<<<<<< HEAD
     if (role === '1') {
       await prisma.student_details.create({
         data: {
@@ -306,7 +296,6 @@ export async function POST(request: NextRequest) {
           nisn: nisn || '',
           parent_contact: parent_contact || '',
           class_id: class_id ? parseInt(class_id) : null,
-=======
     // nis is required (non-nullable, unique) in student_details
     if (role === '1' && nis) {
       // Check for duplicate NIS before inserting
@@ -325,7 +314,6 @@ export async function POST(request: NextRequest) {
           nis,
           nisn: nisn || '',
           parent_contact: parent_contact || '',
->>>>>>> test-plagiarism-correction-feature
         },
       });
     }

@@ -3,11 +3,8 @@ import { Assignment } from '../../../../hooks/useAssignmentData';
 import { formatDateTime, getScoreDisplay, getSubmissionStatusColor } from '../../../../lib/assignmentUtils';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-<<<<<<< HEAD
 import { FaSave, FaEye, FaUser, FaClock, FaTimes } from 'react-icons/fa';
-=======
 import { FaSave, FaEye, FaUser, FaClock, FaTimes, FaRobot, FaChevronDown, FaChevronUp } from 'react-icons/fa';
->>>>>>> test-plagiarism-correction-feature
 import { useSession } from 'next-auth/react';
 
 interface GradingModalProps {
@@ -59,27 +56,6 @@ interface GradeInput {
   feedback: string;
 }
 
-<<<<<<< HEAD
-=======
-interface AiGradingResult {
-  question_id: string;
-  score: number | null;
-  max_score: number;
-  qualitative_grade: string | null;
-  feedback: string;
-  citations: unknown;
-  confidence: string;
-}
-
-function aiConfidenceStyle(conf: string) {
-  const c = (conf || '').toLowerCase();
-  if (c === 'high') return { label: 'High confidence', bg: 'bg-green-100', text: 'text-green-700' };
-  if (c === 'medium') return { label: 'Medium confidence', bg: 'bg-yellow-100', text: 'text-yellow-700' };
-  if (c === 'low') return { label: 'Low confidence', bg: 'bg-red-100', text: 'text-red-700' };
-  return { label: conf || 'Unknown', bg: 'bg-gray-100', text: 'text-gray-700' };
-}
-
->>>>>>> test-plagiarism-correction-feature
 export const GradingModal = ({ assignment, courseCode, sessionId, isOpen, onClose }: GradingModalProps) => {
   const { data: session } = useSession();
   const [submissions, setSubmissions] = useState<SubmissionForGrading[]>([]);
@@ -88,9 +64,7 @@ export const GradingModal = ({ assignment, courseCode, sessionId, isOpen, onClos
   const [overallFeedback, setOverallFeedback] = useState('');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-<<<<<<< HEAD
-=======
-  const [aiResults, setAiResults] = useState<Record<number, AiGradingResult>>({});
+ const [aiResults, setAiResults] = useState<Record<number, AiGradingResult>>({});
   const [aiLoading, setAiLoading] = useState(false);
   const [aiHasJob, setAiHasJob] = useState(false);
   const [aiExpandedQuestions, setAiExpandedQuestions] = useState<Set<number>>(new Set());
@@ -103,7 +77,6 @@ export const GradingModal = ({ assignment, courseCode, sessionId, isOpen, onClos
       return next;
     });
   };
->>>>>>> test-plagiarism-correction-feature
 
   useEffect(() => {
     if (isOpen && assignment) {
@@ -154,8 +127,8 @@ export const GradingModal = ({ assignment, courseCode, sessionId, isOpen, onClos
     }));
     setGrades(initialGrades);
     setOverallFeedback('');
-<<<<<<< HEAD
-=======
+
+
 
     // Fetch AI grading suggestions for the selected student (read-only reference)
     const studentId =
@@ -193,7 +166,6 @@ export const GradingModal = ({ assignment, courseCode, sessionId, isOpen, onClos
     } finally {
       setAiLoading(false);
     }
->>>>>>> test-plagiarism-correction-feature
   };
 
   const updateGrade = (questionId: number, pointsEarned: number, feedback: string) => {
@@ -426,8 +398,6 @@ export const GradingModal = ({ assignment, courseCode, sessionId, isOpen, onClos
                             />
                           </div>
                         </div>
-<<<<<<< HEAD
-=======
 
                         {/* AI Grade Suggestion — collapsible bar, read-only reference */}
                         {isManualGradable && (() => {
@@ -527,7 +497,6 @@ export const GradingModal = ({ assignment, courseCode, sessionId, isOpen, onClos
                             </div>
                           );
                         })()}
->>>>>>> test-plagiarism-correction-feature
                       </div>
                     );
                   })}

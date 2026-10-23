@@ -1,8 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-<<<<<<< HEAD
-=======
 import { requireCourseManager, teacherIdsForAssignment } from '@/lib/auth/course-access';
->>>>>>> test-plagiarism-correction-feature
 import { prisma } from '@/lib/prisma';
 
 // PUT /api/courses/[code]/sessions/[sessionId]/assignments/[assignmentId]/publish
@@ -16,11 +13,9 @@ export async function PUT(
     if (isNaN(assignmentId)) {
       return NextResponse.json({ error: 'Invalid assignment ID' }, { status: 400 });
     }
-<<<<<<< HEAD
-=======
+
     const access = await requireCourseManager(() => teacherIdsForAssignment(assignmentId));
     if (!access.ok) return access.response;
->>>>>>> test-plagiarism-correction-feature
 
     const body = await request.json();
     const { is_published } = body;
@@ -61,10 +56,7 @@ export async function PUT(
     return NextResponse.json(
       {
         error: 'Failed to update assignment status',
-<<<<<<< HEAD
         details: error instanceof Error ? error.message : 'Unknown error',
-=======
->>>>>>> test-plagiarism-correction-feature
       },
       { status: 500 }
     );

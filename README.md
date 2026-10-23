@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
@@ -35,7 +34,6 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-=======
 # LMS St. Louis 2
 
 **Learning management dengan AI-assisted grading dan retrieval berbasis materi pembelajaran.**
@@ -146,4 +144,3 @@ Untuk end-to-end testing, ikuti [Playwright E2E guide](tests/e2e/README.md).
 Environment files yang berisi credentials, uploaded files, backups, dan direktori `docs/` tidak disertakan dalam version control.
 
 Gunakan `.env.example` sebagai configuration template dan simpan nilai environment lokal di `.env.local`. Engineering documentation yang perlu ikut version control tersedia di `ops/`.
->>>>>>> test-plagiarism-correction-feature

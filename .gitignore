@@ -12,10 +12,7 @@
 
 # testing
 /coverage
-<<<<<<< HEAD
-=======
 /public/uploads/courses
->>>>>>> test-plagiarism-correction-feature
 
 # next.js
 /.next/
@@ -47,14 +44,13 @@ next-env.d.ts
 /lib/generated/prisma
 
 DATABASE-SETUP-SUMMARY.md
-<<<<<<< HEAD
+
 
 # docs
 /docs
 
 # scripts
 /scripts
-=======
 /supabase
 
 # Local documentation, including AI-generated plans and QA reports
@@ -97,4 +93,3 @@ GEMINI.md
 /.mcp.json
 /specs/
 skills-lock.json
->>>>>>> test-plagiarism-correction-feature

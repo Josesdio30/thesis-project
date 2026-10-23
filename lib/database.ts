@@ -1,6 +1,6 @@
 import { Pool, PoolConfig } from 'pg';
 
-<<<<<<< HEAD
+
 // Database configuration
 const dbConfig: PoolConfig = {
   host: process.env.DB_HOST || '31.97.50.49',
@@ -13,7 +13,6 @@ const dbConfig: PoolConfig = {
   connectionTimeoutMillis: 2000,
   ssl: false,
 };
-=======
 // All connection details must come from explicit deployment configuration.
 // Never let missing settings fall through to pg's ambient defaults.
 function databaseConfig(): PoolConfig {
@@ -43,7 +42,6 @@ function databaseConfig(): PoolConfig {
 }
 
 const dbConfig = databaseConfig();
->>>>>>> test-plagiarism-correction-feature
 
 // Create connection pool
 const pool = new Pool(dbConfig);

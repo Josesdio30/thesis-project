@@ -1,18 +1,5 @@
 import { Pool, PoolConfig } from 'pg';
 
-
-// Database configuration
-const dbConfig: PoolConfig = {
-  host: process.env.DB_HOST || '31.97.50.49',
-  port: parseInt(process.env.DB_PORT || '9999'),
-  database: process.env.DB_NAME || 'sinlui_ujicoba',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'P@ostgres!',
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-  ssl: false,
-};
 // All connection details must come from explicit deployment configuration.
 // Never let missing settings fall through to pg's ambient defaults.
 function databaseConfig(): PoolConfig {

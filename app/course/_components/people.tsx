@@ -2,10 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { RefreshCw, User, Users } from 'lucide-react';
-
-
 import { buildPeopleQuery } from '@/lib/course-class-selection';
-
 
 interface Teacher {
   id: number;
@@ -42,11 +39,7 @@ interface Student {
 
 interface PeopleProps {
   courseCode?: string;
-
-  classId?: number;
-
   classId?: number | null;
-
 }
 
 const People = ({ courseCode, classId }: PeopleProps) => {
@@ -64,11 +57,7 @@ const People = ({ courseCode, classId }: PeopleProps) => {
       setLoading(true);
       setError(null);
 
-
-      const response = await fetch(`/api/courses/${courseCode}/people?type=teacher${classId ? `&classId=${classId}` : ''}`);
-
       const response = await fetch(`/api/courses/${courseCode}/people?${buildPeopleQuery('teacher', classId)}`);
-
       const result = await response.json();
 
       if (result.success) {
@@ -94,11 +83,7 @@ const People = ({ courseCode, classId }: PeopleProps) => {
       setLoading(true);
       setError(null);
 
-
-      const response = await fetch(`/api/courses/${courseCode}/people?type=students${classId ? `&classId=${classId}` : ''}`);
-
       const response = await fetch(`/api/courses/${courseCode}/people?${buildPeopleQuery('students', classId)}`);
-
       const result = await response.json();
 
       if (result.success) {
@@ -124,11 +109,7 @@ const People = ({ courseCode, classId }: PeopleProps) => {
       setLoading(true);
       setError(null);
 
-
-      const response = await fetch(`/api/courses/${courseCode}/people?type=all${classId ? `&classId=${classId}` : ''}`);
-
       const response = await fetch(`/api/courses/${courseCode}/people?${buildPeopleQuery('all', classId)}`);
-
       const result = await response.json();
 
       if (result.success) {
@@ -149,20 +130,12 @@ const People = ({ courseCode, classId }: PeopleProps) => {
     }
   }, [courseCode, classId]);
 
-
-  // Load data when component mounts or courseCode/classId changes
-
   // Load data when component mounts or courseCode changes
-
   useEffect(() => {
     if (courseCode) {
       fetchAllPeople();
     }
-
-  }, [courseCode, classId, fetchAllPeople]);
-
   }, [courseCode, fetchAllPeople]);
-
 
   // Load specific data when tab changes
   useEffect(() => {
@@ -171,12 +144,6 @@ const People = ({ courseCode, classId }: PeopleProps) => {
     } else if (courseCode && activePeopleTab === 'Students' && students.length === 0) {
       fetchStudents();
     }
-
-  }, [activePeopleTab, courseCode, classId, teacher, students.length, fetchTeacher, fetchStudents]);
-
-  return (
-    <div className="flex-1">
-      <div className="border border-gray-300 rounded-lg p-6 shadow-sm">
   }, [activePeopleTab, courseCode, teacher, students.length, fetchTeacher, fetchStudents]);
   return (
     <div className="flex-1">
@@ -199,8 +166,6 @@ const People = ({ courseCode, classId }: PeopleProps) => {
             <button
               key={tab}
               onClick={() => setActivePeopleTab(tab)}
-              className={`px-4 py-2 text-gray-700 font-semibold text-base ${activePeopleTab === tab ? 'border-b-2 border-blue-500 text-blue-500' : 'hover:text-blue-500'
-                }`}
               className={`px-4 py-2 text-gray-700 font-semibold text-base ${
                 activePeopleTab === tab ? 'border-b-2 border-blue-500 text-blue-500' : 'hover:text-blue-500'
               }`}

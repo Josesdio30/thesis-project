@@ -10,19 +10,6 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('Session');
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [form, setForm] = useState({
-    title: '',
-    kodeMapel: '',
-    startTime: '',
-    endTime: '',
-    tanggal: '',
-    classId: '',
-    teacherId: '',
-    sessionNumber: '1',
-  });
-  const [jadwal, setJadwal] = useState<any[]>([]);
-  const [courses, setCourses] = useState<any[]>([]);
-  const [teachers, setTeachers] = useState<any[]>([]);
-  const [classes, setClasses] = useState<any[]>([]);
     kodeMapel: '',
     jam: '',
     tanggal: '',
@@ -46,35 +33,6 @@ const AdminDashboard = () => {
     }
   }, [router]);
 
-  // Fetch courses, teachers, and classes dari database
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch courses
-        const coursesRes = await fetch('/api/admin/courses');
-        const coursesData = await coursesRes.json();
-        if (coursesData.success) {
-          setCourses(coursesData.courses);
-        }
-
-        // Fetch teachers
-        const teachersRes = await fetch('/api/admin/users?role=TEACHER');
-        const teachersData = await teachersRes.json();
-        if (teachersData.success) {
-          setTeachers(teachersData.data.users.filter((u: any) => u.roles.includes('TEACHER')));
-        }
-
-        // Fetch classes
-        const classesRes = await fetch('/api/admin/classes');
-        const classesData = await classesRes.json();
-        if (classesData.success) {
-          setClasses(classesData.data.classes);
-        }
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    };
-    fetchData();
   // Fetch courses dari database
   useEffect(() => {
     const fetchCourses = async () => {
@@ -100,37 +58,6 @@ const AdminDashboard = () => {
     setLoading(true);
     setError(null);
     try {
-      // Format payload sesuai yang dibutuhkan API
-      const payload = {
-        title: form.title,
-        description: '',
-        courseCode: form.kodeMapel,
-        startTime: form.startTime,
-        endTime: form.endTime,
-        date: form.tanggal,
-        classId: parseInt(form.classId),
-        teacherId: parseInt(form.teacherId),
-        sessionNumber: parseInt(form.sessionNumber),
-      };
-
-      const res = await fetch('/api/admin/session', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Gagal input session');
-      setJadwal((prev) => [data.data, ...prev]);
-      setForm({
-        title: '',
-        kodeMapel: '',
-        startTime: '',
-        endTime: '',
-        tanggal: '',
-        classId: '',
-        teacherId: '',
-        sessionNumber: '1',
-      });
       const res = await fetch('/api/admin/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -177,11 +104,6 @@ const AdminDashboard = () => {
       <Sidebar isMobileOpen={isMobileOpen} setIsMobileOpen={setIsMobileOpen} />
       <div className="flex-1 bg-gray-50 flex flex-col min-w-0">
         <Topbar onMenuClick={() => setIsMobileOpen(!isMobileOpen)} />
-
-        <div className="flex-1 p-6">
-          <div className="max-w-6xl mx-auto">
-            <h1 className="text-2xl font-bold mb-6">Dashboard Admin</h1>
-
         
         <div className="flex-1 p-6">
           <div className="max-w-6xl mx-auto">
@@ -191,10 +113,6 @@ const AdminDashboard = () => {
             <div className="flex space-x-1 bg-white rounded-lg p-1 mb-6 shadow-sm">
               <button
                 onClick={() => setActiveTab('Session')}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${activeTab === 'Session'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                  }`}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
                   activeTab === 'Session'
                     ? 'bg-blue-600 text-white shadow-sm'
@@ -205,10 +123,6 @@ const AdminDashboard = () => {
               </button>
               <button
                 onClick={() => setActiveTab('Schedule')}
-                className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${activeTab === 'Schedule'
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                  }`}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
                   activeTab === 'Schedule'
                     ? 'bg-blue-600 text-white shadow-sm'
@@ -224,61 +138,6 @@ const AdminDashboard = () => {
               <div className="bg-white rounded-lg shadow p-6">
                 <h2 className="text-xl font-semibold mb-4">Add Session</h2>
                 <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Judul Session *</label>
-                      <input
-                        name="title"
-                        type="text"
-                        value={form.title}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="Contoh: Pertemuan 1 - Pengenalan Matematika"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Kelas *</label>
-                      <select
-                        name="classId"
-                        value={form.classId}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                      >
-                        <option value="">Pilih kelas</option>
-                        {classes.map((cls) => (
-                          <option key={cls.id} value={cls.id}>
-                            {cls.name} - {cls.grade_level}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Pengajar *</label>
-                      <select
-                        name="teacherId"
-                        value={form.teacherId}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                      >
-                        <option value="">Pilih pengajar</option>
-                        {teachers.map((teacher) => (
-                          <option key={teacher.id} value={teacher.id}>
-                            {teacher.nama_lengkap}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Mata Pelajaran *</label>
-                      <select
-                        name="kodeMapel"
-                        value={form.kodeMapel}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Mata Pelajaran</label>
@@ -298,54 +157,6 @@ const AdminDashboard = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Nomor Sesi *</label>
-                      <input
-                        name="sessionNumber"
-                        type="number"
-                        min="1"
-                        value={form.sessionNumber}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal *</label>
-                      <input
-                        name="tanggal"
-                        type="date"
-                        value={form.tanggal}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Jam Mulai *</label>
-                      <input
-                        name="startTime"
-                        type="time"
-                        value={form.startTime}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Jam Selesai *</label>
-                      <input
-                        name="endTime"
-                        type="time"
-                        value={form.endTime}
-                        onChange={handleChange}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                      />
-                    </div>
-                  </div>
-                  <button
-                    type="submit"
-                    className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50"
                       <label className="block text-sm font-medium text-gray-700 mb-1">Jam</label>
                       <input 
                         name="jam" 
@@ -409,10 +220,6 @@ const AdminDashboard = () => {
                             <td className="border border-gray-300 px-4 py-2">{formatDateTime(s.start_time)}</td>
                             <td className="border border-gray-300 px-4 py-2">{formatDateTime(s.end_time)}</td>
                             <td className="border border-gray-300 px-4 py-2">
-                              <span className={`px-2 py-1 rounded-full text-xs ${s.is_completed
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-yellow-100 text-yellow-800'
-                                }`}>
                               <span className={`px-2 py-1 rounded-full text-xs ${
                                 s.is_completed 
                                   ? 'bg-green-100 text-green-800' 

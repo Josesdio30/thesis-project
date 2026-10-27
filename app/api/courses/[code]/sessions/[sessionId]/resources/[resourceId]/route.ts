@@ -63,7 +63,6 @@ export async function GET(request: NextRequest, { params }: { params: Promise<Ro
       {
         success: false,
         error: 'Database error',
-        details: error instanceof Error ? error.message : 'Failed to fetch resource',
       },
       { status: 500 }
     );
@@ -144,7 +143,6 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       {
         success: false,
         error: 'Database error',
-        details: error instanceof Error ? error.message : 'Failed to delete resource',
       },
       { status: 500 }
     );

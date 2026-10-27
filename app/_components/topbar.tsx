@@ -2,11 +2,6 @@
 
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu } from 'lucide-react';
-import NotificationBell from '@/components/notification-bell';
-
-export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
-  const pathname = usePathname();
 import { Bell, Menu } from 'lucide-react';
 import { useState } from 'react';
 
@@ -48,8 +43,6 @@ export default function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
         </div>
       </div>
       {/* Right side - Notification */}
-      <div className="flex items-center space-x-6">
-        <NotificationBell />
       <div className="flex items-center space-x-6 relative">
         <div className="relative">
           {/* <Bell className="w-6 h-6 text-gray-600 cursor-pointer" onClick={() => setShowNotif(!showNotif)} />

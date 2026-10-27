@@ -44,13 +44,6 @@ next-env.d.ts
 /lib/generated/prisma
 
 DATABASE-SETUP-SUMMARY.md
-
-
-# docs
-/docs
-
-# scripts
-/scripts
 /supabase
 
 # Local documentation, including AI-generated plans and QA reports

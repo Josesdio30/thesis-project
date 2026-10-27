@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { MessageSquare, Reply, Plus, Paperclip, Send, RefreshCw, User, Trash2 } from 'lucide-react';
 import { MessageSquare, Reply, Plus, Paperclip, Send, RefreshCw, User } from 'lucide-react';
 import { FaChevronDown } from 'react-icons/fa';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -518,40 +517,6 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
   // Format timestamp
   const formatTimestamp = (timestamp: string) => {
     return new Date(timestamp).toLocaleString();
-  };
-
-  // Delete post
-  const handleDeletePost = async (postId: number) => {
-    if (!courseCode || !forum) return;
-
-    const confirmDelete = window.confirm('Apakah Anda yakin ingin menghapus postingan ini?');
-    if (!confirmDelete) return;
-
-    try {
-      setLoading(true);
-      const response = await fetch(`/api/courses/${courseCode}/forums/${forum.id}/posts/${postId}`, {
-        method: 'DELETE',
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        // Remove post from list
-        setPosts(prev => prev.filter(p => p.id !== postId));
-        // Clear selected post if it was deleted
-        if (selectedPost?.id === postId) {
-          setSelectedPost(null);
-          setReplies([]);
-        }
-      } else {
-        setError(result.message || 'Gagal menghapus postingan');
-      }
-    } catch (err) {
-      console.error('Error deleting post:', err);
-      setError('Network error saat menghapus postingan');
-    } finally {
-      setLoading(false);
-    }
   }; // Load forum on mount and when session changes
   useEffect(() => {
     fetchForum();
@@ -596,8 +561,6 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
       )}
 
       <div className="flex flex-col h-[calc(100vh-200px)] bg-gray-50 rounded-lg shadow-sm border border-gray-300">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 border-b border-gray-300 bg-white rounded-t-lg gap-2 sm:gap-0">
         {/* Header */}{' '}
         <div className="flex items-center justify-between p-4 border-b border-gray-300 bg-white rounded-t-lg">
           <div>
@@ -719,12 +682,6 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
             </div>
           </div>
         )}
-
-        <div className="flex flex-1 overflow-hidden flex-col md:flex-row">
-          {/* Posts List */}
-          <div className={`w-full md:w-1/2 border-b md:border-b-0 md:border-r border-gray-300 flex flex-col ${selectedPost ? 'hidden md:flex' : 'flex'}`}>
-            <div className="p-3 bg-gray-100 border-b border-gray-300">
-              <h3 className="font-medium text-gray-700 text-sm sm:text-base">Posts ({posts.length})</h3>
         <div className="flex flex-1 overflow-hidden">
           {/* Posts List */}
           <div className="w-1/2 border-r border-gray-300 flex flex-col">
@@ -749,8 +706,6 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
                   <div
                     key={post.id}
                     onClick={() => setSelectedPost(post)}
-                    className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${selectedPost?.id === post.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
-                      }`}
                     className={`p-4 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors ${
                       selectedPost?.id === post.id ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
                     }`}
@@ -777,34 +732,6 @@ const Forum = ({ courseCode, sessions }: ForumProps) => {
           </div>
 
           {/* Post Detail & Replies */}
-          <div className={`w-full md:w-1/2 flex flex-col ${selectedPost ? 'flex' : 'hidden md:flex'}`}>
-            {selectedPost ? (
-              <>
-                {/* Mobile Back Button */}
-                <button
-                  onClick={() => setSelectedPost(null)}
-                  className="md:hidden flex items-center gap-2 p-3 text-blue-600 hover:bg-blue-50 border-b border-gray-300"
-                >
-                  ← Kembali ke daftar post
-                </button>
-                {/* Post Detail */}
-                <div className="p-3 sm:p-4 border-b border-gray-300 bg-white">
-                  <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-lg font-semibold text-gray-800">{selectedPost.title}</h3>
-                    {(Number(user?.id) === selectedPost.author.id || user?.role === 'TEACHER' || user?.role === 'ADMIN') && (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleDeletePost(selectedPost.id);
-                        }}
-                        className="flex items-center gap-1 px-2 py-1 text-red-600 hover:bg-red-50 rounded transition-colors text-sm"
-                        title="Hapus postingan"
-                      >
-                        <Trash2 size={14} />
-                        Hapus
-                      </button>
-                    )}
-                  </div>
           <div className="w-1/2 flex flex-col">
             {selectedPost ? (
               <>

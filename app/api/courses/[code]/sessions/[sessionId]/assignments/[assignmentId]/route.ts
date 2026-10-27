@@ -71,6 +71,7 @@ export async function GET(
     const visibleSubmissions = isManager
       ? assignment.assignment_submissions
       : assignment.assignment_submissions.filter(submission => submission.student_id === user.id);
+
     // Transform the data
     const transformedAssignment = {
       id: assignment.id,
@@ -97,11 +98,6 @@ export async function GET(
         options: question.assignment_question_options.map(option => ({
           id: option.id,
           option_text: option.option_text,
-          is_correct: option.is_correct,
-          order_number: option.order_number,
-        })),
-      })),
-      submissions: assignment.assignment_submissions.map(submission => ({
           ...(isManager ? { is_correct: option.is_correct } : {}),
           order_number: option.order_number,
         })),
@@ -134,7 +130,6 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching assignment:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch assignment', details: error instanceof Error ? error.message : 'Unknown error' },
       { error: 'Failed to fetch assignment' },
       { status: 500 }
     );
@@ -159,10 +154,6 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { student_id, answers } = body;
-
-    if (!student_id || !answers || !Array.isArray(answers)) {
-      return NextResponse.json({ error: 'Missing required fields: student_id, answers' }, { status: 400 });
     const { answers } = body;
 
     if (!answers || !Array.isArray(answers)) {
@@ -187,6 +178,7 @@ export async function POST(
 
     const member = await requireSessionMember(assignment.session_id);
     if (!member.ok) return member.response;
+
     if (!assignment.is_published) {
       return NextResponse.json({ error: 'Assignment is not published' }, { status: 400 });
     }
@@ -200,7 +192,6 @@ export async function POST(
     const existingSubmissions = await prisma.assignment_submissions.count({
       where: {
         assignment_id: assignmentId,
-        student_id: parseInt(student_id),
         student_id: studentId,
       },
     });
@@ -222,7 +213,6 @@ export async function POST(
       const submission = await tx.assignment_submissions.create({
         data: {
           assignment_id: assignmentId,
-          student_id: parseInt(student_id),
           student_id: studentId,
           attempt_number: existingSubmissions + 1,
           status_id: submittedStatusId,
@@ -255,9 +245,6 @@ export async function POST(
       message: 'Assignment submitted successfully',
     });
   } catch (error) {
-    console.error('Error submitting assignment:', error);
-    return NextResponse.json(
-      { error: 'Failed to submit assignment', details: error instanceof Error ? error.message : 'Unknown error' },
     // FR-SUB-1 / O-18: a concurrent submit can pass the attempt count above; the
     // unique (assignment_id, student_id, attempt_number) index rejects the loser.
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {

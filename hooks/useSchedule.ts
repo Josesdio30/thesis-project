@@ -7,10 +7,6 @@ export interface ScheduleItem {
   id: number;
   subject: string;
   teacher: string;
-  teacher_id?: number | null;
-  session_title: string;
-  class_name: string;
-  class_id?: number | null;
   session_title: string;
   class_name: string;
   description?: string;

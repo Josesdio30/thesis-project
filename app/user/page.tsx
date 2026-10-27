@@ -1,8 +1,5 @@
 'use client';
 
-
-import React, { useState, useEffect, useMemo } from 'react';
-import { FaUsers, FaPlus, FaEdit, FaTrash, FaSpinner, FaEye, FaEyeSlash, FaChevronLeft, FaChevronRight, FaSearch, FaFilter } from 'react-icons/fa';
 import React, { useState, useEffect } from 'react';
 import { FaUsers, FaPlus, FaEdit, FaTrash, FaSpinner, FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Button } from '@/components/ui/button';
@@ -94,25 +91,12 @@ const AddUserModal = ({ isOpen, onClose, onSave, initialData = null, isEditMode 
       } else if (initialData.class_info && initialData.class_info.class_id) {
         classId = initialData.class_info.class_id.toString();
       }
-
-
-      // Generate password dari tanggal lahir untuk ditampilkan
-      let generatedPassword = '';
-      if (tanggalLahir) {
-        const birthDate = new Date(tanggalLahir);
-        const day = birthDate.getDate().toString().padStart(2, '0');
-        const month = (birthDate.getMonth() + 1).toString().padStart(2, '0');
-        const year = birthDate.getFullYear();
-        generatedPassword = `s!nLui2+${day}${month}${year}`;
-      }
-
       // Don't set default class if no class found - let user select
+      
       setFormData({
         nama_lengkap: initialData.nama_lengkap || '',
         email: initialData.email || '',
         user_name: initialData.user_name || '',
-        password: generatedPassword, // ✅ TAMPILKAN password yang di-generate
-        confirmPassword: generatedPassword,
         password: '',
         confirmPassword: '',
         role: initialData.roles ? (initialData.roles[0] === 'ADMIN' ? '3' : initialData.roles[0] === 'TEACHER' ? '2' : '1') : '',
@@ -190,8 +174,6 @@ const AddUserModal = ({ isOpen, onClose, onSave, initialData = null, isEditMode 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.nama_lengkap || !formData.email || !formData.user_name ||
-      !formData.role || !formData.tanggal_lahir) {
     if (!formData.nama_lengkap || !formData.email || !formData.user_name || 
         !formData.role || !formData.tanggal_lahir) {
       alert('Mohon lengkapi semua field yang diperlukan');
@@ -316,25 +298,6 @@ const AddUserModal = ({ isOpen, onClose, onSave, initialData = null, isEditMode 
                 id="tanggal_lahir"
                 type="date"
                 value={formData.tanggal_lahir}
-                onChange={(e) => {
-                  const newDate = e.target.value;
-                  // Auto-generate password dari tanggal lahir baru
-                  let newPassword = '';
-                  if (newDate) {
-                    const birthDate = new Date(newDate);
-                    const day = birthDate.getDate().toString().padStart(2, '0');
-                    const month = (birthDate.getMonth() + 1).toString().padStart(2, '0');
-                    const year = birthDate.getFullYear();
-                    newPassword = `s!nLui2+${day}${month}${year}`;
-                  }
-                  setFormData({
-                    ...formData,
-                    tanggal_lahir: newDate,
-                    password: newPassword,
-                    confirmPassword: newPassword
-                  });
-                }}
-
                 onChange={(e) => setFormData({ ...formData, tanggal_lahir: e.target.value })}
                 required
               />
@@ -358,53 +321,6 @@ const AddUserModal = ({ isOpen, onClose, onSave, initialData = null, isEditMode 
                 ))}
               </SelectContent>
             </Select>
-          </div>
-
-          {/* Password Fields - Auto-generated from birth date */}
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="password">Password (Auto-generated)</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder="Auto-generated dari tanggal lahir"
-                  className="pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                >
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
-                Format: s!nLui2+DDMMYYYY
-              </p>
-            </div>
-            <div>
-              <Label htmlFor="confirmPassword">Konfirmasi Password</Label>
-              <div className="relative">
-                <Input
-                  id="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  value={formData.confirmPassword}
-                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  placeholder="Konfirmasi password"
-                  className="pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                >
-                  {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
-                </button>
-              </div>
-            </div>
           </div>
 
           {/* Student Details */}
@@ -550,50 +466,6 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(true);
   const [classCourses, setClassCourses] = useState<any[]>([]);
 
-
-  // Search and Filter state
-  const [searchQuery, setSearchQuery] = useState('');
-  const [roleFilter, setRoleFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-
-  // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-
-  // Filter users based on search and filters
-  const filteredUsers = useMemo(() => {
-    return users.filter(user => {
-      // Search filter
-      const searchLower = searchQuery.toLowerCase();
-      const matchesSearch = searchQuery === '' ||
-        user.nama_lengkap.toLowerCase().includes(searchLower) ||
-        user.email.toLowerCase().includes(searchLower) ||
-        user.user_name.toLowerCase().includes(searchLower);
-
-      // Role filter
-      const matchesRole = roleFilter === 'all' ||
-        user.roles.includes(roleFilter);
-
-      // Status filter
-      const matchesStatus = statusFilter === 'all' ||
-        (statusFilter === 'active' && user.is_active) ||
-        (statusFilter === 'inactive' && !user.is_active);
-
-      return matchesSearch && matchesRole && matchesStatus;
-    });
-  }, [users, searchQuery, roleFilter, statusFilter]);
-
-  // Calculate paginated users from filtered results
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
-
-  // Reset to page 1 when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchQuery, roleFilter, statusFilter]);
-
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -688,33 +560,6 @@ const UserManagement = () => {
     }
   };
 
-  const handleDeleteUser = async (userId: number) => {
-    if (!confirm('Apakah Anda yakin ingin menghapus user ini?')) {
-      return;
-    }
-
-    try {
-      const response = await fetch('/api/admin/users/delete', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId }),
-      });
-
-      if (response.ok) {
-        alert('User berhasil dihapus!');
-        await fetchData();
-      } else {
-        const errorData = await response.json();
-        alert(`Error: ${errorData.message || errorData.error || 'Failed to delete user'}`);
-      }
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      alert('Error deleting user');
-    }
-  };
-
   const handleMenuClick = () => {
     setIsMobileOpen(true);
   };
@@ -734,7 +579,6 @@ const UserManagement = () => {
                   <FaUsers className="text-blue-600" />
                   User Management
                 </CardTitle>
-                <Button
                 <Button 
                   onClick={() => setIsAddModalOpen(true)}
                   className="flex items-center gap-2"
@@ -745,70 +589,11 @@ const UserManagement = () => {
               </div>
             </CardHeader>
             <CardContent>
-              {/* Search and Filter Controls */}
-              <div className="flex flex-col md:flex-row gap-4 mb-6">
-                {/* Search Input */}
-                <div className="relative flex-1">
-                  <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Cari nama, email, atau username..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                {/* Role Filter */}
-                <div className="flex items-center gap-2">
-                  <FaFilter className="text-gray-400" />
-                  <select
-                    value={roleFilter}
-                    onChange={(e) => setRoleFilter(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                  >
-                    <option value="all">Semua Role</option>
-                    <option value="STUDENT">Student</option>
-                    <option value="TEACHER">Teacher</option>
-                    <option value="ADMIN">Admin</option>
-                  </select>
-                </div>
-
-                {/* Status Filter */}
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
-                >
-                  <option value="all">Semua Status</option>
-                  <option value="active">Active</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-              </div>
-
-              {/* Results count */}
-              <div className="text-sm text-gray-600 mb-4">
-                {filteredUsers.length} user ditemukan
-                {(searchQuery || roleFilter !== 'all' || statusFilter !== 'all') && (
-                  <button
-                    onClick={() => {
-                      setSearchQuery('');
-                      setRoleFilter('all');
-                      setStatusFilter('all');
-                    }}
-                    className="ml-2 text-blue-600 hover:text-blue-800 underline"
-                  >
-                    Reset filter
-                  </button>
-                )}
-              </div>
-
               {loading ? (
                 <div className="flex items-center justify-center py-12">
                   <FaSpinner className="animate-spin text-blue-500 mr-2" />
                   <span className="text-gray-600">Loading users...</span>
                 </div>
-              ) : filteredUsers.length > 0 ? (
               ) : users.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
@@ -824,7 +609,6 @@ const UserManagement = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {paginatedUsers.map((user) => (
                       {users.map((user) => (
                         <tr key={user.id} className="border-b hover:bg-gray-50">
                           <td className="p-3">{user.nama_lengkap}</td>
@@ -853,10 +637,6 @@ const UserManagement = () => {
                           </td>
                           <td className="p-3">
                             <span
-                              className={`text-xs px-2 py-1 rounded-full ${user.is_active
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-red-100 text-red-800'
-                                }`}
                               className={`text-xs px-2 py-1 rounded-full ${
                                 user.is_active
                                   ? 'bg-green-100 text-green-800'
@@ -868,10 +648,6 @@ const UserManagement = () => {
                           </td>
                           <td className="p-3">
                             <div className="flex gap-2">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="flex items-center gap-1"
                               <Button 
                                 size="sm" 
                                 variant="outline" 
@@ -881,11 +657,6 @@ const UserManagement = () => {
                                 <FaEdit className="text-xs" />
                                 Edit
                               </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="flex items-center gap-1 text-red-600 hover:text-red-700"
-                                onClick={() => handleDeleteUser(user.id)}
                               <Button 
                                 size="sm" 
                                 variant="outline" 
@@ -900,64 +671,6 @@ const UserManagement = () => {
                       ))}
                     </tbody>
                   </table>
-
-                  {/* Pagination Controls */}
-                  {totalPages > 1 && (
-                    <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                      <div className="text-sm text-gray-600">
-                        Menampilkan {startIndex + 1} - {Math.min(endIndex, filteredUsers.length)} dari {filteredUsers.length} user
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                          disabled={currentPage === 1}
-                          className="flex items-center gap-1"
-                        >
-                          <FaChevronLeft className="text-xs" />
-                          Prev
-                        </Button>
-
-                        <div className="flex items-center gap-1">
-                          {Array.from({ length: totalPages }, (_, i) => i + 1)
-                            .filter(page => {
-                              // Show first, last, current, and adjacent pages
-                              return page === 1 ||
-                                page === totalPages ||
-                                Math.abs(page - currentPage) <= 1;
-                            })
-                            .map((page, index, array) => (
-                              <React.Fragment key={page}>
-                                {index > 0 && array[index - 1] !== page - 1 && (
-                                  <span className="px-2 text-gray-400">...</span>
-                                )}
-                                <Button
-                                  size="sm"
-                                  variant={currentPage === page ? "default" : "outline"}
-                                  onClick={() => setCurrentPage(page)}
-                                  className="min-w-[36px]"
-                                >
-                                  {page}
-                                </Button>
-                              </React.Fragment>
-                            ))
-                          }
-                        </div>
-
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                          disabled={currentPage === totalPages}
-                          className="flex items-center gap-1"
-                        >
-                          Next
-                          <FaChevronRight className="text-xs" />
-                        </Button>
-                      </div>
-                    </div>
-                  )}
                 </div>
               ) : (
                 <div className="text-center py-12">

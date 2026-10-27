@@ -3,7 +3,6 @@ import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { getSessionUser, requireSessionMember, unauthorizedResponse } from '@/lib/auth/course-access';
 
-
 // Content type mapping for common file extensions
 const CONTENT_TYPE_MAP: Record<string, string> = {
   // Documents
@@ -54,9 +53,6 @@ const CONTENT_TYPE_MAP: Record<string, string> = {
   html: 'text/html',
   json: 'application/json',
   xml: 'application/xml',
-
-  // Default fallback
-  default: 'application/octet-stream',
 };
 
 function getFileExtension(filename: string): string {
@@ -65,13 +61,6 @@ function getFileExtension(filename: string): string {
   return filename.substring(lastDot + 1).toLowerCase();
 }
 
-function getContentType(filename: string): string {
-  const extension = getFileExtension(filename);
-  return CONTENT_TYPE_MAP[extension] || CONTENT_TYPE_MAP['default'];
-}
-
-export async function POST(request: NextRequest) {
-  try {
 // Q-08 (2026-10-17): PDF, Word and images only.
 const ALLOWED_EXTENSIONS = new Set(['pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png', 'gif']);
 
@@ -125,12 +114,6 @@ export async function POST(request: NextRequest) {
     const sessionId = formData.get('sessionId') as string;
     const context = formData.get('context') as string;
 
-    console.log('=== FILE UPLOAD REQUEST ===');
-    console.log('Course Code:', courseCode);
-    console.log('Session ID:', sessionId);
-    console.log('Context:', context);
-    console.log('File Name:', file?.name);
-    console.log('==========================');
     if (!file) {
       return NextResponse.json({ error: 'No file received' }, { status: 400 });
     }
@@ -188,9 +171,6 @@ export async function POST(request: NextRequest) {
     const filename = `${timestamp}_${sanitizedName}`;
     const filepath = path.join(uploadDir, filename);
 
-    // Get file extension and content type
-    const fileExtension = getFileExtension(file.name);
-    const detectedContentType = getContentType(file.name);
     // Only allowed extensions reach this point, and each has a known type.
     const detectedContentType = CONTENT_TYPE_MAP[fileExtension];
 
@@ -199,8 +179,6 @@ export async function POST(request: NextRequest) {
     console.log('Browser reported type:', file.type);
 
     // Save file
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
     await writeFile(filepath, buffer);
 
     console.log('File saved to:', filepath); // Return file URL (public path) with context support
@@ -225,7 +203,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error: 'Upload failed',
-        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

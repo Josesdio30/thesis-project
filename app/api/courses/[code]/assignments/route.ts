@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/auth';
 import {
   canManageCourse,
   forbiddenResponse,
@@ -17,15 +15,6 @@ export async function GET(
   { params }: { params: Promise<{ code: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const { code } = await params;
-    const courseCode = code;
-    const isTeacher = session.user.role === 'TEACHER' || session.user.role === 'ADMIN';
     const user = await getSessionUser();
     if (!user) return unauthorizedResponse();
     if (!isAdminRole(user.role) && !isTeacherRole(user.role) && !isStudentRole(user.role)) return forbiddenResponse();
@@ -46,7 +35,6 @@ export async function GET(
       },
       include: {
         class_courses: {
-          include: {
           where: offeringScope,
           include: {
             enrollments: { where: { student_id: user.id }, select: { id: true } },
@@ -90,8 +78,6 @@ export async function GET(
       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
-    const allAssignments = [];
-    for (const classCourse of courseData.class_courses) {
     const allowedOfferings = courseData.class_courses.filter(classCourse =>
       canManageCourse(user, [classCourse.teacher_id]) ||
       (isStudentRole(user.role) && classCourse.enrollments.length > 0)
@@ -133,11 +119,6 @@ export async function GET(
               options: question.assignment_question_options.map(option => ({
                 id: option.id,
                 option_text: option.option_text,
-                ...(isTeacher && { is_correct: option.is_correct }),
-                order_number: option.order_number,
-              })),
-            })),
-            submissions: assignment.assignment_submissions.map(submission => ({
                 ...(isManager && { is_correct: option.is_correct }),
                 order_number: option.order_number,
               })),
@@ -176,12 +157,6 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching course assignments:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch assignments', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
-  }
-}
-
       { error: 'Failed to fetch assignments' },
       { status: 500 }
     );

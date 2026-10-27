@@ -623,11 +623,7 @@ const AssignmentDetailModal = ({
               <FaEye className="text-blue-600" />
               Submission Details - {selectedSubmission?.student?.nama_lengkap}
             </DialogTitle>
-
-            <DialogDescription>View and grade student submission for "{assignment?.title}"</DialogDescription>
-
             <DialogDescription>{`View and grade student submission for "${assignment?.title ?? ''}"`}</DialogDescription>
-
           </DialogHeader>
 
           {selectedSubmission && (
@@ -722,11 +718,7 @@ const AssignmentDetailModal = ({
 
                       {/* Student's Answer */}
                       <div className="mt-4 bg-blue-50 border border-blue-200 rounded-lg p-3">
-
-                        <h5 className="font-medium text-blue-800 mb-2">Student's Answer:</h5>
-
                         <h5 className="font-medium text-blue-800 mb-2">Student&apos;s Answer:</h5>
-
                         {submissionAnswer ? (
                           <div className="text-gray-800">
                             {submissionAnswer.selected_option_id ? (

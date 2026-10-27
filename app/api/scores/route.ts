@@ -81,7 +81,6 @@ export async function GET(request: NextRequest) {
                   class_courses: {
                     select: {
                       class_id: true,
-
                       courses: {
                         select: {
                           course_code: true,
@@ -138,7 +137,6 @@ export async function GET(request: NextRequest) {
           assignment_type: submission.assignments.enumeration.name,
           course_code: course?.course_code || 'N/A',
           course_name: course?.course_name || 'Unknown Course',
-          class_name: classInfo?.class_name || 'Unknown Class',
           class_id: classCourse?.class_id ?? null,
           class_name: classInfo?.class_name || 'Unknown Class',
           session_id: submission.assignments.session_id,
@@ -261,7 +259,6 @@ export async function GET(request: NextRequest) {
           assignment_type: submission.assignments.enumeration.name,
           course_code: course?.course_code || 'N/A',
           course_name: course?.course_name || 'Unknown Course',
-          class_name: classInfo?.class_name || 'Unknown Class',
           class_id: classCourse?.class_id ?? null,
           class_name: classInfo?.class_name || 'Unknown Class',
           session_id: submission.assignments.session_id,
@@ -287,7 +284,6 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching scores:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch scores', details: error instanceof Error ? error.message : 'Unknown error' },
       { error: 'Failed to fetch scores' },
       { status: 500 }
     );

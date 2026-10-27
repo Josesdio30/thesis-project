@@ -25,8 +25,7 @@ async function checkAdminAccess(session: any) {
   }
 
   const isAdmin = userDetails.app_user_role?.some(
-    (role: any) => role.enumeration?.name === 'ADMIN' && role.is_active
-    role => role.enumeration?.name?.toLowerCase() === 'admin' && role.is_active
+    (role: any) => role.enumeration?.name?.toLowerCase() === 'admin' && role.is_active
   );
 
   if (!isAdmin) {
@@ -144,4 +143,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-} 

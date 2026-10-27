@@ -36,7 +36,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Admin access required' }, { status: 403 });
     }
 
-    // Get all users with their roles
+    // Fetch all users with their roles and details
     const users = await prisma.app_user.findMany({
       where: {
         is_deleted: false,
@@ -52,7 +52,6 @@ export async function GET(request: NextRequest) {
             classes: true,
           },
         },
-        student_details: true,
         teacher_details: true,
         admin_details: true,
       },
@@ -61,8 +60,8 @@ export async function GET(request: NextRequest) {
       },
     });
 
+    // Process users to include class information
     const userData = await Promise.all(users.map(async (user) => {
-      // Get class information for students
       let classInfo = null;
       if (user.student_details) {
         if (user.student_details.classes) {
@@ -84,17 +83,6 @@ export async function GET(request: NextRequest) {
                     include: {
                       academic_years: true,
                     },
-        // Find enrollments for this student
-        const studentEnrollments = await prisma.enrollments.findMany({
-          where: {
-            student_id: user.id,
-          },
-          include: {
-            class_courses: {
-              include: {
-                classes: {
-                  include: {
-                    academic_years: true,
                   },
                 },
               },
@@ -113,20 +101,6 @@ export async function GET(request: NextRequest) {
               grade_level: activeEnrollment.class_courses.classes.grade_level,
             };
           }
-          },
-        });
-
-        // Get the first active enrollment with active class_course
-        const activeEnrollment = studentEnrollments.find(enrollment => 
-          enrollment.class_courses?.is_active && enrollment.class_courses?.classes
-        );
-
-        if (activeEnrollment?.class_courses?.classes) {
-          classInfo = {
-            class_id: activeEnrollment.class_courses.classes.id,
-            class_name: activeEnrollment.class_courses.classes.class_name,
-            grade_level: activeEnrollment.class_courses.classes.grade_level,
-          };
         }
       }
 
@@ -289,6 +263,17 @@ export async function POST(request: NextRequest) {
 
     // Create student details if STUDENT role is selected
     if (role === '1') {
+      if (nis) {
+        const existingNis = await prisma.student_details.findUnique({ where: { nis } });
+        if (existingNis) {
+          await prisma.app_user.delete({ where: { id: newUser.id } });
+          return NextResponse.json(
+            { success: false, error: 'NIS already exists' },
+            { status: 400 }
+          );
+        }
+      }
+
       await prisma.student_details.create({
         data: {
           user_id: newUser.id,
@@ -296,24 +281,6 @@ export async function POST(request: NextRequest) {
           nisn: nisn || '',
           parent_contact: parent_contact || '',
           class_id: class_id ? parseInt(class_id) : null,
-    // nis is required (non-nullable, unique) in student_details
-    if (role === '1' && nis) {
-      // Check for duplicate NIS before inserting
-      const existingNis = await prisma.student_details.findUnique({ where: { nis } });
-      if (existingNis) {
-        await prisma.app_user.delete({ where: { id: newUser.id } });
-        return NextResponse.json(
-          { success: false, error: 'NIS already exists' },
-          { status: 400 }
-        );
-      }
-
-      await prisma.student_details.create({
-        data: {
-          user_id: newUser.id,
-          nis,
-          nisn: nisn || '',
-          parent_contact: parent_contact || '',
         },
       });
     }
@@ -387,4 +354,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

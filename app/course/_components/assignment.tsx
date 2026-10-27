@@ -1,4 +1,3 @@
-import React, { useState } from 'react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { AssignmentProvider } from '@/lib/contexts/AssignmentContext';
@@ -16,15 +15,12 @@ import { filterAssignments } from '../../../lib/assignmentUtils';
 interface AssignmentTabProps {
   courseCode: string;
   sessionId: number;
-}
-
-export default function AssignmentTab({ courseCode, sessionId }: AssignmentTabProps) {
-  const { data: session } = useSession();
   initialAssignmentId?: number | null;
 }
 
 export default function AssignmentTab({ courseCode, sessionId, initialAssignmentId }: AssignmentTabProps) {
   const { data: session } = useSession();
+
   const [viewMode, setViewMode] = useState<'all' | 'by-session'>('all');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -35,10 +31,6 @@ export default function AssignmentTab({ courseCode, sessionId, initialAssignment
   // Custom hooks
   const { assignments, loading, refetch } = useAssignmentData(courseCode);
   const { handlePublishToggle, handleBulkPublish, handleSubmitAnswer } = useAssignmentActions(courseCode, refetch);
-
-  const isTeacher = session?.user?.role === 'TEACHER' || session?.user?.role === 'GURU';
-  const currentUserId = session?.user?.id ? parseInt(session.user.id) : null;
-  const filteredAssignments = filterAssignments(assignments, isTeacher);
 
   const isTeacher = session?.user?.role?.toUpperCase() === 'TEACHER' || session?.user?.role?.toUpperCase() === 'GURU';
   const currentUserId = session?.user?.id ? parseInt(session.user.id) : null;

@@ -14,14 +14,6 @@ export async function POST(
     if (isNaN(assignmentId)) {
       return NextResponse.json({ error: 'Invalid assignment ID' }, { status: 400 });
     }
-
-    const body = await request.json();
-    const { submission_id, grader_id, grades, feedback } = body;
-
-    if (!submission_id || !grader_id || !grades || !Array.isArray(grades)) {
-      return NextResponse.json(
-        {
-          error: 'Missing required fields: submission_id, grader_id, grades',
     const access = await requireCourseManager(() => teacherIdsForAssignment(assignmentId));
     if (!access.ok) return access.response;
 
@@ -98,7 +90,6 @@ export async function POST(
         data: {
           total_score: totalScore,
           feedback: feedback,
-          graded_by: grader_id,
           graded_by: access.user.id,
           graded_at: new Date(),
           status_id: gradedStatusId,
@@ -123,7 +114,6 @@ export async function POST(
     return NextResponse.json(
       {
         error: 'Failed to grade assignment',
-        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );
@@ -141,7 +131,6 @@ export async function GET(
     if (isNaN(assignmentId)) {
       return NextResponse.json({ error: 'Invalid assignment ID' }, { status: 400 });
     }
-
     const access = await requireCourseManager(() => teacherIdsForAssignment(assignmentId));
     if (!access.ok) return access.response;
 
@@ -149,9 +138,6 @@ export async function GET(
     const submissionId = url.searchParams.get('submission_id');
 
     if (submissionId) {
-      // Get specific submission for grading
-      const submission = await prisma.assignment_submissions.findUnique({
-        where: { id: parseInt(submissionId) },
       const id = parseInt(submissionId);
       if (isNaN(id)) {
         return NextResponse.json({ error: 'Invalid submission ID' }, { status: 400 });
@@ -180,7 +166,6 @@ export async function GET(
         },
       });
 
-      if (!submission) {
       // Q-07 / Q-10: access was checked for the URL's assignment, so a submission
       // of any other assignment is treated as missing (no existence leak).
       if (!submission || submission.assignment_id !== assignmentId) {
@@ -244,7 +229,6 @@ export async function GET(
     return NextResponse.json(
       {
         error: 'Failed to fetch grading data',
-        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );

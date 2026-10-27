@@ -83,10 +83,6 @@ export async function POST(request: NextRequest) {
       );
 
     if (!teacher || !isTeacher) {
-      },
-    });
-
-    if (!teacher || !teacher.teacher_details) {
       return NextResponse.json(
         { success: false, error: 'Teacher not found' },
         { status: 404 }

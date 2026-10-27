@@ -15,6 +15,7 @@ export async function POST(
     const user = await getSessionUser();
     if (!user) return unauthorizedResponse();
     const studentId = user.id;
+
     const resolvedParams = await params;
     const assignmentId = parseInt(resolvedParams.assignmentId);
     if (isNaN(assignmentId)) {
@@ -22,10 +23,6 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { student_id, answers } = body;
-
-    if (!student_id || !answers || !Array.isArray(answers)) {
-      return NextResponse.json({ error: 'Missing required fields: student_id, answers' }, { status: 400 });
     const { answers } = body;
 
     if (!answers || !Array.isArray(answers)) {
@@ -71,7 +68,6 @@ export async function POST(
     const existingSubmissions = await prisma.assignment_submissions.count({
       where: {
         assignment_id: assignmentId,
-        student_id: parseInt(student_id),
         student_id: studentId,
       },
     });
@@ -93,7 +89,6 @@ export async function POST(
       const submission = await tx.assignment_submissions.create({
         data: {
           assignment_id: assignmentId,
-          student_id: parseInt(student_id),
           student_id: studentId,
           attempt_number: existingSubmissions + 1,
           status_id: submittedStatusId,
@@ -193,9 +188,6 @@ export async function POST(
       message: 'Assignment submitted successfully',
     });
   } catch (error) {
-    console.error('Error submitting assignment:', error);
-    return NextResponse.json(
-      { error: 'Failed to submit assignment', details: error instanceof Error ? error.message : 'Unknown error' },
     // FR-SUB-1 / O-18: a concurrent submit can pass the attempt count above; the
     // unique (assignment_id, student_id, attempt_number) index rejects the loser.
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {

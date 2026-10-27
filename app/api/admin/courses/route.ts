@@ -39,33 +39,11 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     const { isAdmin, error } = await checkAdminAccess(session);
+    
     if (!isAdmin) {
       return NextResponse.json({ success: false, error }, { status: 401 });
     }
 
-    // Get all teachers (users with teacher_details OR teacher role)
-    const teachers = await prisma.app_user.findMany({
-      where: {
-        OR: [
-          {
-            teacher_details: {
-              isNot: null,
-            },
-          },
-          {
-            app_user_role: {
-              some: {
-                enumeration: {
-                  name: {
-                    equals: 'teacher',
-                    mode: 'insensitive',
-                  },
-                },
-                is_active: true,
-              },
-            },
-          },
-        ],
     // Get all teachers
     const teachers = await prisma.app_user.findMany({
       where: {
@@ -107,7 +85,6 @@ export async function GET(request: NextRequest) {
         teachers: teachers.map(teacher => ({
           id: teacher.id,
           name: teacher.nama_lengkap,
-          kode_guru: teacher.teacher_details?.kode_guru || teacher.user_name || '-',
           kode_guru: teacher.teacher_details?.kode_guru,
           niy: teacher.teacher_details?.niy,
         })),
@@ -143,6 +120,7 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     const { isAdmin, error } = await checkAdminAccess(session);
+    
     if (!isAdmin) {
       return NextResponse.json({ success: false, error }, { status: 401 });
     }

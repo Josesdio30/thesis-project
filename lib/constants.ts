@@ -22,7 +22,6 @@ export const ADMIN_NAVIGATION_ITEMS = [
   { icon: 'FaUniversity', text: 'Class Management', path: '/admin/classes' },
   { icon: 'FaCalendarAlt', text: 'Academic Year', path: '/admin/academic-years' },
   { icon: 'FaUsers', text: 'User Management', path: '/user' },
-  { icon: 'FaUsers', text: 'User Management', path: '/user' },
   { icon: 'FaRobot', text: 'AI Management', path: '/admin/ai' },
 ] as const;
 

@@ -13,7 +13,6 @@ export async function PUT(
     if (isNaN(assignmentId)) {
       return NextResponse.json({ error: 'Invalid assignment ID' }, { status: 400 });
     }
-
     const access = await requireCourseManager(() => teacherIdsForAssignment(assignmentId));
     if (!access.ok) return access.response;
 
@@ -56,7 +55,6 @@ export async function PUT(
     return NextResponse.json(
       {
         error: 'Failed to update assignment status',
-        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 }
     );
